@@ -1,13 +1,15 @@
 from __future__ import annotations
 from typing import Any, Union
 from Complex import Complex
-from Vector import Vector
+from Vector import Vector, t_vector
 import copy
 import functools
 
+t_matrix = list[list[Union[float, Complex]]]
+
 
 class Matrix:
-    def __init__(self, mat: list[list[Union[float, Complex]]], sol_vec: list[Union[float, Complex]] = None) -> None:
+    def __init__(self, mat: t_matrix, sol_vec: t_vector = None) -> None:
         self.matrix = mat
         self.rows = len(mat)
         self.cols = len(mat[0])
@@ -23,6 +25,30 @@ class Matrix:
                 continue
             rank += 1
         return rank
+
+    @property
+    def determinant(self) -> float:
+        if self.rows != self.cols:
+            raise ValueError("Matrix must be square")
+        if self.rows == 1:
+            return self.matrix[0][0]
+        if self.rows == 2:
+            return self.matrix[0][0] * self.matrix[1][1] - self.matrix[0][1] * self.matrix[1][0]
+        return sum([self.matrix[i][0] * ((-1)**i) * self.cofactor(i, 0).determinant for i in range(self.rows)])
+
+    def cofactor(self, row_to_remove: int, col_to_remove: int) -> Matrix:
+        if(row_to_remove >= self.rows or col_to_remove >= self.cols):
+            raise ValueError("Row or column index out of range")
+        res: t_matrix = []
+        for i, row in enumerate(self.matrix):
+            if i == row_to_remove:
+                continue
+            res.append([])
+            for j, col in enumerate(self.matrix[i]):
+                if j == col_to_remove:
+                    continue
+                res[i if i < row_to_remove else i-1].append(self.matrix[i][j])
+        return Matrix(res)
 
     def __getitem__(self, index: int):
         if not isinstance(index, int):
@@ -171,7 +197,3 @@ class Matrix:
     def fromString(matrix_string: str) -> Matrix:
         return Matrix([[int(num) for num in row.split()]
                        for row in matrix_string.split("\n")])
-
-    @staticmethod
-    def isInstance(val: Any) -> bool:
-        return isinstance(val, Matrix)

@@ -30,5 +30,10 @@ def func2():
     print(s.toOrthonormal())
 
 
+def func3():
+    assert(Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]]).determinant == 1)
+    assert(Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).determinant == 0)
+
+
 if __name__ == '__main__':
-    func2()
+    func3()

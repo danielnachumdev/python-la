@@ -3,9 +3,11 @@ from typing import Any, Union
 from Field import Field, Fields
 from Complex import Complex
 
+t_vector = list[Union[float, Complex]]
+
 
 class Vector:
-    def __init__(self, values: list[Union[float, Complex]], field: Field = None) -> None:
+    def __init__(self, values: t_vector, field: Field = None) -> None:
         self.__values = values
         self.__field = field
 
