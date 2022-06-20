@@ -51,7 +51,7 @@ def func4():
             Vector([1, -1, 0, 0]),
             Vector([0, 0, 1, -1])
         ])
-        print(s.toOrthonormal().find_projection(v))
+        print(v.projection_onto(s))
 
     def g():
         # def func(v1: Vector, v2: Vector) -> float:

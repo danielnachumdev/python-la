@@ -95,13 +95,24 @@ class Vector:
     def toOrthonormal(self) -> Vector:
         return self / self.norm()
 
-    def projection_onto(self, value: Vector) -> Vector:
-        if not isinstance(value, Vector):  # or not isinstance(value, Span):
-            raise TypeError("v must be of type Vector")
-        if value.length != self.length:
-            raise ValueError("v must have the same length as self")
+    def projection_onto(self, value) -> Vector:
+        """
+        return the projection of self onto value which can be another vector or a Span
+        """
+        from Span import Span
+        if not isinstance(value, Vector) and not isinstance(value, Span):
+            raise TypeError("v must be of type Vector or Span")
+        is_span = isinstance(value, Span)
+        if not is_span and value.length != self.length:
+            raise ValueError("value must have the same length as self")
+        if is_span and value[0].length != self.length:
+            raise ValueError(
+                "the span's vectors must have the same length as self")
         from InnerProduct import StandardInnerProduct as sip
-        return sip(self, value)/sip(value, value)*value
+        if not is_span:
+            return sip(self, value)/sip(value, value)*value
+        else:
+            return value.projection_of(self)
 
     def copy(self) -> Vector:
         return Vector(self.__values, self.__field)

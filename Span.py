@@ -93,10 +93,13 @@ class Span:
             result.append(current.toOrthonormal())
         return result
 
-    def find_projection(self, v: Vector):
+    def projection_of(self, v: Vector) -> Vector:
+        """
+        returns the vector projection of vector v on the span (=self)
+        """
         res: Vector = Vector.generate_vector(v.length, 0)
-        for w in self.vectors:
-            res = res + v.projection_onto(w)
+        for w in self.toOrthonormal():
+            res += v.projection_onto(w)
         return res
 
     def isVectorInSpan(self, vec: Vector) -> bool:
