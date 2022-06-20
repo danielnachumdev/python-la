@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, Union
 from Field import Field, Fields
 from Complex import Complex
-
+import random
 t_vector = list[Union[float, Complex]]
 
 
@@ -19,11 +19,16 @@ class Vector:
     def length(self):
         return len(self.__values)
 
+    @property
+    def adjoint(self) -> Vector:
+        # TODO complex
+        return self.copy()
+
     def __str__(self) -> str:
         return str(self.__values)
 
     def __add__(self, other: Vector) -> Vector:
-        if not Vector.isInstance(other):
+        if not isinstance(other, Vector):
             raise TypeError("Vector can only be added to another Vector")
         if self.__field != other.__field:
             raise ValueError("Vectors must have the same field")
@@ -32,7 +37,7 @@ class Vector:
         return Vector([self.__values[i] + other.__values[i] for i in range(len(self.__values))])
 
     def __sub__(self, other: Vector) -> Vector:
-        if not Vector.isInstance(other):
+        if not isinstance(other, Vector):
             raise TypeError(
                 "Vector can only be subtracted from another Vector")
         if self.__field != other.__field:
@@ -59,6 +64,18 @@ class Vector:
     def __iter__(self):
         return iter(self.__values)
 
+    def __eq__(self, other: Vector) -> bool:  # TODO: do i want to raise errors?
+        if not isinstance(other, Vector):
+            raise TypeError("Vector can only be compared to another Vector")
+        if self.__field != other.__field:
+            raise ValueError("Vectors must have the same field")
+        if len(self.__values) != len(other.__values):
+            raise ValueError("Vectors must have the same length")
+        return self.__values == other.__values
+
+    def __ne__(self, other: Vector) -> bool:
+        return not (self == other)
+
     def set(self, index, value) -> None:
         self.__values[index] = value
 
@@ -77,6 +94,20 @@ class Vector:
     def toOrthonormal(self) -> Vector:
         return self / self.norm()
 
+    def find_hetel(v: Vector) -> Vector:
+        if not isinstance(v, Vector):
+            raise TypeError("v must be of type Vector")
+
+    def copy(self) -> Vector:
+        return Vector(self.__values, self.__field)
+
     @staticmethod
-    def isInstance(object: Any) -> bool:
-        return isinstance(object, Vector)
+    def generate_vector(size: int,  def_value: bool = None, f: Field = None) -> Vector:
+        if f is None:
+            f = Fields.R
+        # return Vector([f.random() for _ in range(size)])
+        # TODO
+        MIN_VAL = -100
+        MAX_VAL = 100
+        F = random.uniform
+        return Vector([F(MIN_VAL, MAX_VAL) if def_value is None else def_value for _ in range(size)])

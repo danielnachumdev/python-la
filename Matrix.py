@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, Union
 from Complex import Complex
 from Vector import Vector, t_vector
+from Span import Span
 import copy
 import functools
 
@@ -34,21 +35,103 @@ class Matrix:
             return self.matrix[0][0]
         if self.rows == 2:
             return self.matrix[0][0] * self.matrix[1][1] - self.matrix[0][1] * self.matrix[1][0]
-        return sum([self.matrix[i][0] * ((-1)**i) * self.cofactor(i, 0).determinant for i in range(self.rows)])
+        return sum([self.matrix[i][0] * ((-1)**i) * self.minor(i, 0) for i in range(self.rows)])
 
-    def cofactor(self, row_to_remove: int, col_to_remove: int) -> Matrix:
-        if(row_to_remove >= self.rows or col_to_remove >= self.cols):
+    @property
+    def is_invertiable(self) -> bool:
+        return self.determinant != 0
+
+    @property
+    def is_square(self) -> bool:
+        return self.rows == self.cols
+
+    @property
+    def kernel(self) -> Span:
+        pass
+
+    @property
+    def image(self) -> Span:
+        pass
+
+    def inverse(self) -> Matrix:
+        if not self.is_invertiable:
+            raise ValueError("Matrix must be invertible")
+        return Matrix([[self.minor(i, j) / self.determinant for j in range(self.cols)]
+                       for i in range(self.rows)])
+
+    def cofactor(self, row_to_ignore: int, col_to_ignore: int) -> Matrix:
+        if(row_to_ignore >= self.rows or col_to_ignore >= self.cols):
             raise ValueError("Row or column index out of range")
         res: t_matrix = []
         for i, row in enumerate(self.matrix):
-            if i == row_to_remove:
+            if i == row_to_ignore:
                 continue
             res.append([])
             for j, col in enumerate(self.matrix[i]):
-                if j == col_to_remove:
+                if j == col_to_ignore:
                     continue
-                res[i if i < row_to_remove else i-1].append(self.matrix[i][j])
+                res[i if i < row_to_ignore else i-1].append(self.matrix[i][j])
         return Matrix(res)
+
+    def minor(self, row_to_ignore: int, col_to_ignore: int) -> float:
+        return self.cofactor(row_to_ignore, col_to_ignore).determinant
+
+    def transpose(self) -> Matrix:
+        return Matrix([[self.matrix[j][i] for j in range(self.cols)]
+                       for i in range(self.rows)])
+
+    def reorgenize_rows(self):
+        def comparer(a: list[float], b: list[float]) -> bool:
+            def first_not_zero_index(row: list[float]) -> int:
+                for i in range(len(row)):
+                    if row[i] != 0:
+                        break
+                return i
+            return -1 if first_not_zero_index(a) > first_not_zero_index(b) else 1
+        self.matrix = sorted(
+            self.matrix, key=functools.cmp_to_key(comparer), reverse=True)
+
+    def solve(self) -> Matrix:
+        """
+        Solve the system of equations
+        """
+        if self.rows != self.cols:
+            raise ValueError("Matrix must be square")
+        # if self.rows != self.solution_vector.length:
+        #     raise ValueError(
+        #         "Matrix and solution vector must have the same number of rows")
+
+        def first_not_zero_index(row: list[float]) -> int:
+            for i in range(len(row)):
+                if row[i] != 0:
+                    break
+            return i
+        res = copy.deepcopy(self)
+        res.reorgenize_rows()
+        for r in range(res.rows):
+            lead_index = first_not_zero_index(res[r])
+            lead_value = res[r][lead_index]
+            if lead_value == 0:
+                continue
+            if lead_value != 1:
+                for c in range(res.cols):
+                    res[r][c] /= lead_value
+                res.solution_vector[r] /= lead_value
+                lead_value = res[r][lead_index]
+            for r2 in range(res.rows):
+                if r == r2:
+                    continue
+                row_divider = res[r2][lead_index]/lead_value
+                if row_divider == 0:
+                    continue
+                for c in range(res.cols):
+                    res[r2][c] -= row_divider * res[r][c]
+                res.solution_vector[r2] -= row_divider * \
+                    res.solution_vector[r]
+        if res.rank != res.rows:
+            return "nullity rank was atleast 1, not yet implemented"  # TODO
+
+        return res
 
     def __getitem__(self, index: int):
         if not isinstance(index, int):
@@ -72,10 +155,6 @@ class Matrix:
 
     def __neg__(self) -> Matrix:
         return Matrix([[-self.matrix[i][j] for j in range(self.cols)]
-                       for i in range(self.rows)])
-
-    def transpose(self) -> Matrix:
-        return Matrix([[self.matrix[j][i] for j in range(self.cols)]
                        for i in range(self.rows)])
 
     def __sub__(self, other: Matrix) -> Matrix:
@@ -135,59 +214,6 @@ class Matrix:
         if any([self.matrix[i][j] != other.matrix[i][j] for i in range(self.rows) for j in range(self.cols)]):
             return False
         return True
-
-    def reorgenize_rows(self):
-        def comparer(a: list[float], b: list[float]) -> bool:
-            def first_not_zero_index(row: list[float]) -> int:
-                for i in range(len(row)):
-                    if row[i] != 0:
-                        break
-                return i
-            return -1 if first_not_zero_index(a) > first_not_zero_index(b) else 1
-        self.matrix = sorted(
-            self.matrix, key=functools.cmp_to_key(comparer), reverse=True)
-
-    def solve(self) -> Matrix:
-        """
-        Solve the system of equations
-        """
-        if self.rows != self.cols:
-            raise ValueError("Matrix must be square")
-        # if self.rows != self.solution_vector.length:
-        #     raise ValueError(
-        #         "Matrix and solution vector must have the same number of rows")
-
-        def first_not_zero_index(row: list[float]) -> int:
-            for i in range(len(row)):
-                if row[i] != 0:
-                    break
-            return i
-        res = copy.deepcopy(self)
-        res.reorgenize_rows()
-        for r in range(res.rows):
-            lead_index = first_not_zero_index(res[r])
-            lead_value = res[r][lead_index]
-            if lead_value == 0:
-                continue
-            if lead_value != 1:
-                for c in range(res.cols):
-                    res[r][c] /= lead_value
-                res.solution_vector[r] /= lead_value
-                lead_value = res[r][lead_index]
-            for r2 in range(res.rows):
-                if r == r2:
-                    continue
-                row_divider = res[r2][lead_index]/lead_value
-                if row_divider == 0:
-                    continue
-                for c in range(res.cols):
-                    res[r2][c] -= row_divider * res[r][c]
-                res.solution_vector[r2] -= row_divider * \
-                    res.solution_vector[r]
-        if res.rank != res.rows:
-            return "nullity rank was atleast 1, not yet implemented"  # TODO
-
-        return res
 
     @staticmethod
     def fromVector(vec: Vector) -> Matrix:
