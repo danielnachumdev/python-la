@@ -51,7 +51,7 @@ def func4():
             Vector([1, -1, 0, 0]),
             Vector([0, 0, 1, -1])
         ])
-        print(s.toOrthonormal().find_hetel(v))
+        print(s.toOrthonormal().find_projection(v))
 
     def g():
         # def func(v1: Vector, v2: Vector) -> float:
@@ -77,7 +77,7 @@ def func4():
 
         print(isInnerProduct(func, generator))
 
-    g()
+    f()
 
 
 if __name__ == '__main__':

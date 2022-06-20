@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import Any
 from Vector import Vector
 from Field import Field
-from InnerProduct import StandardInnerProduct
 
 
 class Span:
@@ -84,20 +83,20 @@ class Span:
     def toOrthonormal(self) -> Span:
         result = Span([])
         result.append(self[0].toOrthonormal())
+        from InnerProduct import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
             curr_tag = Vector([0 for _ in range(self[0].length)])
             for prev in result:
-                curr_tag = curr_tag+StandardInnerProduct(prev, current) * prev
+                curr_tag = curr_tag+sip(prev, current) * prev
             current = current-curr_tag
             result.append(current.toOrthonormal())
         return result
 
-    def find_hetel(self, v: Vector):
+    def find_projection(self, v: Vector):
         res: Vector = Vector.generate_vector(v.length, 0)
-        f = StandardInnerProduct
         for w in self.vectors:
-            res = res + f(v, w)/f(w, w)*w
+            res = res + v.projection_onto(w)
         return res
 
     def isVectorInSpan(self, vec: Vector) -> bool:

@@ -3,6 +3,7 @@ from typing import Any, Union
 from Field import Field, Fields
 from Complex import Complex
 import random
+
 t_vector = list[Union[float, Complex]]
 
 
@@ -94,9 +95,13 @@ class Vector:
     def toOrthonormal(self) -> Vector:
         return self / self.norm()
 
-    def find_hetel(v: Vector) -> Vector:
-        if not isinstance(v, Vector):
+    def projection_onto(self, value: Vector) -> Vector:
+        if not isinstance(value, Vector):  # or not isinstance(value, Span):
             raise TypeError("v must be of type Vector")
+        if value.length != self.length:
+            raise ValueError("v must have the same length as self")
+        from InnerProduct import StandardInnerProduct as sip
+        return sip(self, value)/sip(value, value)*value
 
     def copy(self) -> Vector:
         return Vector(self.__values, self.__field)
