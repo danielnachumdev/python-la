@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Any, Union
-from Complex import Complex
-from Vector import Vector, t_vector
-from Span import Span
+from .Complex import Complex
+from .Vector import Vector, t_vector
+from .Span import Span
 import copy
 import functools
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any, Union
-from Field import Field, Fields
-from Complex import Complex
+from .Field import Field, Fields
+from .Complex import Complex
 import random
 
 t_vector = list[Union[float, Complex]]
@@ -99,7 +99,7 @@ class Vector:
         """
         return the projection of self onto value which can be another vector or a Span
         """
-        from Span import Span
+        from .Span import Span
         if not isinstance(value, Vector) and not isinstance(value, Span):
             raise TypeError("v must be of type Vector or Span")
         is_span = isinstance(value, Span)
@@ -108,7 +108,7 @@ class Vector:
         if is_span and value[0].length != self.length:
             raise ValueError(
                 "the span's vectors must have the same length as self")
-        from InnerProduct import StandardInnerProduct as sip
+        from .InnerProduct import StandardInnerProduct as sip
         if not is_span:
             return sip(self, value)/sip(value, value)*value
         else:

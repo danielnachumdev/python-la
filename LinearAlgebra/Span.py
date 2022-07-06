@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any
-from Vector import Vector
-from Field import Field
+from .Vector import Vector
+from .Field import Field
 
 
 class Span:
@@ -83,7 +83,7 @@ class Span:
     def toOrthonormal(self) -> Span:
         result = Span([])
         result.append(self[0].toOrthonormal())
-        from InnerProduct import StandardInnerProduct as sip
+        from .InnerProduct import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
             curr_tag = Vector([0 for _ in range(self[0].length)])

@@ -1,6 +1,6 @@
-from Vector import Vector
+from .Vector import Vector
 import random
-from Complex import Complex
+from .Complex import Complex
 
 
 def StandardInnerProduct(a: Vector, b: Vector) -> float:
