@@ -4,8 +4,8 @@
 Almost fully implemented
 * Implemented generic class `Field`
   * each instance contains info about the degree of the field and the modulus of the field
-  * a `random()` function that generates a vector acording to a virtual function which is inmplemented in the subclasses to generate one element
-* Implemented generic subclass for rationals `RationalField'`
+  * a `random()` function that generates a vector acording to a virtual function which is implemented in the subclasses to generate one element
+* Implemented generic subclass for rationals `RationalField`
 * Implemented generic subclass for reals `RealField`
 * Implemented generic subclass for complex numbers `ComplexField`
 * created instances for those subclasses of `degree=1` and `modulus=1` called `DefaultRationalField`, `DefaultRealField`, `DefaultComplexField`
