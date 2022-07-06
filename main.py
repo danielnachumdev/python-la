@@ -1,9 +1,10 @@
-from Vector import Vector
-from Field import Field, Fields
-from Complex import Complex
-from Span import Span
-from Matrix import Matrix
-from InnerProduct import StandardInnerProduct, isInnerProduct
+# from Vector import Vector
+# from Field import Field, Fields
+# from Complex import Complex
+# from Span import Span
+# from Matrix import Matrix
+# from InnerProduct import StandardInnerProduct, isInnerProduct
+from LinearAlgebra import Vector, Field, Fields, Complex, Span, Matrix, isInnerProduct, StandardInnerProduct
 import math
 
 
@@ -42,14 +43,14 @@ PI = math.pi
 def func4():
     def f():
         v = Vector([2, 4, 6, 8])
+        # s = Span([
+        #     Vector([1, 0, -1, 0]),
+        #     Vector([1, 1, -1, -1])
+        # ])
         s = Span([
             Vector([1, 0, -1, 0]),
-            Vector([1, 1, 1, 1])
-        ])
-        s = Span([
-            Vector([1, 0, -1, 0]),
-            Vector([1, -1, 0, 0]),
-            Vector([0, 0, 1, -1])
+            Vector([1, 1, 0, 0]),
+            Vector([0, 0, 1, 1])
         ])
         print(v.projection_onto(s))
 
@@ -64,16 +65,16 @@ def func4():
         #     return x1*x2+PI/2*z1*z2+0.5*x1*y2+0.5*x2*y1+42*y1*y2
 
         def generator(zero: bool = False) -> Vector:
-            return Vector.generate_vector(2, 0 if zero else None)
+            return Vector.generate_vector(3, 0 if zero else None)
 
         def func(v1: Vector, v2: Vector) -> float:
             x1 = v1[0]
             y1 = v1[1]
-            # z1 = v1[2]
+            z1 = v1[2]
             x2 = v2[0]
             y2 = v2[1]
-            # z2 = v2[2]
-            return x1*x2+3*y1*x2+3 * x1*y2-y1*y2
+            z2 = v2[2]
+            return x1*x2+PI/2*z1*z2
 
         print(isInnerProduct(func, generator))
 
