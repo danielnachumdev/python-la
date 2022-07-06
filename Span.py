@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any
-from .Vector import Vector
-from .Field import Field
+from Vector import Vector
+from Field import Field
 
 
 class Span:
@@ -71,6 +71,7 @@ class Span:
             return True
 
     def validate(self) -> bool:
+        from .InnerProduct import StandardInnerProduct
         for i in range(len(self.vectors)-1):
             for j in range(i+1, len(self.vectors)):
                 if StandardInnerProduct(self.vectors[i], self.vectors[j]) != 0:
@@ -97,7 +98,7 @@ class Span:
         """
         returns the vector projection of vector v on the span (=self)
         """
-        res: Vector = Vector.generate_vector(v.length, 0)
+        res: Vector = Vector.generate(v.length, 0)
         for w in self.toOrthonormal():
             res += v.projection_onto(w)
         return res

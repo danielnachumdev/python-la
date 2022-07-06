@@ -1,19 +1,18 @@
 from __future__ import annotations
-from typing import Any, Union
-from .Field import Field, Fields
-from .Complex import Complex
+from typing import Union
+import Field
+from Complex import Complex
 import random
-
 t_vector = list[Union[float, Complex]]
 
 
 class Vector:
-    def __init__(self, values: t_vector, field: Field = None) -> None:
+    def __init__(self, values: t_vector, field: Field = Field.DefaultRealField) -> None:
         self.__values = values
         self.__field = field
 
     @property
-    def field(self) -> Field:
+    def field(self) -> Field.Field:
         return self.__field
 
     @property
@@ -118,12 +117,5 @@ class Vector:
         return Vector(self.__values, self.__field)
 
     @staticmethod
-    def generate_vector(size: int,  def_value: bool = None, f: Field = None) -> Vector:
-        if f is None:
-            f = Fields.R
-        # return Vector([f.random() for _ in range(size)])
-        # TODO
-        MIN_VAL = -100
-        MAX_VAL = 100
-        F = random.uniform
-        return Vector([F(MIN_VAL, MAX_VAL) if def_value is None else def_value for _ in range(size)])
+    def generate(min: float = -10, max: float = 10, degree: int = 10,  def_value: bool = None, f: Field.Field = Field.DefaultRealField) -> Vector:
+        return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])

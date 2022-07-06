@@ -1,11 +1,12 @@
-# from Vector import Vector
-# from Field import Field, Fields
-# from Complex import Complex
-# from Span import Span
-# from Matrix import Matrix
-# from InnerProduct import StandardInnerProduct, isInnerProduct
-from LinearAlgebra import Vector, Field, Fields, Complex, Span, Matrix, isInnerProduct, StandardInnerProduct
+from Vector import Vector
+from Field import Field, Fields, RationalField, RealField
+from Complex import Complex
+from Span import Span
+from Matrix import Matrix
+from InnerProduct import StandardInnerProduct, isInnerProduct
 import math
+
+PI = math.pi
 
 
 def func1():
@@ -37,9 +38,6 @@ def func3():
     assert(Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).determinant == 0)
 
 
-PI = math.pi
-
-
 def func4():
     def f():
         v = Vector([2, 4, 6, 8])
@@ -65,7 +63,7 @@ def func4():
         #     return x1*x2+PI/2*z1*z2+0.5*x1*y2+0.5*x2*y1+42*y1*y2
 
         def generator(zero: bool = False) -> Vector:
-            return Vector.generate_vector(3, 0 if zero else None)
+            return Vector.generate(3, 0 if zero else None)
 
         def func(v1: Vector, v2: Vector) -> float:
             x1 = v1[0]
@@ -81,5 +79,9 @@ def func4():
     f()
 
 
+def t():
+    print(RealField(Fields.R, 3).random() in RealField(Fields.R, 3))
+
+
 if __name__ == '__main__':
-    func4()
+    t()
