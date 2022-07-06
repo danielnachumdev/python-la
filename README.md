@@ -25,5 +25,5 @@ Partially implemented
 
 ## InnerProduct
 Partially implemented
-* Implemented Standard Inner Product
-* Implemented isInnerProduct that checks if the given function is an inner product (the result is not with absolute certinaty. e.g: if you get a false value it is certianly not an inner product but a true value not neccessearly indicates it is)
+* Implemented `StandardInnerProduct`
+* Implemented `isInnerProduct` that checks if the given function is an inner product (the result is not with absolute certinaty. e.g: if you get a false value it is certianly not an inner product but a true value not neccessearly indicates it is)
