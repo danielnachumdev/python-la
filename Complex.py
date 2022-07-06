@@ -43,17 +43,18 @@ class Complex:
     def __abs__(self) -> float:
         return (self.real ** 2 + self.imag ** 2) ** 0.5
 
-    @property
-    def conjugate(self):
-        return Complex(self.real, -self.imag)
-
     def __eq__(self, other: Complex) -> bool:
+        # TODO add equality to float
         if not isinstance(other, Complex):
             return False
         return self.real == other.real and self.imag == other.imag
 
     def __ne__(self, other):
         return self.real != other.real or self.imag != other.imag
+
+    @property
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
 
     @property
     def norm(self):
