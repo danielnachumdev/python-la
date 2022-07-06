@@ -1,15 +1,14 @@
 from __future__ import annotations
 from typing import Union
 import Field
-from Complex import Complex
-import random
-t_vector = list[Union[float, Complex]]
+import Complex
+t_vector = list[Union[float, Complex.Complex]]
 
 
 class Vector:
-    def __init__(self, values: t_vector, field: Field = Field.DefaultRealField) -> None:
+    def __init__(self, values: t_vector, field: Field.Field = None) -> None:
         self.__values = values
-        self.__field = field
+        self.__field = Field.DefaultRealField if not field else field
 
     @property
     def field(self) -> Field.Field:
@@ -58,7 +57,7 @@ class Vector:
     def __truediv__(self, num: float) -> Vector:
         return self * (1 / num)
 
-    def __getitem__(self, index: int) -> Union[float, Complex]:
+    def __getitem__(self, index: int) -> Union[float, Complex.Complex]:
         return self.__values[index]
 
     def __iter__(self):
@@ -117,5 +116,7 @@ class Vector:
         return Vector(self.__values, self.__field)
 
     @staticmethod
-    def generate(min: float = -10, max: float = 10, degree: int = 10,  def_value: bool = None, f: Field.Field = Field.DefaultRealField) -> Vector:
+    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value: bool = None, f: Field.Field = None) -> Vector:
+        if f is None:
+            f = Field.DefaultRealField
         return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])

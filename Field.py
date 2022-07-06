@@ -92,7 +92,7 @@ class ComplexField(Field):
         Complex.Complex.generate(min, max, random.uniform)
 
     def __contains__(self, obj) -> bool:
-        if (isinstance(obj, Complex) or isinstance(obj, float) or isinstance(obj, int)) and self._degree == 1:
+        if (isinstance(obj, Complex.Complex) or isinstance(obj, float) or isinstance(obj, int)) and self._degree == 1:
             return True
         else:
             if not isinstance(obj, Vector.Vector):

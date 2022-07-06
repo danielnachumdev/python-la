@@ -63,7 +63,7 @@ def func4():
         #     return x1*x2+PI/2*z1*z2+0.5*x1*y2+0.5*x2*y1+42*y1*y2
 
         def generator(zero: bool = False) -> Vector:
-            return Vector.generate(3, 0 if zero else None)
+            return Vector.random(3, 0 if zero else None)
 
         def func(v1: Vector, v2: Vector) -> float:
             x1 = v1[0]

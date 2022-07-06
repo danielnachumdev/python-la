@@ -1,9 +1,11 @@
 import Field
 
+fields = Field.Fields
+real = Field.RealField
+complex = Field.ComplexField
+
 
 def test_containment():
-    assert Field.RealField(Field.Fields.R, 3).random(
-    ) in Field.RealField(Field.Fields.R, 3)
-    assert Field.ComplexField(Field.Fields.C, 3).random(
-    ) in Field.ComplexField(Field.Fields.C, 3)
-    assert Field.DefaultComplexField.random() in Field.ComplexField(Field.Fields.C, 1)
+    assert real(fields.R, 3).random() in real(fields.R, 3)
+    assert complex(fields.C, 3).random() in complex(fields.C, 3)
+    assert Field.DefaultComplexField.random() in complex(fields.C, 1)

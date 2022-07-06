@@ -219,9 +219,14 @@ class Matrix:
 
     @staticmethod
     def fromVector(vec: Vector) -> Matrix:
-        return Matrix([[vec.__values[i] for i in range(vec.get_length())]])
+        return Matrix([[vec.__values[i] for i in range(vec.length)]])
 
     @staticmethod
     def fromString(matrix_string: str) -> Matrix:
         return Matrix([[int(num) for num in row.split()]
                        for row in matrix_string.split("\n")])
+
+    @staticmethod
+    def random(f: Field = DefaultRealField, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
+        # TODO how to check that defualt value is inside 'f'? what if 'f' is ratinals and has no __contains__ implemented?
+        return Matrix([f.random(min, max) if def_value is None else def_value for _ in range(degree)], field=f)
