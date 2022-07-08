@@ -1,7 +1,7 @@
 # linear-algebra
 
 ## Field
-Almost fully implemented
+* Implemented field axioms checking
 * Implemented generic class `Field`
   * each instance contains info about the degree of the field and the modulus of the field
   * a `random()` function that generates a vector acording to a virtual function which is implemented in the subclasses to generate one element

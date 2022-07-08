@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Union
 import random
+from utils import almost_equal
 
 
 class Complex:
@@ -44,13 +45,38 @@ class Complex:
         return (self.real ** 2 + self.imag ** 2) ** 0.5
 
     def __eq__(self, other: Complex) -> bool:
-        # TODO add equality to float
+        if not isinstance(other, Complex) and not isinstance(self, float) and not isinstance(other, int):
+            raise TypeError(f"cannot compare equality to type {type(other)}")
         if not isinstance(other, Complex):
-            return False
+            other = Complex(other, 0)
         return self.real == other.real and self.imag == other.imag
 
     def __ne__(self, other):
-        return self.real != other.real or self.imag != other.imag
+        return not self.__eq__(other)
+
+    def __truediv__(self, other: Union[int, float, Complex]) -> Complex:
+        if not isinstance(other, Complex) and not isinstance(other, float) and not isinstance(other, int):
+            raise TypeError(
+                "can only divide complex by [int, float , complex]")
+        if other == 0:
+            raise ZeroDivisionError("Cannot divide by zero")
+
+        if not isinstance(other, Complex):
+            other = Complex(other, 0)
+
+        nominator = Complex(self.real, self.imag)*other.conjugate
+        denominator = other*other.conjugate
+        return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
+
+    def __rtruediv__(self, other) -> Complex:
+        if not isinstance(other, Complex) and not isinstance(other, float) and not isinstance(other, int):
+            raise TypeError(
+                "can only divide [int, float , complex] by complex")
+        if not isinstance(other, Complex):
+            other = Complex(other, 0)
+        nominator = other*self.conjugate
+        denominator = self*self.conjugate
+        return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
 
     @property
     def conjugate(self):
@@ -58,7 +84,7 @@ class Complex:
 
     @property
     def norm(self):
-        return self.real**2+self.imag**2
+        return (self * self.conjugate).real
 
     @staticmethod
     def generate(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
