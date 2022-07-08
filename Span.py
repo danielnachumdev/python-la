@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any
 from Vector import Vector
 from Field import Field
+from utils import are_operators_implemnted
 
 
 class Span:
@@ -29,7 +30,7 @@ class Span:
                     raise ValueError(
                         "Span can only be created from vectors of the same field")
         self.vectors = base
-        if not self.__are_operators_implementes():
+        if not are_operators_implemnted(type(self.vectors[0])):
             raise AttributeError(
                 "Not all required operators are implemented for the class of the objects")
 
@@ -51,27 +52,6 @@ class Span:
 
     def __iter__(self):
         return iter(self.vectors)
-
-    def __are_operators_implementes(self) -> bool:
-        if(len(self.vectors) > 0):
-            T = type(self.vectors[0])
-            O = object
-            try:
-                T.__add__
-                T.__radd__
-                T.__sub__
-                T.__rsub__
-                T.__neg__
-                T.__mul__
-                T.__rmul__
-                T.__truediv__
-                T.__eq__
-                T.__ne__
-            except AttributeError:
-                return False
-            return True
-        else:
-            return True
 
     def validate(self) -> bool:
         from InnerProduct import StandardInnerProduct
