@@ -25,6 +25,9 @@ class Field:
         self._degree = degree
         self._zero = zero
         self._one = one
+        if not Field.is_field(self):
+            raise ValueError(
+                "This is not a field as one or more of the axioms do not check-out")
 
     def __str__(self) -> str:
         return str(self._name)

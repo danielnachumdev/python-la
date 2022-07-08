@@ -20,7 +20,19 @@ def almost_equal(*args):
 
     def compare_two(a, b) -> bool:
         if b == 0:
-            return a == 0
+            try:
+                return a < THRESHOLD
+            except:
+                return a == 0
+        if a == 0:
+            try:
+                return b < THRESHOLD
+            except:
+                return b == 0
         return abs(1-a/b) < THRESHOLD
 
     return all([compare_two(args[0], args[i]) for i in range(1, len(args))])
+
+
+a, b, c = [-0.6666666666666666, 1.6666666666666667, -1.0]
+almost_equal((a+b)+c, a+(b+c))
