@@ -32,7 +32,3 @@ def almost_equal(*args):
         return abs(1-a/b) < THRESHOLD
 
     return all([compare_two(args[0], args[i]) for i in range(1, len(args))])
-
-
-a, b, c = [-0.6666666666666666, 1.6666666666666667, -1.0]
-almost_equal((a+b)+c, a+(b+c))
