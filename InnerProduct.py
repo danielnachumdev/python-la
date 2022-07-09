@@ -1,6 +1,6 @@
 from Vector import Vector
 import random
-from Complex import Complex
+from typing import Callable
 
 
 def StandardInnerProduct(a: Vector, b: Vector) -> float:
@@ -13,13 +13,16 @@ def StandardInnerProduct(a: Vector, b: Vector) -> float:
     return sum([a[i] * b[i] for i in range(a.length)])
 
 
-def isInnerProduct(func, generator_func) -> bool:
+is_zero = bool
+
+
+def isInnerProduct(func: Callable[[Vector, Vector], float], generator_func: Callable[[is_zero], Vector]) -> bool:
     MIN_VAL = -100
     MAX_VAL = 100
     REPETITIONS = 1000
     THRESHOLD = 0.000000001
 
-    def check_linearity(func, generator_func) -> bool:
+    def check_linearity(func: Callable[[Vector, Vector], float], generator_func: Callable[[is_zero], Vector]) -> bool:
         for _ in range(REPETITIONS):
             a: Vector = generator_func()
             b: Vector = generator_func()
@@ -32,7 +35,7 @@ def isInnerProduct(func, generator_func) -> bool:
                 return False
         return True
 
-    def check_symmetry(func, generator_func) -> bool:
+    def check_symmetry(func: Callable[[Vector, Vector], float], generator_func: Callable[[is_zero], Vector]) -> bool:
         for _ in range(REPETITIONS):
             a: Vector = generator_func()
             b: Vector = generator_func()
@@ -43,7 +46,7 @@ def isInnerProduct(func, generator_func) -> bool:
                 return False
         return True
 
-    def check_norm(func, generator_func) -> bool:
+    def check_norm(func: Callable[[Vector, Vector], float], generator_func: Callable[[is_zero], Vector]) -> bool:
         for _ in range(REPETITIONS):
             v: Vector = generator_func()
             if not func(v, v) > 0:

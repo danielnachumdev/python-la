@@ -32,3 +32,14 @@ def almost_equal(*args):
         return abs(1-a/b) < THRESHOLD
 
     return all([compare_two(args[0], args[i]) for i in range(1, len(args))])
+
+
+def areinstances(arr: list, T):
+    return check_foreach(arr, lambda v: isinstance(v, T))
+
+
+def check_foreach(arr: list, condition) -> bool:
+    for v in arr:
+        if not condition(v):
+            return False
+    return True

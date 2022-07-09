@@ -1,18 +1,25 @@
 from __future__ import annotations
-from typing import Union
+from typing import Union, Any
 import Field
 import Complex
 t_vector = list[Union[float, Complex.Complex]]
 
 
 class Vector:
+
+    @staticmethod
+    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field.Field = None) -> Vector:
+        if f is None:
+            f = Field.DefaultRealField
+        return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])
+
+    @staticmethod
+    def fromSize(size: int, default_value: Any = 0) -> Vector:
+        return Vector([default_value for _ in range(size)])
+
     def __init__(self, values: t_vector, field: Field.Field = None) -> None:
         self.__values = values
-        self.__field = Field.DefaultRealField if not field else field
-
-    @property
-    def field(self) -> Field.Field:
-        return self.__field
+        self.field = Field.DefaultRealField if not field else field
 
     @property
     def length(self):
@@ -29,7 +36,7 @@ class Vector:
     def __add__(self, other: Vector) -> Vector:
         if not isinstance(other, Vector):
             raise TypeError("Vector can only be added to another Vector")
-        if self.__field != other.__field:
+        if self.field != other.field:
             raise ValueError("Vectors must have the same field")
         if len(self.__values) != len(other.__values):
             raise ValueError("Vectors must have the same length")
@@ -39,7 +46,7 @@ class Vector:
         if not isinstance(other, Vector):
             raise TypeError(
                 "Vector can only be subtracted from another Vector")
-        if self.__field != other.__field:
+        if self.field != other.field:
             raise ValueError("Vectors must have the same field")
         if len(self.__values) != len(other.__values):
             raise ValueError("Vectors must have the same length")
@@ -66,7 +73,7 @@ class Vector:
     def __eq__(self, other: Vector) -> bool:  # TODO: do i want to raise errors?
         if not isinstance(other, Vector):
             raise TypeError("Vector can only be compared to another Vector")
-        if self.__field != other.__field:
+        if self.field != other.field:
             raise ValueError("Vectors must have the same field")
         if len(self.__values) != len(other.__values):
             raise ValueError("Vectors must have the same length")
@@ -75,6 +82,9 @@ class Vector:
     def __ne__(self, other: Vector) -> bool:
         return not (self == other)
 
+    def __len__(self) -> int:
+        return self.length
+
     def set(self, index, value) -> None:
         self.__values[index] = value
 
@@ -82,9 +92,9 @@ class Vector:
         return sum([x ** 2 for x in self]) ** 0.5
 
     def dot(self, other: Vector) -> Vector:
-        if not Vector.isInstance(other):
+        if not isinstance(other, Vector):
             raise TypeError("Vector can only be multiplied by another Vector")
-        if self.__field != other.__field:
+        if self.field != other.field:
             raise ValueError("Vectors must have the same field")
         if len(self.__values) != len(other.__values):
             raise ValueError("Vectors must have the same length")
@@ -113,10 +123,4 @@ class Vector:
             return value.projection_of(self)
 
     def copy(self) -> Vector:
-        return Vector(self.__values, self.__field)
-
-    @staticmethod
-    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value: bool = None, f: Field.Field = None) -> Vector:
-        if f is None:
-            f = Field.DefaultRealField
-        return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])
+        return Vector(self.__values, self.field)

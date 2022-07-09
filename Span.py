@@ -6,8 +6,20 @@ from utils import are_operators_implemnted
 
 
 class Span:
-    # TODO create span from Field
-    def __init__(self, base: list[Any] = [], validate: bool = False) -> None:
+
+    @staticmethod
+    def spanField(field: Field) -> Span:
+        """
+        will return the standard span over F^n e.g : [e1,e2,...,en]
+        """
+        vecs = []
+        for i in range(field._degree):
+            v = Vector.fromSize(field._degree, field._zero)
+            v[i] = field._one
+            vecs.append(v)
+        return Span(vecs)
+
+    def __init__(self, base: list[Vector] = []) -> None:
         """
         Initialize a Span object.
         :param base: A list of objects to be used as the base of the span.
@@ -25,8 +37,9 @@ class Span:
                 raise TypeError(
                     "All objects must have a field attribute which is an Instance of class Field")
             # if all vectors in base are of the same field add then otherwise throw an error
+            self.field = self.vectors[0].field
             for vector in base:
-                if vector.field != example_item.field:
+                if vector.field != self.field:
                     raise ValueError(
                         "Span can only be created from vectors of the same field")
         self.vectors = base
@@ -53,13 +66,38 @@ class Span:
     def __iter__(self):
         return iter(self.vectors)
 
-    def validate(self) -> bool:
-        from InnerProduct import StandardInnerProduct
-        for i in range(len(self.vectors)-1):
-            for j in range(i+1, len(self.vectors)):
-                if StandardInnerProduct(self.vectors[i], self.vectors[j]) != 0:
-                    return False
-        return True
+    def __len__(self) -> int:
+        return len(self.vectors)
+    # def validate(self) -> bool:
+    #     from InnerProduct import StandardInnerProduct
+    #     for i in range(len(self.vectors)-1):
+    #         for j in range(i+1, len(self.vectors)):
+    #             if StandardInnerProduct(self.vectors[i], self.vectors[j]) != 0:
+    #                 return False
+    #     return True
+
+    def __contains__(self, vector: Vector) -> bool:
+        """
+        operator 'in' wil specify wheter an element (a Vector) exsists in the vectors lsit of the span
+        """
+        if not isinstance(vector, Vector):
+            raise TypeError(
+                "can only check containment of objects of type 'Vector'")
+        for v in self.vectors:
+            if vector == v:
+                return True
+        return False
+
+    def contains(self, vector: Vector) -> bool:
+        """
+        will return true if there is a linear combination of self's vectors that creates 'vector'
+        """
+        if not isinstance(vector, Vector):
+            raise TypeError(
+                "can only check containment of objects of type 'Vector'")
+        from Matrix import Matrix
+        Matrix.fromSpan(self, vector)
+        return False
 
     def append(self, vec: Vector) -> None:
         self.vectors.append(vec)
@@ -67,7 +105,7 @@ class Span:
     def toOrthonormal(self) -> Span:
         result = Span([])
         result.append(self[0].toOrthonormal())
-        from .InnerProduct import StandardInnerProduct as sip
+        from InnerProduct import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
             curr_tag = Vector([0 for _ in range(self[0].length)])
@@ -81,13 +119,17 @@ class Span:
         """
         returns the vector projection of vector v on the span (=self)
         """
-        res: Vector = Vector.random(v.length, 0)
+        res: Vector = Vector.fromSize(len(v), 0)
         for w in self.toOrthonormal():
             res += v.projection_onto(w)
         return res
 
-    def isVectorInSpan(self, vec: Vector) -> bool:
-        pass
+    def random(self, min: Any = -10, max: Any = 10) -> Vector:
+        return self.field.random(min, max)
+
+    def is_spanning(self, field: Field) -> bool:
+        # TODO implement this
+        raise NotImplementedError("")
 
 
 class VectorSpace(Span):

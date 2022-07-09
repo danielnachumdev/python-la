@@ -3,6 +3,7 @@ from enum import Enum
 import random
 import Complex
 import Vector
+from typing import Any, Callable, Union
 from utils import are_operators_implemnted, almost_equal
 
 
@@ -33,19 +34,29 @@ class Field:
         return str(self._name)
 
     def __eq__(self, other: Field) -> bool:
-        return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree
+        return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree and self._zero == other._zero and self._one == other._one
 
-    def _generate_one(self, min: int = -10, max: int = 10):
+    def _generate_one(self, min: int = -10, max: int = 10) -> Any:
+        """
+        This is a virtual method for derived classes to generate a random element from current field with degree 1
+        e.g. if self is Rn hen Rn._generate_one() will return an elemnt from R1
+        the generation of a full vector is with 'random' function
+        """
         raise NotImplementedError("This is a virtual method")
 
-    def random(self, min: float = -10, max: float = 10):
+    def random(self, min: float = -10, max: float = 10) -> Vector:
+        """
+        will generate a random vector from this field
+        """
         self._generate_one(min, max)
         return Vector .Vector([
             self._generate_one(min, max)
             for _ in range(self._degree)
         ], self)
 
-    def __contains__(self, obj):
+    def __contains__(self, obj: Any) -> bool:
+        """
+        """
         raise NotImplementedError("This is a virtual method")
 
     @staticmethod
@@ -55,7 +66,7 @@ class Field:
             raise NotImplementedError(
                 "One of the nescesary operators for calculation was not implemented")
 
-        def checker(var_count, rule, exclude=None) -> bool:
+        def checker(var_count: int, rule: Callable[[], bool], exclude=None) -> bool:
             if exclude is None:
                 exclude = []
             for _ in range(N):
@@ -112,7 +123,7 @@ class Field:
 
 
 class RationalField(Field):
-    def _generate_one(self, min: int = -10, max: int = 10):
+    def _generate_one(self, min: int = -10, max: int = 10) -> float:
         if min == max:
             raise ValueError(
                 "if 'min'=='max' you shouldnt use this function becuase there's no use to it")
@@ -126,7 +137,7 @@ class RationalField(Field):
             denominator = f(min, max)
         return sign*nominator/denominator
 
-    def __contains__(self, obj):
+    def __contains__(self, obj) -> bool:
         """
         NOT IMPLEMENTED
         Due to how numbers are stored in python all fractional numbers are rational so this function is irrelevant
@@ -139,10 +150,10 @@ DefaultRationalField = RationalField(Fields.Q, 0, 1)
 
 
 class RealField(Field):
-    def _generate_one(self, min: int = -10, max: int = 10):
+    def _generate_one(self, min: int = -10, max: int = 10) -> float:
         return random.uniform(min, max)
 
-    def __contains__(self, obj) -> bool:
+    def __contains__(self, obj: Union[int, float, Vector.Vector]) -> bool:
         if isinstance(obj, float) or isinstance(obj, int) and self._degree == 1:
             return True
         else:
@@ -156,10 +167,10 @@ DefaultRealField = RealField(Fields.R, 0, 1)
 
 
 class ComplexField(Field):
-    def _generate_one(self, min: int = -10, max: int = 10):
+    def _generate_one(self, min: int = -10, max: int = 10) -> Complex.Complex:
         return Complex.Complex.generate(min, max, random.uniform)
 
-    def __contains__(self, obj) -> bool:
+    def __contains__(self, obj: Union[int, float, Complex.Complex, Vector.Vector]) -> bool:
         if (isinstance(obj, Complex.Complex) or isinstance(obj, float) or isinstance(obj, int)) and self._degree == 1:
             return True
         else:
