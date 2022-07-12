@@ -1,5 +1,5 @@
-from Vector import Vector
-from Matrix import Matrix
-from Span import Span, VectorSpace
-from Field import Field, Field, DefaultRealField, DefaultComplexField, DefaultRationalField, RationalField, RealField, ComplexField
-from InnerProduct import StandardInnerProduct, isInnerProduct
+from Vector import *
+from Matrix import *
+from Span import *
+from Field import *
+from InnerProduct import *
