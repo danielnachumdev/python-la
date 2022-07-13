@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import Any
 from Vector import Vector
-from Field import Field
+import Field
 from utils import are_operators_implemnted
 
 
 class Span:
 
     @staticmethod
-    def spanField(field: Field) -> Span:
+    def spanField(field: Field.Field) -> Span:
         """
         will return the standard span over F^n e.g : [e1,e2,...,en]
         """
@@ -127,7 +127,7 @@ class Span:
     def random(self, min: Any = -10, max: Any = 10) -> Vector:
         return self.field.random(min, max)
 
-    def is_spanning(self, field: Field) -> bool:
+    def is_spanning(self, field: Field.Field) -> bool:
         # TODO implement this
         raise NotImplementedError("")
 

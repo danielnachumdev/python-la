@@ -22,7 +22,8 @@ Partially implemented
 Partially implemented
 ## Matrix
 Partially implemented
-
+## Linear Transformation
+Partially implemented
 ## InnerProduct
 Partially implemented
 * Implemented `StandardInnerProduct`

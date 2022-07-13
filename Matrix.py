@@ -1,9 +1,10 @@
 from __future__ import annotations
+from utils import almost_equal
 from typing import Any, Union
 from Complex import Complex
 from Vector import Vector, t_vector
-from Span import Span
-from Field import Field, DefaultRealField
+import Span
+import Field
 import copy
 import functools
 from utils import areinstances, check_foreach
@@ -21,11 +22,11 @@ class Matrix:
         return Matrix([[v] for v in vec], sol)
 
     @staticmethod
-    def fromSpan(span: Span, sol: Vector) -> Matrix:
+    def fromSpan(span: Span.Span, sol: Vector) -> Matrix:
         """
         will create a matrix from the span in the order that the vectors appear and as columns
         """
-        if not isinstance(span, Span):
+        if not isinstance(span, Span.Span):
             raise TypeError("span must be 'Span'")
         return Matrix.fromVectors([v for v in span], sol)
 
@@ -51,17 +52,21 @@ class Matrix:
                        for row in matrix_string.split("\n")], sol)
 
     @staticmethod
-    def random(f: Field = DefaultRealField, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
+    def random(f: Field.Field = None, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
+        if f is None:
+            f = Field.DefaultRealField
         # TODO how to check that defualt value is inside 'f'? what if 'f' is ratinals and has no __contains__ implemented?
         return Matrix([[f.random(min, max) if def_value is None else def_value for _ in range(degree)]for __ in range(degree)], field=f)
 
-    def __init__(self, mat: t_matrix, sol_vec: t_vector = None, field: Field = DefaultRealField) -> None:
+    def __init__(self, mat: t_matrix, sol_vec: t_vector = None, field: Field.Field = None) -> None:
+        if field is None:
+            field = Field.DefaultRealField
         self.__matrix = mat
         self.__rows = len(mat)
         self.__cols = len(mat[0])
         self.__solution_vector = sol_vec if sol_vec else [
             0 for _ in range(self.__rows)]
-        self.__field = field
+        self.field = field
 
     @property
     def rank(self) -> int:
@@ -92,11 +97,11 @@ class Matrix:
         return self.__rows == self.__cols
 
     @property
-    def kernel(self) -> Span:
+    def kernel(self) -> Span.Span:
         pass
 
     @property
-    def image(self) -> Span:
+    def image(self) -> Span.Span:
         pass
 
     def __getitem__(self, index: int):
@@ -180,6 +185,16 @@ class Matrix:
         if any([self.__matrix[i][j] != other.__matrix[i][j] for i in range(self.__rows) for j in range(self.__cols)]):
             return False
         return True
+
+    def __len__(self) -> int:
+        return self.__rows
+
+    def almost_equal(self, other: Matrix) -> bool:
+        if not isinstance(other, Matrix):
+            raise TypeError("Matrix can only be compared to another Matrix")
+        if not self.field == other.field:
+            raise ValueError("Matrix must have the same field")
+        return all([all([almost_equal(self[i][j], other[i][j])] for j in range(len(self[0]))) for i in range(len(self))])
 
     def inverse(self) -> Matrix:
         if not self.is_invertiable:

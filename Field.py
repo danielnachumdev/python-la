@@ -5,15 +5,29 @@ import Complex
 import Vector
 from typing import Any, Callable, Union
 from utils import are_operators_implemnted, almost_equal
+import Matrix
 
 
 class Fields(Enum):
     Q = "Q"
     R = "R"
     C = "C"
+    M = "M"
 
 
 class Field:
+    @staticmethod
+    def create(name: Fields, zero, one, degree: int = 1, modulu: int = 1) -> Field:
+        match name:
+            case Fields.Q:
+                return RationalField(name, zero, one,degree, modulu)
+            case Fields.R:
+                return RealField(name, zero, one, degree, modulu)
+            case Fields.C:
+                return ComplexField(name, zero, one ,degree, modulu)
+            case Fields.M:
+                return MatrixField(name, zero, one ,degree, modulu)
+
     def __init__(self, name: Fields,  zero, one, degree: int = 1, modulu: int = 1) -> None:
         if not isinstance(name, Fields):
             raise TypeError("'name' must be from enum 'Fields'")
@@ -35,6 +49,11 @@ class Field:
 
     def __eq__(self, other: Field) -> bool:
         return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree and self._zero == other._zero and self._one == other._one
+
+    @property
+    def classOfInstance(self) -> Field:
+        # raise NotImplementedError("This is a virtual method")
+        return type(self)
 
     def _generate_one(self, min: int = -10, max: int = 10) -> Any:
         """
@@ -123,6 +142,9 @@ class Field:
 
 
 class RationalField(Field):
+    # def over(self) -> RationalField:
+    #     return RationalField
+
     def _generate_one(self, min: int = -10, max: int = 10) -> float:
         if min == max:
             raise ValueError(
@@ -150,6 +172,9 @@ DefaultRationalField = RationalField(Fields.Q, 0, 1)
 
 
 class RealField(Field):
+    # def over(self) -> RealField:
+    #     return RealField
+
     def _generate_one(self, min: int = -10, max: int = 10) -> float:
         return random.uniform(min, max)
 
@@ -167,6 +192,9 @@ DefaultRealField = RealField(Fields.R, 0, 1)
 
 
 class ComplexField(Field):
+    # def over(self) -> ComplexField:
+    # return ComplexField
+
     def _generate_one(self, min: int = -10, max: int = 10) -> Complex.Complex:
         return Complex.Complex.generate(min, max, random.uniform)
 
@@ -182,3 +210,17 @@ class ComplexField(Field):
 
 DefaultComplexField = ComplexField(
     Fields.C, Complex.Complex(0, 0), Complex.Complex(1, 0))
+
+
+class MatrixField(Field):
+    # def over(self) -> MatrixField:
+    #     return MatrixField
+
+    def __init__(self,) -> None:
+        pass
+
+    def _generate_one(self, min: int = -10, max: int = 10) -> Matrix.Matrix:
+        pass
+
+    def __contains__(self, v) -> bool:
+        pass

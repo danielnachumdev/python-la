@@ -1,4 +1,5 @@
 from __future__ import annotations
+from utils import almost_equal
 from typing import Union, Any
 import Field
 import Complex
@@ -40,7 +41,7 @@ class Vector:
             raise ValueError("Vectors must have the same field")
         if len(self.__values) != len(other.__values):
             raise ValueError("Vectors must have the same length")
-        return Vector([self.__values[i] + other.__values[i] for i in range(len(self.__values))])
+        return Vector([self.__values[i] + other.__values[i] for i in range(len(self.__values))], self.field)
 
     def __sub__(self, other: Vector) -> Vector:
         if not isinstance(other, Vector):
@@ -50,13 +51,13 @@ class Vector:
             raise ValueError("Vectors must have the same field")
         if len(self.__values) != len(other.__values):
             raise ValueError("Vectors must have the same length")
-        return Vector([self.__values[i] - other.__values[i] for i in range(len(self.__values))])
+        return Vector([self.__values[i] - other.__values[i] for i in range(len(self.__values))], self.field)
 
     def __neg__(self) -> Vector:
-        return Vector([-self.__values[i] for i in range(len(self.__values))])
+        return Vector([-self.__values[i] for i in range(len(self.__values))], self.field)
 
     def __mul__(self, num: float) -> Vector:
-        return Vector([num * self.__values[i] for i in range(len(self.__values))])
+        return Vector([num * self.__values[i] for i in range(len(self.__values))], self.field)
 
     def __rmul__(self, num: float) -> Vector:
         return self.__mul__(num)
@@ -84,6 +85,13 @@ class Vector:
 
     def __len__(self) -> int:
         return self.length
+
+    def almost_equal(self, other: Vector) -> bool:
+        if not isinstance(other, Vector):
+            raise TypeError("Vector can only be compared to another Vector")
+        if not self.field == other.field:
+            raise ValueError("Vectors must have the same field")
+        return all([almost_equal(self[i], other[i]) for i in range(len(self))])
 
     def set(self, index, value) -> None:
         self.__values[index] = value

@@ -3,7 +3,7 @@ from Field import Field, Fields, RationalField, RealField
 from Complex import Complex
 from Span import Span
 from Matrix import Matrix
-from InnerProduct import StandardInnerProduct, isInnerProduct
+from InnerProduct import InnerProduct, StandardInnerProduct
 import math
 
 PI = math.pi
@@ -74,7 +74,7 @@ def func4():
             z2 = v2[2]
             return x1*x2+PI/2*z1*z2
 
-        print(isInnerProduct(func, generator))
+        print(InnerProduct.isInnerProduct(func, generator))
 
     f()
 
