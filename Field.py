@@ -20,63 +20,13 @@ class Field:
     def create(name: Fields, zero, one, degree: int = 1, modulu: int = 1) -> Field:
         match name:
             case Fields.Q:
-                return RationalField(name, zero, one,degree, modulu)
+                return RationalField(name, zero, one, degree, modulu)
             case Fields.R:
                 return RealField(name, zero, one, degree, modulu)
             case Fields.C:
-                return ComplexField(name, zero, one ,degree, modulu)
+                return ComplexField(name, zero, one, degree, modulu)
             case Fields.M:
-                return MatrixField(name, zero, one ,degree, modulu)
-
-    def __init__(self, name: Fields,  zero, one, degree: int = 1, modulu: int = 1) -> None:
-        if not isinstance(name, Fields):
-            raise TypeError("'name' must be from enum 'Fields'")
-        if not isinstance(degree, int):
-            raise TypeError("'degree' must be of type 'int'")
-        if not isinstance(modulu, int):
-            raise TypeError("'modulu' must be of type 'int'")
-        self._name = name
-        self._modulu = modulu
-        self._degree = degree
-        self._zero = zero
-        self._one = one
-        if not Field.is_field(self):
-            raise ValueError(
-                "This is not a field as one or more of the axioms do not check-out")
-
-    def __str__(self) -> str:
-        return str(self._name)
-
-    def __eq__(self, other: Field) -> bool:
-        return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree and self._zero == other._zero and self._one == other._one
-
-    @property
-    def classOfInstance(self) -> Field:
-        # raise NotImplementedError("This is a virtual method")
-        return type(self)
-
-    def _generate_one(self, min: int = -10, max: int = 10) -> Any:
-        """
-        This is a virtual method for derived classes to generate a random element from current field with degree 1
-        e.g. if self is Rn hen Rn._generate_one() will return an elemnt from R1
-        the generation of a full vector is with 'random' function
-        """
-        raise NotImplementedError("This is a virtual method")
-
-    def random(self, min: float = -10, max: float = 10) -> Vector:
-        """
-        will generate a random vector from this field
-        """
-        self._generate_one(min, max)
-        return Vector .Vector([
-            self._generate_one(min, max)
-            for _ in range(self._degree)
-        ], self)
-
-    def __contains__(self, obj: Any) -> bool:
-        """
-        """
-        raise NotImplementedError("This is a virtual method")
+                return MatrixField(name, zero, one, degree, modulu)
 
     @staticmethod
     def is_field(field: Field) -> bool:
@@ -137,8 +87,57 @@ class Field:
             def multiplication() -> bool:
                 return checker(1, lambda a: almost_equal(a * (1/a), field._one, (1/a)*a), [0])
             return all([addition(), multiplication()])
-
         return all([associativity(), commutativity(), distributivity(), identity(), inverses()])
+
+    def __init__(self, name: Fields,  zero, one, degree: int = 1, modulu: int = 1) -> None:
+        if not isinstance(name, Fields):
+            raise TypeError("'name' must be from enum 'Fields'")
+        if not isinstance(degree, int):
+            raise TypeError("'degree' must be of type 'int'")
+        if not isinstance(modulu, int):
+            raise TypeError("'modulu' must be of type 'int'")
+        self._name = name
+        self._modulu = modulu
+        self._degree = degree
+        self._zero = zero
+        self._one = one
+        if not Field.is_field(self):
+            raise ValueError(
+                "This is not a field as one or more of the axioms do not check-out")
+
+    @property
+    def classOfInstance(self) -> Field:
+        # raise NotImplementedError("This is a virtual method")
+        return type(self)
+
+    def __str__(self) -> str:
+        return str(self._name)
+
+    def __eq__(self, other: Field) -> bool:
+        return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree and self._zero == other._zero and self._one == other._one
+
+    def __contains__(self, obj: Any) -> bool:
+        """
+        """
+        raise NotImplementedError("This is a virtual method")
+
+    def _generate_one(self, min: int = -10, max: int = 10) -> Any:
+        """
+        This is a virtual method for derived classes to generate a random element from current field with degree 1
+        e.g. if self is Rn hen Rn._generate_one() will return an elemnt from R1
+        the generation of a full vector is with 'random' function
+        """
+        raise NotImplementedError("This is a virtual method")
+
+    def random(self, min: float = -10, max: float = 10) -> Vector:
+        """
+        will generate a random vector from this field
+        """
+        self._generate_one(min, max)
+        return Vector .Vector([
+            self._generate_one(min, max)
+            for _ in range(self._degree)
+        ], self)
 
 
 class RationalField(Field):

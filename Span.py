@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import Any
-from Vector import Vector
+import Vector
 import Field
 from utils import are_operators_implemnted
 
 
 class Span:
-
     @staticmethod
     def spanField(field: Field.Field) -> Span:
         """
@@ -19,7 +18,7 @@ class Span:
             vecs.append(v)
         return Span(vecs)
 
-    def __init__(self, base: list[Vector] = []) -> None:
+    def __init__(self, base: list[Vector.Vector] = []) -> None:
         """
         Initialize a Span object.
         :param base: A list of objects to be used as the base of the span.
@@ -60,7 +59,7 @@ class Span:
             raise ValueError("Spans must have the same length")
         return Span([self.vectors[i] + other.vectors[i] for i in range(len(self.vectors))])
 
-    def __getitem__(self, index: int) -> Vector:
+    def __getitem__(self, index: int) -> Vector.Vector:
         return self.vectors[index]
 
     def __iter__(self):
@@ -76,11 +75,11 @@ class Span:
     #                 return False
     #     return True
 
-    def __contains__(self, vector: Vector) -> bool:
+    def __contains__(self, vector: Vector.Vector) -> bool:
         """
         operator 'in' wil specify wheter an element (a Vector) exsists in the vectors lsit of the span
         """
-        if not isinstance(vector, Vector):
+        if not isinstance(vector, Vector.Vector):
             raise TypeError(
                 "can only check containment of objects of type 'Vector'")
         for v in self.vectors:
@@ -88,18 +87,18 @@ class Span:
                 return True
         return False
 
-    def contains(self, vector: Vector) -> bool:
+    def contains(self, vector: Vector.Vector) -> bool:
         """
         will return true if there is a linear combination of self's vectors that creates 'vector'
         """
-        if not isinstance(vector, Vector):
+        if not isinstance(vector, Vector.Vector):
             raise TypeError(
                 "can only check containment of objects of type 'Vector'")
         from Matrix import Matrix
         Matrix.fromSpan(self, vector)
         return False
 
-    def append(self, vec: Vector) -> None:
+    def append(self, vec: Vector.Vector) -> None:
         self.vectors.append(vec)
 
     def toOrthonormal(self) -> Span:
@@ -108,30 +107,25 @@ class Span:
         from InnerProduct import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
-            curr_tag = Vector([0 for _ in range(self[0].length)])
+            curr_tag = Vector.Vector([0 for _ in range(self[0].length)])
             for prev in result:
                 curr_tag = curr_tag+sip(prev, current) * prev
             current = current-curr_tag
             result.append(current.toOrthonormal())
         return result
 
-    def projection_of(self, v: Vector) -> Vector:
+    def projection_of(self, v: Vector.Vector) -> Vector.Vector:
         """
         returns the vector projection of vector v on the span (=self)
         """
-        res: Vector = Vector.fromSize(len(v), 0)
+        res: Vector.Vector = Vector.Vector.fromSize(len(v), 0)
         for w in self.toOrthonormal():
             res += v.projection_onto(w)
         return res
 
-    def random(self, min: Any = -10, max: Any = 10) -> Vector:
+    def random(self, min: Any = -10, max: Any = 10) -> Vector.Vector:
         return self.field.random(min, max)
 
     def is_spanning(self, field: Field.Field) -> bool:
         # TODO implement this
         raise NotImplementedError("")
-
-
-class VectorSpace(Span):
-    # becuase they are the same thing
-    pass

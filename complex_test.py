@@ -60,3 +60,7 @@ def test_norm():
 def test_division():
     assert 1/a == c(1/2, -1/2)
     assert a/2 == c(0.5, 0.5)
+
+
+def test_pow():
+    assert c(1, 1)**2 == c(0, 2)

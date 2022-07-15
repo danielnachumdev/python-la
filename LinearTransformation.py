@@ -5,7 +5,7 @@ from typing import Callable
 
 class LinearTransformation:
     @staticmethod
-    def isFuncLinearTransformation(func: Callable[[Any, Field.Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
+    def isFuncLinearTransformation(func: Callable[[Any, Field.Field], Union[Vector.Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
         COUNT = 100
         for _ in range(COUNT):
             a, b = src_field._generate_one(), src_field._generate_one()

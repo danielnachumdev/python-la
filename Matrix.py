@@ -2,7 +2,7 @@ from __future__ import annotations
 from utils import almost_equal
 from typing import Any, Union
 from Complex import Complex
-from Vector import Vector, t_vector
+import Vector
 import Span
 import Field
 import copy
@@ -14,7 +14,7 @@ t_matrix = list[list[Union[float, Complex]]]
 class Matrix:
 
     @staticmethod
-    def fromVector(vec: Vector, sol: Vector = None) -> Matrix:
+    def fromVector(vec: Vector.Vector, sol: Vector.Vector = None) -> Matrix:
         """
         will add the vector as a column
         """
@@ -22,7 +22,7 @@ class Matrix:
         return Matrix([[v] for v in vec], sol)
 
     @staticmethod
-    def fromSpan(span: Span.Span, sol: Vector) -> Matrix:
+    def fromSpan(span: Span.Span, sol: Vector.Vector) -> Matrix:
         """
         will create a matrix from the span in the order that the vectors appear and as columns
         """
@@ -31,11 +31,11 @@ class Matrix:
         return Matrix.fromVectors([v for v in span], sol)
 
     @staticmethod
-    def fromVectors(vecs: list[Vector], sol: Vector = None) -> Matrix:
+    def fromVectors(vecs: list[Vector.Vector], sol: Vector.Vector = None) -> Matrix:
         """
         will create a amtrix from the vectors in the order they appear and as columns
         """
-        if not areinstances(vecs, Vector):
+        if not areinstances(vecs, Vector.Vector):
             raise TypeError("all elements must be instances of class 'Vector'")
         if not check_foreach(vecs, lambda v: v.field == vecs[0].field):
             raise ValueError("vectors are not over the same field")
@@ -47,7 +47,7 @@ class Matrix:
         return Matrix(mat, sol, field=vecs[0].field)
 
     @staticmethod
-    def fromString(matrix_string: str, sol: Vector) -> Matrix:
+    def fromString(matrix_string: str, sol: Vector.Vector) -> Matrix:
         return Matrix([[int(num) for num in row.split()]
                        for row in matrix_string.split("\n")], sol)
 
@@ -58,7 +58,7 @@ class Matrix:
         # TODO how to check that defualt value is inside 'f'? what if 'f' is ratinals and has no __contains__ implemented?
         return Matrix([[f.random(min, max) if def_value is None else def_value for _ in range(degree)]for __ in range(degree)], field=f)
 
-    def __init__(self, mat: t_matrix, sol_vec: t_vector = None, field: Field.Field = None) -> None:
+    def __init__(self, mat: t_matrix, sol_vec: list[Union[float, Complex]] = None, field: Field.Field = None) -> None:
         if field is None:
             field = Field.DefaultRealField
         self.__matrix = mat
@@ -137,19 +137,19 @@ class Matrix:
         return Matrix([[self.__matrix[i][j] - other.__matrix[i][j] for j in range(self.__cols)]
                        for i in range(self.__rows)])
 
-    def __mul__(self, other: Union[float, Complex, Vector, Matrix]) -> Union[float, Complex, Vector, Matrix]:
+    def __mul__(self, other: Union[float, Complex, Vector.Vector, Matrix]) -> Union[float, Complex, Vector.Vector, Matrix]:
         """
         self * other
         """
         if isinstance(other, float) or isinstance(other, Complex) or isinstance(other, int):
             return Matrix([[other * self.__matrix[i][j] for j in range(self.__cols)]
                            for i in range(self.__rows)])
-        if isinstance(other, Vector):
+        if isinstance(other, Vector.Vector):
             if self.__cols != other.length:
                 raise ValueError(
                     "Matrix and Vector must have the same number of rows")
-            return Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
-                           for i in range(self.__rows)])
+            return Vector.Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
+                                  for i in range(self.__rows)])
         if isinstance(other, Matrix):
             if self.__cols != other.__rows:
                 raise ValueError(
@@ -159,7 +159,7 @@ class Matrix:
         raise TypeError(
             "Matrix can only be multiplied by a number, Vector, or Matrix")
 
-    def __rmul__(self, other: Union[int, float, Complex, Vector, Matrix]) -> Union[float, Complex, Vector, Matrix]:
+    def __rmul__(self, other: Union[int, float, Complex, Vector.Vector, Matrix]) -> Union[float, Complex, Vector.Vector, Matrix]:
         """
         other * self
         """
@@ -175,7 +175,7 @@ class Matrix:
             return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
                             for k in range(other.__cols)] for i in range(self.__rows)])
         raise TypeError(
-            "Matrix can only be multiplied by a number, Vector, or Matrix")
+            "Matrix can only be multiplied by a number, Vector.Vector, or Matrix")
 
     def __eq__(self, other: Matrix) -> bool:
         if not isinstance(other, Matrix):

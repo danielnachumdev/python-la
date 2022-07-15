@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Union
 import random
-from utils import almost_equal
+from utils import almost_equal, isoneof
 
 
 class Complex:
@@ -77,6 +77,31 @@ class Complex:
         nominator = other*self.conjugate
         denominator = self*self.conjugate
         return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
+
+    # TODO: implement this
+    def __pow__(self, p):
+        if not isoneof(p, [int]):
+            raise NotImplementedError(
+                "Complex.__pow__ only implemented for int right now")
+
+        def fix_negativ(v) -> Complex:
+            if p < 0:
+                return 1/v
+            return v
+
+        if p == 0:
+            return Complex(1, 0)
+        elif p == 1:
+            return fix_negativ(self)
+        else:
+            res = self
+            for _ in range(abs(p)-1):
+                res *= self
+            return fix_negativ(res)
+
+    # TODO: implement this
+    def __rpow__(self, other):
+        raise NotImplementedError("This is not implemented yet")
 
     @property
     def conjugate(self):
