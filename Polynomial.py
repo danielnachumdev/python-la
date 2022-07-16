@@ -46,3 +46,6 @@ class Polynomial:
 
     def __call__(self, v):
         pass
+
+    def gcd_with(self, other: Polynomial) -> Polynomial:
+        pass

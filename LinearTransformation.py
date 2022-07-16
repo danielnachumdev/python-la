@@ -1,6 +1,7 @@
 from __future__ import annotations
 from Matrix import *
 from typing import Callable
+import Field
 
 
 class LinearTransformation:
@@ -53,3 +54,7 @@ class LinearTransformation:
 
     def toMatrix(self, base=None) -> Matrix:
         pass
+
+
+class Hom(Field.Field):
+    pass

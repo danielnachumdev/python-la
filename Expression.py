@@ -4,6 +4,8 @@ import Polynomial
 from typing import Union, Callable, Any, Tuple
 import Complex
 from utils import isoneof, alloneof, validate_brackets
+import Vector
+import LinearTransformation
 
 
 class Expression:
@@ -104,6 +106,10 @@ class Expression:
         else:
             raise ValueError("cant be calculated")
 
+    @property
+    def minimal_polyinomial(self) -> Polynomial.Polynomial:
+        pass
+
     def __add__(self, other: Union[int, float, Complex.Complex, Expression, Polynomial.Polynomial]) -> Union[Expression, Polynomial.Polynomial]:
         if isinstance(other, Expression):
             if self.func and other.func:
@@ -189,3 +195,6 @@ class Expression:
                 return f"{self.a}*x^{self.p}"
             return f"{self.a}*x^{self.p}+{self.b}"
         return "No representations for lambda"
+
+    def toVector(self) -> Vector.Vector:
+        pass
