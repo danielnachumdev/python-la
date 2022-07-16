@@ -3,7 +3,7 @@ from Field import RealField, Fields
 
 COUNT = 100
 N = 50
-Fn = RealField(Fields.R, 0, 1, N, 1)
+Fn = RealField(N)
 
 
 def test_from_vector():

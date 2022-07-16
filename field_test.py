@@ -3,9 +3,9 @@ c = Complex.Complex
 
 
 def test_containment():
-    rf = RealField(Fields.R, 0, 1, 3)
-    cf = ComplexField(Fields.C, c(0, 0), c(1, 0), 3)
-    cf2 = ComplexField(Fields.C, c(0, 0), c(1, 0), 1)
+    rf = RealField(3)
+    cf = ComplexField(3)
+    cf2 = ComplexField(1)
     for _ in range(100):
         assert rf.random() in rf
         assert cf.random() in cf
@@ -19,7 +19,7 @@ def test_is_field():
 
 
 def test_clone():
-    r3 = RealField(Fields.R, 0, 1, 3)
-    r21 = r3.classOfInstance(r3._name, r3._zero, r3._one, 2)
-    r23 = r3.classOfInstance.create(r3._name, r3._zero, r3._one, 2)
+    r3 = RealField(3)
+    r21 = r3.classOfInstance(2)
+    r23 = r3.classOfInstance.create(r3._name, 2)
     assert r21 == r23

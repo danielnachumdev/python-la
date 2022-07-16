@@ -1,8 +1,8 @@
 from LinearTransformation import *
 from Field import Fields, RealField
 
-R3 = RealField(Fields.R, 0, 1, 4)
-R2 = RealField(Fields.R, 0, 1, 2)
+R3 = RealField(4)
+R2 = RealField(2)
 
 
 def test_containment():

@@ -17,16 +17,18 @@ class Fields(Enum):
 
 class Field:
     @staticmethod
-    def create(name: Fields, zero, one, degree: int = 1, modulu: int = 1) -> Field:
+    def create(name: Fields, degree: int = 1, modulu: int = 1) -> Field:
         match name:
             case Fields.Q:
-                return RationalField(name, zero, one, degree, modulu)
+                return RationalField(degree, modulu)
             case Fields.R:
-                return RealField(name, zero, one, degree, modulu)
+                return RealField(degree, modulu)
             case Fields.C:
-                return ComplexField(name, zero, one, degree, modulu)
+                return ComplexField(degree, modulu)
             case Fields.M:
-                return MatrixField(name, zero, one, degree, modulu)
+                # TODO Field create function for Fields.M
+                pass
+                # return MatrixField(name, zero, one, degree, modulu)
 
     @staticmethod
     def is_field(field: Field) -> bool:
