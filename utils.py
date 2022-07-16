@@ -1,3 +1,4 @@
+# import Complex
 import math
 
 
@@ -18,8 +19,22 @@ def are_operators_implemnted(T) -> bool:
         return False
 
 
+def isoneof(v, lst: list) -> bool:
+    for T in lst:
+        if isinstance(v, T):
+            return True
+    return False
+
+
+def alloneof(value: list, types: list):
+    for v in value:
+        if not isoneof(v, types):
+            return False
+    return True
+
+
 def almost_equal(*args):
-    # THRESHOLD = 0.000000000001
+    THRESHOLD = 0.000000000001
     # def compare_two(a, b) -> bool:
     #     # if b == 0:
     #     #     try:
@@ -36,25 +51,19 @@ def almost_equal(*args):
     #     return abs(a-b) < THRESHOLD
     # return all([compare_two(args[0], args[i]) for i in range(1, len(args))])
 
-    return all([math.isclose(args[0], args[i]) for i in range(1, len(args))])
+    def wrapper(a, b):
+        if alloneof([a, b], [int, float]):
+            return math.isclose(a, b, abs_tol=THRESHOLD)
+        else:  # they are Complex.Complex
+            try:
+                return math.isclose(a.real, b.real, abs_tol=THRESHOLD) and math.isclose(a.imag, b.imag, abs_tol=THRESHOLD)
+            except Exception as e:
+                assert False, "shouldnt be here"
+    return all([wrapper(args[0], args[i]) for i in range(1, len(args))])
 
 
 def areinstances(arr: list, T):
     return check_foreach(arr, lambda v: isinstance(v, T))
-
-
-def isoneof(v, lst: list) -> bool:
-    for T in lst:
-        if isinstance(v, T):
-            return True
-    return False
-
-
-def alloneof(value: list, types: list):
-    for v in value:
-        if not isoneof(v, types):
-            return False
-    return True
 
 
 def check_foreach(arr: list, condition) -> bool:

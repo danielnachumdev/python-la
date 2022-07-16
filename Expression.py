@@ -175,3 +175,17 @@ class Expression:
         else:
 
             raise NotImplementedError("Not implemented")
+
+    def __str__(self) -> str:
+        if not alloneof([self.a, self.p, self.b], [type(None)]):
+            if self.a == 0:
+                return f"{self.b}"
+            if self.b == 0:
+                if self.p == 0:
+                    return f"{self.a}"
+                else:
+                    if self.a == 1:
+                        return f"x^{self.p}"
+                return f"{self.a}*x^{self.p}"
+            return f"{self.a}*x^{self.p}+{self.b}"
+        return "No representations for lambda"

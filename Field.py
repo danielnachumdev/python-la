@@ -45,6 +45,8 @@ class Field:
                         break
                 else:
                     if not rule(*vars):
+                        pass
+                    if not rule(*vars):
                         return False
             return True
 
