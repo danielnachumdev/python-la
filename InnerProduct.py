@@ -31,7 +31,7 @@ class InnerProduct:
             for _ in range(REPETITIONS):
                 a: Vector = generator_func()
                 b: Vector = generator_func()
-                # TODO complex
+                # TODO implemnt symmetry check for complex
                 original = func(a, b)
                 adj = func(b, a)
                 if original-adj > THRESHOLD:

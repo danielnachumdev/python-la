@@ -7,7 +7,8 @@ import Span
 import Field
 import copy
 import functools
-from utils import areinstances, check_foreach
+import Polynomial
+from utils import areinstances, check_foreach, isoneof
 t_matrix = list[list[Union[float, Complex]]]
 
 
@@ -58,6 +59,14 @@ class Matrix:
         # TODO how to check that defualt value is inside 'f'? what if 'f' is ratinals and has no __contains__ implemented?
         return Matrix([[f.random(min, max) if def_value is None else def_value for _ in range(degree)]for __ in range(degree)], field=f)
 
+    @staticmethod
+    def fromJordanBlocks(lst: list[Matrix]) -> Matrix:
+        pass
+
+    @staticmethod
+    def createJordanBlock(size: int, eigenvalue) -> Matrix:
+        pass
+
     def __init__(self, mat: t_matrix, sol_vec: list[Union[float, Complex]] = None, field: Field.Field = None) -> None:
         if field is None:
             field = Field.DefaultRealField
@@ -67,6 +76,16 @@ class Matrix:
         self.__solution_vector = sol_vec if sol_vec else [
             0 for _ in range(self.__rows)]
         self.field = field
+
+    @property
+    def kernel(self) -> Span.Span:
+        # TODO calculate kernel
+        pass
+
+    @property
+    def image(self) -> Span.Span:
+        # TODO implement image calculation
+        pass
 
     @property
     def rank(self) -> int:
@@ -93,6 +112,11 @@ class Matrix:
         return self.determinant != 0
 
     @property
+    def invert(self) -> Matrix:
+        # TODO calculate the invert of a matrix
+        pass
+
+    @property
     def is_square(self) -> bool:
         return self.__rows == self.__cols
 
@@ -102,6 +126,41 @@ class Matrix:
 
     @property
     def image(self) -> Span.Span:
+        pass
+
+    @property
+    def is_diagonialable(self) -> bool:
+        # TODO implement diagonialability check
+        pass
+
+    @property
+    def is_nilpotent(self) -> bool:
+        # TODO implement nilpotency check
+        pass
+
+    @property
+    def eigen_values(self) -> Vector.Vector:
+        # TODO implement eigen value calculation
+        pass
+
+    @property
+    def jordan_form(self) -> Matrix:
+        # TODO implement jordan form calculation
+        pass
+
+    @property
+    def chain_basis(self) -> Span.Span:
+        # TODO implement chain basis calculation
+        pass
+
+    @property
+    def characteristic_polynomial(self) -> Polynomial.Polynomial:
+        # TODO implement characteristic polynomial calculation
+        pass
+
+    @property
+    def minimal_polynomial(self) -> Polynomial.Polynomial:
+        # TODO implement minimal polynomial calculation
         pass
 
     def __getitem__(self, index: int):
@@ -141,7 +200,7 @@ class Matrix:
         """
         self * other
         """
-        if isinstance(other, float) or isinstance(other, Complex) or isinstance(other, int):
+        if isoneof(other, [int, float, Complex]):
             return Matrix([[other * self.__matrix[i][j] for j in range(self.__cols)]
                            for i in range(self.__rows)])
         if isinstance(other, Vector.Vector):
@@ -163,7 +222,7 @@ class Matrix:
         """
         other * self
         """
-        if isinstance(other, float) or isinstance(other, Complex) or isinstance(other, int):
+        if isoneof(other, [int, float, Complex]):
             return self.__mul__(other)
         if isinstance(other, Vector):
             raise TypeError(
@@ -175,16 +234,19 @@ class Matrix:
             return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
                             for k in range(other.__cols)] for i in range(self.__rows)])
         raise TypeError(
-            "Matrix can only be multiplied by a number, Vector.Vector, or Matrix")
+            f"cant perform {type(other)}*Matrix.\ncan only be multiplied by a:\n\tint\n\tfloat\n\tComplex\n\tVector\n\tMatrix]")
 
     def __eq__(self, other: Matrix) -> bool:
         if not isinstance(other, Matrix):
-            raise TypeError("Matrix can only be compared to another Matrix")
+            raise TypeError(f"cant complare 'Matrix' with '{type(other)}'")
         if self.__rows != other.__rows or self.__cols != other.__cols:
             return False
         if any([self.__matrix[i][j] != other.__matrix[i][j] for i in range(self.__rows) for j in range(self.__cols)]):
             return False
         return True
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
 
     def __len__(self) -> int:
         return self.__rows
@@ -273,5 +335,18 @@ class Matrix:
                 res.__solution_vector[r2] -= row_divider * \
                     res.__solution_vector[r]
         if res.rank != res.__rows:
-            return "nullity rank was atleast 1, not yet implemented"  # TODO
+            # TODO implement solutions for nullity rank > 1
+            return "nullity rank was atleast 1, not yet implemented"
         return res
+
+    def get_eigen_space_of(eigenvalue) -> Span:
+        # TODO calculate the eigen space of an eigen value
+        pass
+
+    def algebraic_multiplicity(eigenvalue) -> int:
+        # TODO calculate the algebraic multiplicity of an eigenvalue
+        pass
+
+    def geometric_multiplicity(eigenvalue) -> int:
+        # TODO calculate the geometric multiplicity of an eigenvalue
+        pass

@@ -28,7 +28,7 @@ class Vector:
 
     @property
     def adjoint(self) -> Vector:
-        # TODO complex
+        # TODO implement adjoint for complex vector
         return self.copy()
 
     def __str__(self) -> str:
@@ -71,8 +71,9 @@ class Vector:
     def __iter__(self):
         return iter(self.__values)
 
-    def __eq__(self, other: Vector) -> bool:  # TODO: do i want to raise errors?
+    def __eq__(self, other: Vector) -> bool:
         if not isinstance(other, Vector):
+            # FIXME: do i want to raise errors?
             raise TypeError("Vector can only be compared to another Vector")
         if self.field != other.field:
             raise ValueError("Vectors must have the same field")

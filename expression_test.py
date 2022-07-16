@@ -58,7 +58,4 @@ def test_derivative():
 
 
 def test_antiderivative():
-    anti = Expression.fromString("x^2").antiderivative(x)
-    if not almost_equal(anti, x**3/3):
-        pass
-    assert almost_equal(anti, x**3/3)
+    assert almost_equal(Expression.fromString("x^2").antiderivative(x), x**3/3)

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from Vector import Vector
+import Vector
 import Expression
 import functools
 
@@ -29,7 +29,8 @@ class Polynomial:
         self.expressions.sort(key=functools.cmp_to_key(comparer), reverse=True)
 
     @property
-    def roots(self) -> Vector:
+    def roots(self) -> Vector.Vector:
+        # TODO calculation of roots if possible
         pass
 
     def __str__(self) -> str:
@@ -39,13 +40,26 @@ class Polynomial:
         return " + ".join([str(e) for e in self.expressions])
 
     def __add__(self, other) -> Polynomial:
+        # TODO implement polinomial __add__
+        pass
+
+    def __radd__(self, other) -> Polynomial:
+        # TODO implement polinomial __radd__
         pass
 
     def __mul__(self, other) -> Polynomial:
+        # TODO implement polinomial __mul__
         pass
 
+    def __rmul__(self, other) -> Polynomial:
+        # TODO implement polinomial __rmul__
+        pass
+    # TODO implement other operators
+
     def __call__(self, v):
+        # TODO implement polinomial __call__
         pass
 
     def gcd_with(self, other: Polynomial) -> Polynomial:
+        # TODO implement gcd calculation
         pass

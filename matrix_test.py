@@ -21,3 +21,7 @@ def test_from_vectors():
         for i in range(len(vecs[0])):
             for j in range(len(vecs)):
                 assert vecs[j][i] == m[i][j]
+
+
+def test_determinant():
+    assert Matrix([[1, 1], [1, 1]]).determinant == 0

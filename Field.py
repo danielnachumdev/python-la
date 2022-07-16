@@ -143,8 +143,8 @@ class Field:
 
 
 class RationalField(Field):
-    # def over(self) -> RationalField:
-    #     return RationalField
+    def __init__(self, degree=1, modulu=1):
+        super().__init__(Fields.Q, 0, 1, degree, modulu)
 
     def _generate_one(self, min: int = -10, max: int = 10) -> float:
         if min == max:
@@ -169,12 +169,12 @@ class RationalField(Field):
             "Due to how numbers are stored in python all fractional numbers are rational so this function is irrelevant")
 
 
-DefaultRationalField = RationalField(Fields.Q, 0, 1)
+DefaultRationalField = RationalField()
 
 
 class RealField(Field):
-    # def over(self) -> RealField:
-    #     return RealField
+    def __init__(self, degree=1, modulu=1):
+        super().__init__(Fields.R, 0, 1, degree, modulu)
 
     def _generate_one(self, min: int = -10, max: int = 10) -> float:
         return random.uniform(min, max)
@@ -189,12 +189,13 @@ class RealField(Field):
             return obj.field == self
 
 
-DefaultRealField = RealField(Fields.R, 0, 1)
+DefaultRealField = RealField()
 
 
 class ComplexField(Field):
-    # def over(self) -> ComplexField:
-    # return ComplexField
+    def __init__(self, degree=1, modulu=1):
+        super().__init__(Fields.C, Complex.Complex(0, 0),
+                         Complex.Complex(1, 0), degree, modulu)
 
     def _generate_one(self, min: int = -10, max: int = 10) -> Complex.Complex:
         return Complex.Complex.generate(min, max, random.uniform)
@@ -209,15 +210,14 @@ class ComplexField(Field):
             return obj.field == self
 
 
-DefaultComplexField = ComplexField(
-    Fields.C, Complex.Complex(0, 0), Complex.Complex(1, 0))
+DefaultComplexField = ComplexField()
 
 
 class MatrixField(Field):
-    # def over(self) -> MatrixField:
-    #     return MatrixField
+    # TODO MatrixFIeld
 
-    def __init__(self,) -> None:
+    def __init__(self, n: int, field: Field,) -> None:
+
         pass
 
     def _generate_one(self, min: int = -10, max: int = 10) -> Matrix.Matrix:

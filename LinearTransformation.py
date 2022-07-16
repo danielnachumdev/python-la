@@ -5,6 +5,7 @@ import Field
 
 
 class LinearTransformation:
+    # TODO rethink data structure
     @staticmethod
     def isFuncLinearTransformation(func: Callable[[Any, Field.Field], Union[Vector.Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
         COUNT = 100
@@ -18,6 +19,9 @@ class LinearTransformation:
     @staticmethod
     def fromMatrix(m: Matrix) -> LinearTransformation:
         return LinearTransformation(m.field, type(m.field)(m.field._name), lambda x: m*x)
+
+    def is_invariant_to(span: Span) -> bool:
+        pass
 
     def __init__(self, src_field: Field, dst_field: Field, func: Callable[[Any], Any]) -> None:
         """creates a new linear transformation
@@ -33,7 +37,7 @@ class LinearTransformation:
         self.dst_field = dst_field
         self.func = func
 
-    def __call__(self, v: Any) -> Union[Vector, Matrix]:
+    def __call__(self, v: Any) -> Union[Vector.Vector, Matrix]:
         """ apply the transformation on an object
         Args:
             v (Any): the object to apply the transformation on
@@ -53,8 +57,13 @@ class LinearTransformation:
             raise e
 
     def toMatrix(self, base=None) -> Matrix:
+        # TODO implement calculation of operator over specific base
         pass
 
 
-class Hom(Field.Field):
-    pass
+# class Hom(Field.Field):
+#     pass
+
+
+# class Operator(LinearTransformation):
+#     pass

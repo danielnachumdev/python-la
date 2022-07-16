@@ -197,4 +197,5 @@ class Expression:
         return "No representations for lambda"
 
     def toVector(self) -> Vector.Vector:
+        # TODO rethink if this needs to be here or in Polynomial.Polynomial and if so, how to do it
         pass

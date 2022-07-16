@@ -78,8 +78,8 @@ class Complex:
         denominator = self*self.conjugate
         return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
 
-    # TODO: implement this
     def __pow__(self, p):
+        # TODO: implement Complex**p fully
         if not utils.isoneof(p, [int]):
             raise NotImplementedError(
                 "Complex.__pow__ only implemented for int right now")
@@ -99,8 +99,8 @@ class Complex:
                 res *= self
             return fix_negativ(res)
 
-    # TODO: implement this
     def __rpow__(self, other):
+        # TODO: implement base**Complex
         raise NotImplementedError("This is not implemented yet")
 
     @property
