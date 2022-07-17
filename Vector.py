@@ -76,7 +76,9 @@ class Vector:
     def __rmul__(self, num: float) -> Vector:
         return self.__mul__(num)
 
-    def __truediv__(self, num: float) -> Vector:
+    def __truediv__(self, other) -> Vector:
+        if utils.isoneof(other, [int, float, Complex]):
+            return self.__mul__(1/other)
         raise ValueError("cant divide vector")
 
     def __rtruediv__(self, num: float) -> Vector:

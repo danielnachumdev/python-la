@@ -84,4 +84,4 @@ def t():
 
 
 if __name__ == '__main__':
-    t()
+    print(Span([Vector([2, -1, 0, 1]), Vector([0, -0.5, 1, 0])]).toOrthonormal())

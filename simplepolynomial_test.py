@@ -1,4 +1,4 @@
-from Polynomial import Polynomial as p
+from SimplePolynomial import SimplePolynomial as p
 
 x = p([1], [1])
 xp1 = p([1, 1], [1, 0])
@@ -15,6 +15,9 @@ def test_addition():
     assert 5+x == p([1, 5], [1, 0])
     assert 5+x+5 == p([1, 10], [1, 0])
     assert x+p([2], [2]) == p([1, 2], [1, 2])
+
+
+test_addition()
 
 
 def test_subtraction():

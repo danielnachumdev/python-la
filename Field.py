@@ -200,7 +200,7 @@ class ComplexField(Field):
                          Complex.Complex(1, 0), degree, modulu)
 
     def _generate_one(self, min: int = -10, max: int = 10) -> Complex.Complex:
-        return Complex.Complex.generate(min, max, random.uniform)
+        return Complex.Complex.random(min, max, random.uniform)
 
     def __contains__(self, obj: Union[int, float, Complex.Complex, Vector.Vector]) -> bool:
         if (isinstance(obj, Complex.Complex) or isinstance(obj, float) or isinstance(obj, int)) and self._degree == 1:

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 
-class Calculateable:
+class Calculable:
     @staticmethod
-    def fromString(s: str) -> Calculateable:
+    def fromString(s: str) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
     def __init__(self):
@@ -25,40 +25,40 @@ class Calculateable:
             raise NotImplementedError(
                 "abstract class - operators are not implemented")
 
-    def __add__(self, other) -> Calculateable:
+    def __add__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __radd__(self, other) -> Calculateable:
+    def __radd__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __mul__(self, other) -> Calculateable:
+    def __mul__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __rmul__(self, other) -> Calculateable:
+    def __rmul__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __neg__(self) -> Calculateable:
+    def __neg__(self) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __sub__(self, other) -> Calculateable:
+    def __sub__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __rsub__(self, other) -> Calculateable:
+    def __rsub__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __truediv__(self, other) -> Calculateable:
+    def __truediv__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __rtruediv__(self, other) -> Calculateable:
+    def __rtruediv__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __pow__(self, other) -> Calculateable:
+    def __pow__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __eq__(self, other) -> Calculateable:
+    def __eq__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
-    def __ne__(self, other) -> Calculateable:
+    def __ne__(self, other) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
     def __call__(self, value):

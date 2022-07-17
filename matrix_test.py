@@ -57,6 +57,6 @@ def test_solve():
 
 
 def test_with_polynomial():
-    from Polynomial import Polynomial
-    assert Polynomial.fromString("x^2")(
+    from SimplePolynomial import SimplePolynomial
+    assert SimplePolynomial.fromString("x^2")(
         Matrix([[1, 0], [0, 1]])) == Matrix([[1, 0], [0, 1]])

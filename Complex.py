@@ -112,5 +112,5 @@ class Complex:
         return (self * self.conjugate).real
 
     @staticmethod
-    def generate(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
+    def random(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
         return Complex(value_func(min_val, max_val), value_func(min_val, max_val))

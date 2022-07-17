@@ -7,7 +7,7 @@ import Span
 import Field
 import copy
 import functools
-import Polynomial
+import SimplePolynomial
 from utils import areinstances, check_foreach, isoneof
 t_matrix = list[list[Union[float, Complex]]]
 
@@ -153,12 +153,12 @@ class Matrix:
         pass
 
     @property
-    def characteristic_polynomial(self) -> Polynomial.Polynomial:
+    def characteristic_polynomial(self) -> SimplePolynomial.SimplePolynomial:
         # TODO implement characteristic polynomial calculation
         pass
 
     @property
-    def minimal_polynomial(self) -> Polynomial.Polynomial:
+    def minimal_polynomial(self) -> SimplePolynomial.SimplePolynomial:
         # TODO implement minimal polynomial calculation
         pass
 

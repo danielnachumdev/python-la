@@ -50,6 +50,22 @@ class Span:
     def dim(self) -> int:
         return len(self)
 
+    @property
+    def basis(self) -> Span:
+        pass
+
+    @property
+    def has_lineary_dependency(self) -> bool:
+        pass
+
+    @property
+    def is_orthogonal(self):
+        pass
+
+    @property
+    def is_orthonormal(self):
+        pass
+
     def __str__(self) -> str:
         result = ""
         for vector in self.vectors:
@@ -106,8 +122,7 @@ class Span:
         self.vectors.append(vec)
 
     def toOrthonormal(self) -> Span:
-        result = Span([])
-        result.append(self[0].toOrthonormal())
+        result = [self[0].toOrthonormal()]
         from InnerProduct import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
@@ -116,7 +131,7 @@ class Span:
                 curr_tag = curr_tag+sip(prev, current) * prev
             current = current-curr_tag
             result.append(current.toOrthonormal())
-        return result
+        return Span(result)
 
     def projection_of(self, v: Vector.Vector) -> Vector.Vector:
         """

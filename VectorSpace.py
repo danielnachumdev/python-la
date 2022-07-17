@@ -5,3 +5,5 @@ class VectorSpace:
 
 class PolynomialVectorSpace(VectorSpace):
     pass
+
+# TODO is oclidian, is hermitian

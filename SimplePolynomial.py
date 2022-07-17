@@ -1,22 +1,21 @@
 from __future__ import annotations
 from statistics import quantiles
 import Vector
-import Expression
 import functools
-from Calculateable import Calculateable
+from Calculable import Calculable
 import utils
 import Complex
 from typing import Tuple
 
 
-class Polynomial(Calculateable):
+class SimplePolynomial(Calculable):
     @staticmethod
-    def fromString(input: str, var: str = "x") -> Polynomial:
+    def fromString(input: str, var: str = "x") -> SimplePolynomial:
         if var not in input:
             for c in input:
                 if not c.isdigit():
                     raise ValueError("")
-            return Polynomial([float(input)], [0])
+            return SimplePolynomial([float(input)], [0])
             raise ValueError("Variable not found in string")
         # --------helper functions----------
 
@@ -33,8 +32,8 @@ class Polynomial(Calculateable):
                     res.append(c)
             return res
 
-        def sub_to_poly(sub) -> Polynomial:
-            def pow_to_poly(subb: str) -> Polynomial:
+        def sub_to_poly(sub) -> SimplePolynomial:
+            def pow_to_poly(subb: str) -> SimplePolynomial:
                 individual_chars = splitter([subb], "^")
                 if len(individual_chars) == 2:
                     bias = 1
@@ -56,14 +55,14 @@ class Polynomial(Calculateable):
                     except ValueError as e:
                         bias += 1
                         prefix, power = extract_nums(individual_chars)
-                    return Polynomial([prefix], [power])
+                    return SimplePolynomial([prefix], [power])
 
                 elif len(individual_chars) == 1:
                     text = individual_chars[0]
                     if text == var:
-                        return Polynomial([1], [1])
+                        return SimplePolynomial([1], [1])
                     prefix = float(text.replace(var, ""))
-                    return Polynomial([prefix], [1 if var in text else 0])
+                    return SimplePolynomial([prefix], [1 if var in text else 0])
                 assert False, "didnt think about that"
 
             multiplication_stack = stacker(sub, ["*", "/"])
@@ -86,9 +85,9 @@ class Polynomial(Calculateable):
                 raise ValueError("invalid brackets")
             input = utils.open_power(input)
             sub_inputs = utils.split_not_between_brackets(input, "*")
-            res = Polynomial.fromString(sub_inputs[0], var)
+            res = SimplePolynomial.fromString(sub_inputs[0], var)
             for sub_input in sub_inputs[1:]:
-                res *= Polynomial.fromString(sub_input, var)
+                res *= SimplePolynomial.fromString(sub_input, var)
             return res
         else:
             # split with addition
@@ -117,7 +116,7 @@ class Polynomial(Calculateable):
         POW = 1
         PRE = 0
 
-        def comparer(v1: Expression.Expression, v2: Expression.Expression) -> int:
+        def comparer(v1: Tuple, v2: Tuple) -> int:
             # TODO what if one of them is complex? __lt__ need to be implemented, but how?
             bias = 1
             if v1[POW] < v2[POW]:
@@ -199,66 +198,66 @@ class Polynomial(Calculateable):
             return f"{str(prefix)}X^{str(power)}"
         return " + ".join([one_to_str(i) for i in range(len(self))])
 
-    def __add__(self, other) -> Polynomial:
+    def __add__(self, other) -> SimplePolynomial:
         if utils.isoneof(other, [int, float, Complex.Complex]):
             if other == 0:
-                return Polynomial(self.prefixes, self.powers)
+                return SimplePolynomial(self.prefixes, self.powers)
             elif 0 in self.powers:
                 index = self.powers.index(0)
                 if self.prefixes[index] + other == 0:
-                    return Polynomial(self.prefixes[:index]+self.prefixes[index+1:], self.powers[:index]+self.powers[index+1:])
+                    return SimplePolynomial(self.prefixes[:index]+self.prefixes[index+1:], self.powers[:index]+self.powers[index+1:])
                 new_prefixes = self.prefixes[:index] + \
                     [self.prefixes[index] + other] + self.prefixes[index+1:]
-                return Polynomial(new_prefixes, self.powers)
-            return Polynomial(self.prefixes+[other], self.powers+[0])
-        elif isinstance(other, Polynomial):
-            return Polynomial(self.prefixes+other.prefixes, self.powers+other.powers)
+                return SimplePolynomial(new_prefixes, self.powers)
+            return SimplePolynomial(self.prefixes+[other], self.powers+[0])
+        elif isinstance(other, SimplePolynomial):
+            return SimplePolynomial(self.prefixes+other.prefixes, self.powers+other.powers)
         raise NotImplementedError(
             f"Polynomial addition not implemented for {type(other)}")
 
-    def __radd__(self, other) -> Polynomial:
+    def __radd__(self, other) -> SimplePolynomial:
         return self.__add__(other)
 
-    def __sub__(self, other) -> Polynomial:
+    def __sub__(self, other) -> SimplePolynomial:
         return self.__add__(-other)
 
-    def __rsub__(self, other) -> Polynomial:
+    def __rsub__(self, other) -> SimplePolynomial:
         return other + (-self)
 
-    def __neg__(self) -> Polynomial:
+    def __neg__(self) -> SimplePolynomial:
         return self*(-1)
 
-    def __mul__(self, other) -> Polynomial:
+    def __mul__(self, other) -> SimplePolynomial:
         if utils.isoneof(other, [int, float, Complex.Complex]):
-            return Polynomial([other*pre for pre in self.prefixes], self.powers)
-        elif isinstance(other, Polynomial):
+            return SimplePolynomial([other*pre for pre in self.prefixes], self.powers)
+        elif isinstance(other, SimplePolynomial):
             new_prefixes, new_powers = [], []
             for i in range(len(other)):
                 for j in range(len(self)):
                     new_prefixes.append(self.prefixes[j]*other.prefixes[i])
                     new_powers.append(self.powers[j]+other.powers[i])
-            return Polynomial(new_prefixes, new_powers)
+            return SimplePolynomial(new_prefixes, new_powers)
         raise NotImplementedError(
             f"Polynomial multiplication not implemented for {type(other)}")
 
-    def __rmul__(self, other) -> Polynomial:
+    def __rmul__(self, other) -> SimplePolynomial:
         return self.__mul__(other)
 
-    def __truediv__(self, other) -> Tuple[Polynomial, Polynomial]:
+    def __truediv__(self, other) -> Tuple[SimplePolynomial, SimplePolynomial]:
         if self == other:
-            return Polynomial([1], [0]), 0
+            return SimplePolynomial([1], [0]), 0
         if utils.isoneof(other, [int, float, Complex.Complex]):
             return self*(1/other), 0
-        elif isinstance(other, Polynomial):
+        elif isinstance(other, SimplePolynomial):
             if self.degree >= other.degree and len(self) > len(other):
-                quotient, remainder = Polynomial([0], [0]), None
+                quotient, remainder = SimplePolynomial([0], [0]), None
                 current = self
                 prefix, power = 1, 1
                 while(current.degree >= other.degree):
                     prefix = current.prefixes[0]/other.prefixes[0]
                     power = current.prefixes[0] - other.powers[0]
-                    quotient += Polynomial([prefix], [power])
-                    subtructor = Polynomial(
+                    quotient += SimplePolynomial([prefix], [power])
+                    subtructor = SimplePolynomial(
                         [quotient.prefixes[-1]*v for v in other.prefixes], [quotient.prefixes[-1]*v for v in other.powers])
                     current -= subtructor
                 remainder, _ = current/other
@@ -270,16 +269,16 @@ class Polynomial(Calculateable):
         # TODO need to add?
         raise NotImplementedError("Polynomial division not implemented")
 
-    def __rtruediv__(self, other) -> Polynomial:
+    def __rtruediv__(self, other) -> SimplePolynomial:
         if utils.isoneof(other, [int, float, Complex.Complex]):
             pass
-        elif isinstance(other, Polynomial):
+        elif isinstance(other, SimplePolynomial):
             pass
 
-    def __pow__(self, pow) -> Polynomial:
+    def __pow__(self, pow) -> SimplePolynomial:
         if isinstance(pow, int):
             if pow == 0:
-                return Polynomial([1], [0])
+                return SimplePolynomial([1], [0])
             res = self
             for _ in range(abs(pow)-1):
                 res *= self
@@ -287,14 +286,14 @@ class Polynomial(Calculateable):
                 return 1/res
             return res
 
-    def __eq__(self, other: Polynomial) -> bool:
+    def __eq__(self, other: SimplePolynomial) -> bool:
         if utils.isoneof(other, [int, float, Complex.Complex]):
             if other == 0:
                 return len(self) == 0
             if len(self) != 1:
                 return False
             return self.powers[0] == 0 and self.prefixes[0] == other
-        if isinstance(other, Polynomial):
+        if isinstance(other, SimplePolynomial):
             if len(self) != len(other):
                 return False
             for i in range(len(self)):
@@ -310,7 +309,7 @@ class Polynomial(Calculateable):
     def __call__(self, v):
         import Matrix
         import LinearTransformation
-        if not utils.isoneof(v, [int, float, Complex.Complex, Polynomial, Matrix.Matrix, LinearTransformation.LinearTransformation]):
+        if not utils.isoneof(v, [int, float, Complex.Complex, SimplePolynomial, Matrix.Matrix, LinearTransformation.LinearTransformation]):
             # TODO implement __call_ for matrix,operator,vector,etc
             raise NotImplementedError(
                 "Polynomial __call__ not implemented for " + str(type(v)))
@@ -322,7 +321,7 @@ class Polynomial(Calculateable):
     def __len__(self) -> int:
         return len(self.powers)
 
-    def gcd_with(self, other: Polynomial) -> Polynomial:
+    def gcd_with(self, other: SimplePolynomial) -> SimplePolynomial:
         # TODO implement gcd calculation
         pass
 
