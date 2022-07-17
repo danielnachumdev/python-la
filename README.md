@@ -24,6 +24,12 @@ Partially implemented
 Partially implemented
 ## Linear Transformation
 Partially implemented
+## Polynomial
+* addition,subtraction,negation,multiplication,power
+* can substitute x for any of the following:
+  * inf,float,complex
+  * matrix
+  * linear transformation
 ## InnerProduct
 Partially implemented
 * Implemented `StandardInnerProduct`
