@@ -28,9 +28,6 @@ def test_open_power():
     assert func("(x)^10") == "(x)(x)(x)(x)(x)(x)(x)(x)(x)(x)"
 
 
-test_open_power()
-
-
 def test_split_not_between_brackets():
     func = split_not_between_brackets
     assert func("(()())*(()())", "*") == ["()*()", "()*()"]
@@ -40,3 +37,29 @@ def test_split_not_between_brackets():
     assert func("(x+1)(x+1)", "-") == ["x+1", "x+1"]
     assert func("(x+1)(x+1)", "/") == ["x+1", "x+1"]
     assert func("((x)+1)(x+1)", "*") == ["(x)+1", "x+1"]
+
+
+def test_composit_functions():
+    from Vector import Vector
+    from LinearTransformation import LinearTransformation
+    from Field import RealField
+    import random
+
+    def func(v, target):
+        return Vector([v[1], v[0]], target)
+    R2 = RealField(2)
+    lt = LinearTransformation(R2, R2, func)
+    v = R2.random()
+    assert lt(lt(v)) == v
+    assert (lt**2)(v) == v
+    assert (lt**4)(v) == (lt**2)(v)
+    num = random.randint(1, 10)
+    lt2 = num*lt
+    assert lt2(v) == Vector([v[1]*num, v[0]*num], R2)
+    assert (lt2**2)(v) == Vector([v[0]*num**2, v[1]*num**2], R2)
+
+    def func(v, target):
+        return Vector([0, v[0]], target)
+    lt = LinearTransformation(R2, R2, func)
+    v = R2.random()
+    assert (num*lt**2)(v) == Vector([0, 0], R2)

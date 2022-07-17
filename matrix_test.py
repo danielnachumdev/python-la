@@ -27,6 +27,35 @@ def test_determinant():
     assert Matrix([[1, 1], [1, 1]]).determinant == 0
 
 
+def test_id():
+    assert Matrix.id(2) == Matrix([[1, 0], [0, 1]])
+
+
+def test_guassian_elimination():
+    assert Matrix([[1, 1], [1, 1]]).guassian_elimination(
+    ) == Matrix([[1, 1], [0, 0]])
+    assert Matrix.id(5).guassian_elimination(
+    ) == Matrix.id(5)
+
+
+def test_solve():
+    from Span import Span
+    from Vector import Vector
+    assert Matrix([[1, 1], [1, 1]]).solve(Vector([1, 2])) == None
+    assert Matrix.id(2).solve() == Vector([0, 0])
+    # FIXME
+    # assert Matrix([[1, 1], [1, 1]]).solve() == Span([Vector([0, 1])])
+
+
+# def test_kernel():
+#     from Span import Span
+#     from Vector import Vector
+#     assert Matrix([[1, 0], [0, 0]]).kernel == Span([Vector([0, 1])])
+
+
+# test_kernel()
+
+
 def test_with_polynomial():
     from Polynomial import Polynomial
     assert Polynomial.fromString("x^2")(

@@ -36,7 +36,7 @@ class Span:
                 raise TypeError(
                     "All objects must have a field attribute which is an Instance of class Field")
             # if all vectors in base are of the same field add then otherwise throw an error
-            self.field = self.vectors[0].field
+            self.field = example_item.field
             for vector in base:
                 if vector.field != self.field:
                     raise ValueError(
@@ -45,6 +45,10 @@ class Span:
         if not are_operators_implemnted(type(self.vectors[0])):
             raise AttributeError(
                 "Not all required operators are implemented for the class of the objects")
+
+    @property
+    def dim(self) -> int:
+        return len(self)
 
     def __str__(self) -> str:
         result = ""

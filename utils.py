@@ -1,4 +1,5 @@
 # import Complex
+
 import math
 from typing import Tuple
 
@@ -8,6 +9,7 @@ def are_operators_implemnted(T) -> bool:
         T.__add__
         T.__radd__
         T.__sub__
+        T.__rsub__
         T.__neg__
         T.__mul__
         T.__rmul__

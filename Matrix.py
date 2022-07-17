@@ -67,6 +67,13 @@ class Matrix:
     def createJordanBlock(size: int, eigenvalue) -> Matrix:
         pass
 
+    @staticmethod
+    def id(size: int) -> Matrix:
+        arr = [[0 for __ in range(size)] for _ in range(size)]
+        for i in range(size):
+            arr[i][i] = 1
+        return Matrix(arr)
+
     def __init__(self, mat: t_matrix, sol_vec: list[Union[float, Complex]] = None, field: Field.Field = None) -> None:
         if field is None:
             field = Field.DefaultRealField
@@ -79,8 +86,8 @@ class Matrix:
 
     @property
     def kernel(self) -> Span.Span:
-        # TODO calculate kernel
-        pass
+        solution = Matrix(
+            self.__matrix, [0 for _ in range(self.__rows)]).solve()
 
     @property
     def image(self) -> Span.Span:
@@ -119,14 +126,6 @@ class Matrix:
     @property
     def is_square(self) -> bool:
         return self.__rows == self.__cols
-
-    @property
-    def kernel(self) -> Span.Span:
-        pass
-
-    @property
-    def image(self) -> Span.Span:
-        pass
 
     @property
     def is_diagonialable(self) -> bool:
@@ -176,7 +175,7 @@ class Matrix:
         return result
 
     def __add__(self, other: Matrix) -> Matrix:
-        if not Matrix.isInstance(other):
+        if not isinstance(other, Matrix):
             raise TypeError("Matrix can only be added to another Matrix")
         if self.__rows != other.__rows or self.__cols != other.__cols:
             raise ValueError("Matrices must have the same dimensions")
@@ -188,7 +187,7 @@ class Matrix:
                        for i in range(self.__rows)])
 
     def __sub__(self, other: Matrix) -> Matrix:
-        if not Matrix.isInstance(other):
+        if not isinstance(other, Matrix):
             raise TypeError(
                 "Matrix can only be subtracted from another Matrix")
         if self.__rows != other.__rows or self.__cols != other.__cols:
@@ -315,15 +314,9 @@ class Matrix:
         self.__matrix = sorted(
             self.__matrix, key=functools.cmp_to_key(comparer), reverse=True)
 
-    def solve(self) -> Matrix:
-        """
-        Solve the system of equations
-        """
-        if self.__rows != self.__cols:
-            raise ValueError("Matrix must be square")
-        # if self.rows != self.solution_vector.length:
-        #     raise ValueError(
-        #         "Matrix and solution vector must have the same number of rows")
+    def guassian_elimination(self, sol=None) -> Matrix:
+        if not sol:
+            sol = self.__solution_vector
 
         def first_not_zero_index(row: list[float]) -> int:
             for i in range(len(row)):
@@ -331,7 +324,9 @@ class Matrix:
                     break
             return i
         res = copy.deepcopy(self)
+        res.__solution_vector = sol
         res.reorgenize_rows()
+        # gaussian elimination
         for r in range(res.__rows):
             lead_index = first_not_zero_index(res[r])
             lead_value = res[r][lead_index]
@@ -352,10 +347,29 @@ class Matrix:
                     res[r2][c] -= row_divider * res[r][c]
                 res.__solution_vector[r2] -= row_divider * \
                     res.__solution_vector[r]
-        if res.rank != res.__rows:
-            # TODO implement solutions for nullity rank > 1
-            return "nullity rank was atleast 1, not yet implemented"
         return res
+
+    def solve(self, vec=None) -> Union[Vector.Vector, Span.Span, None]:
+        """
+        Solve the system of equations
+        """
+        if self.__rows != self.__cols:
+            raise ValueError("Matrix must be square")
+        if vec == None:
+            vec = self.__solution_vector
+        if not isoneof(vec, [Vector.Vector, list]):
+            raise TypeError("Matrix must be solved for a vector")
+        result_matrix = self.guassian_elimination(list(vec))
+        for i, row in enumerate(result_matrix):
+            if (not Vector.Vector(row).has_no_zero) and result_matrix.__solution_vector[i] != 0:
+                return None
+        if result_matrix.rank != result_matrix.__rows:
+            # FIXME
+            # TODO implement solutions for nullity rank > 1
+            raise NotImplementedError(
+                "nullity rank was atleast 1, not yet implemented")
+        else:
+            return Vector.Vector(result_matrix.__solution_vector)
 
     def get_eigen_space_of(eigenvalue) -> Span:
         # TODO calculate the eigen space of an eigen value
