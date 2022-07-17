@@ -27,23 +27,27 @@ __Static methods:__
 random(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
 ```
 __Private methods:__
- - [x] `__add__`
- - [x] `__radd__`
- - [x] `__sub__`
- - [x] `__rsub__`
- - [x] `__neg__`
- - [x] `__mul__`
- - [x] `__rmul__`
- - [x] `__truediv__`
- - [x] `__rtruediv__`
- - [x] `__abs__` := `norm`
- - [x] `__eq__`
- - [x] `__ne__`
- - [x] `__pow__`
- - [ ] `__rpow__`
+```python
+__add__
+__radd__
+__sub__
+__rsub__
+__neg__
+__mul__
+__rmul__
+__truediv__
+__rtruediv__
+__abs__ := norm
+__eq__
+__ne__
+__pow__
+__rpow__ TBD
+```
 __Properties::__
- - [x] `conjugate`
- - [x] `norm`
+```python
+conjugate
+norm
+```
 ## Vector
 
 * addition, subtraction, negation
