@@ -68,7 +68,7 @@ class Matrix:
         pass
 
     @staticmethod
-    def id(size: int) -> Matrix:
+    def id_matrix(size: int) -> Matrix:
         arr = [[0 for __ in range(size)] for _ in range(size)]
         for i in range(size):
             arr[i][i] = 1
@@ -117,11 +117,6 @@ class Matrix:
     @property
     def is_invertiable(self) -> bool:
         return self.determinant != 0
-
-    @property
-    def invert(self) -> Matrix:
-        # TODO calculate the invert of a matrix
-        pass
 
     @property
     def is_square(self) -> bool:

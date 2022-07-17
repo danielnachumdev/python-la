@@ -10,9 +10,7 @@ t_vector = list[Union[float, Complex.Complex]]
 class Vector:
 
     @staticmethod
-    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field.Field = None) -> Vector:
-        if f is None:
-            f = Field.DefaultRealField
+    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field.Field = Field.DefaultRealField) -> Vector:
         return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])
 
     @staticmethod
@@ -128,6 +126,7 @@ class Vector:
         return Vector([self.__values[i] * other.__values[i] for i in range(len(self.__values))])
 
     def toOrthonormal(self) -> Vector:
+        # TODO change name to Normalize?
         return self / self.norm()
 
     def projection_onto(self, value) -> Vector:

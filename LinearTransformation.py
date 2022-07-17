@@ -62,12 +62,10 @@ class LinearTransformation:
         return self.__add__(other)
 
     def __sub__(self, other) -> LinearTransformation:
-        # TODO
-        pass
+        return self.__add__(-other)
 
     def __rsub__(self, other) -> LinearTransformation:
-        # TODO
-        pass
+        return other+(-self)
 
     def __neg__(self) -> LinearTransformation:
         return self.__mul__(-1)

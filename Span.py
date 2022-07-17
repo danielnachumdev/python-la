@@ -13,7 +13,7 @@ class Span:
         """
         vecs = []
         for i in range(field._degree):
-            v = Vector.fromSize(field._degree, field._zero)
+            v = Vector.Vector.fromSize(field._degree, field._zero)
             v[i] = field._one
             vecs.append(v)
         return Span(vecs)
@@ -73,7 +73,7 @@ class Span:
         return result
 
     def __add__(self, other: Span) -> Span:
-        if not Span.isInstance(other):
+        if not isinstance(other, Span):
             raise TypeError("Span can only be added to another Span")
         if len(self.vectors) != len(other.vectors):
             raise ValueError("Spans must have the same length")

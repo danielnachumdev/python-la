@@ -49,23 +49,156 @@ conjugate
 norm
 ```
 ## Vector
+__Static methods:__
+```python
+random(min: float = -10, max: float = 10, degree: int = 10, def_value=None, f: Field = Field.DefaultRealField) -> Vector
 
-* addition, subtraction, negation
+fromSize(size: int, default_value: Any = 0) -> Vector
+```
+__Private methods:__
+```python
+__add__
+__radd__
+__sub__
+__rsub__
+__neg__
+__mul__
+__rmul__
+__truediv__
+__rtruediv__
+__eq__
+__ne__
+__getitem__
+__iter__
+__len__
 
-* scalar multiplication and division
-
-* dot product
+almost_equal
+set
+norm
+dot
+toOrthonormal
+projection_onto
+copy
+```
+__Properties:__
+```python
+length
+adjoint TBD
+has_no_zero
+```
 
 ## Span
+__Static methods:__
+```python
+spanField(field: Field) -> Span
+```
+__Private methods:__
+```python
+__add__
+__eq__
+__ne__
+__getitem__
+__iter__
+__len__
+__contains__
 
-Partially implemented
+contains
+append
+toOrthonormal
+projection_of
+random
+is_spanning
+```
+__Properties:__
+```python
+dim
+basis
+has_lineart_dependency
+is_orthogonal
+is_orthonormal
+```
 
 ## Matrix
+__Static methods:__
+```python
+fromVector
+fromVectors
+fromSpan
+fromString
+random
+fromJordanBlocks TBD
+createJordanBlcok TBD
+id_matrix
+```
+__Private methods:__
+```python
+__add__
+__sub__
+__neg__
+__mul__
+__rmul__
+__truediv__
+__rtruediv__
+__eq__
+__ne__
+__getitem__
+__len__
 
+almost_equal
+inverse
+cofactor
+minor
+tarnspose
+reorgenize_rows
+guassian_elimination
+solve TBD
+get_eigen_space_of TBD
+algebraic_multiplicity TBD
+geometric_multiplicity TBD
+```
+__Properties:__
+```python
+kernel TBD
+image TBD
+rank
+determinant
+is_invertible
+is_square
+is_diagonialable TBD
+is_nilpotent TBD
+eigen_values TBD
+jordan_form TBD
+chain_basis TBD
+characteristic_polynomial TBD
+minimal_polynomial TBD
+```
 Partially implemented
 
 ## Linear Transformation
+__Static methods:__
+```python
+isFuncLinearTransformation
+fromMatrix
+id
+```
+__Private methods:__
+```python
+__add__
+__radd__
+__sub__
+__rsub__
+__neg__
+__mul__
+__rmul__
+__truediv__
+__call__
 
+toMatrix TBD
+```
+__Properties:__
+```python
+
+```
 Partially implemented
 
   
@@ -73,30 +206,77 @@ Partially implemented
 An interface for the following subclasses:
 ### Polynomial
 * #### SimplePolynomial
-	An object which represents: `a_n*x^b_n + ... + a_1*x + a_0`
-	*  [x] addition, subtraction, negation, multiplication, power
-	 * [x] division by scalar
-	 * [x]  variable substitution with :
-		 *  int
-		 * float
-		 * Complex
-		 * Polynomial
-		 * Linear Transformation
-		 * Matrix
+	__Static methods:__
+	```python
+	fromString
+	```
+	__Private methods:__
+	```python
+	__add__
+	__radd__
+	__sub__
+	__rsub__
+	__neg__
+	__mul__
+	__rmul__
+	__truediv__
+	__rtruediv__
+	__pow__
+	__eq__
+	__ne__
+	__call__
+	__len__
 
-
+	gcd_with TBD
+	```
+	__Properties:__
+	```python
+	roots
+	degree
+	```
 * #### PolinomialFraction
-	An object which represents: `SimplePolynomial1 / SimplePolynomial2`
-a superset of SimplePolynomial to add the ability of division  
+	 __Static methods:__
+	```python
 
-## Expression - TBD
+	```
+	__Private methods:__
+	```python
 
-polinomials, exponents, trigonemtry, logarithm, constants, variables
+	```
+	__Properties:__
+	```python
+
+	```
+
+### Expression - TBD
+__Static methods:__
+```python
+
+```
+__Private methods:__
+```python
+
+```
+__Properties:__
+```python
+
+```
 
 ## InnerProduct
 
-Partially implemented
+__Static methods:__
+```python
+isInnerProduct
+```
+__Private methods:__
+```python
+__call__
+```
+__Properties:__
+```python
 
-* Implemented `StandardInnerProduct`
-
-* Implemented `isInnerProduct` that checks if the given function is an inner product (the result is not with absolute certinaty. e.g: if you get a false value it is certianly not an inner product but a true value not neccessearly indicates it is)
+```
+__Instances:__
+```python
+StandardInnerProduct
+```
