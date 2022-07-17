@@ -4,22 +4,39 @@
   
 
 ## Field
+__Static methods:__
+```python
+create
+is_field
+```
+__Private methods:__
+```python
+__str__
+__eq__ virtual
+__contains__ virtual
 
-* Implemented field axioms checking
+_generate_one virtual
+random
+```
+__Properties:__
+```python
+classOfInstance
+```
+__Other classes:__
+```python
+class  RationalField(Field)
+class  RealField(Field)
+class  ComplexField(Field)
+class  MatrixField(Field)
 
-* Implemented generic class `Field`
-
-* each instance contains info about the degree of the field and the modulus of the field
-
-* a `random()` function that generates a vector acording to a virtual function which is implemented in the subclasses to generate one element
-
-* Implemented generic subclass for rationals `RationalField`
-
-* Implemented generic subclass for reals `RealField`
-
-* Implemented generic subclass for complex numbers `ComplexField`
-
-* created instances for those subclasses of `degree=1` and `modulus=1` called `DefaultRationalField`, `DefaultRealField`, `DefaultComplexField`
+Fields(Enum)
+```
+__Instances:__
+```python
+DefaultRationalField
+DefaultRealField
+DefaultComplexField
+```
 
 ## Complex
 __Static methods:__
