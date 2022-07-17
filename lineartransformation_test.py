@@ -15,3 +15,17 @@ def test_containment():
 
 def test_is_func_function():
     pass
+
+
+def test_with_plynomial():
+    field = R2
+
+    def func(v, target_field):
+        return Vector.Vector([0, v[0]], target_field)
+    lt = LinearTransformation(field, field, func)
+    from Polynomial import Polynomial
+    v = field.random()
+    assert Polynomial.fromString("x^2")(lt)(v) == Vector([0, 0])
+
+
+test_with_plynomial()

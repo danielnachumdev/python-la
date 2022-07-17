@@ -25,3 +25,9 @@ def test_from_vectors():
 
 def test_determinant():
     assert Matrix([[1, 1], [1, 1]]).determinant == 0
+
+
+def test_with_polynomial():
+    from Polynomial import Polynomial
+    assert Polynomial.fromString("x^2")(
+        Matrix([[1, 0], [0, 1]])) == Matrix([[1, 0], [0, 1]])

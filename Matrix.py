@@ -201,8 +201,13 @@ class Matrix:
         self * other
         """
         if isoneof(other, [int, float, Complex]):
-            return Matrix([[other * self.__matrix[i][j] for j in range(self.__cols)]
-                           for i in range(self.__rows)])
+            res = self
+            for i in range(len(self)):
+                for j in range(len(self[0])):
+                    res[i][j] *= other
+            return res
+            # return Matrix([[other * self.__matrix[i][j] for j in range(len[self[0]])]
+            #                for i in range(len(self))])
         if isinstance(other, Vector.Vector):
             if self.__cols != other.length:
                 raise ValueError(
@@ -250,6 +255,19 @@ class Matrix:
 
     def __len__(self) -> int:
         return self.__rows
+
+    def __pow__(self, other) -> Matrix:
+        if isoneof(other, [int, float]):
+            if other == int(other):
+                other = int(other)
+                res = self
+                for _ in range(other-1):
+                    res *= self
+                return res
+            raise NotImplementedError(
+                "Matrix**float is not implemented")
+        raise NotImplementedError(
+            f"Matrix power not implemented for Matrix**{type(other)}")
 
     def almost_equal(self, other: Matrix) -> bool:
         if not isinstance(other, Matrix):

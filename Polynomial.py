@@ -1,65 +1,329 @@
 from __future__ import annotations
+from statistics import quantiles
 import Vector
 import Expression
 import functools
+from Calculateable import Calculateable
+import utils
+import Complex
+from typing import Tuple
 
 
-class Polynomial:
+class Polynomial(Calculateable):
     @staticmethod
-    def fromString(s: str, var: str = "x") -> Polynomial:
-        if var not in s:
+    def fromString(input: str, var: str = "x") -> Polynomial:
+        if var not in input:
+            for c in input:
+                if not c.isdigit():
+                    raise ValueError("")
+            return Polynomial([float(input)], [0])
             raise ValueError("Variable not found in string")
+        # --------helper functions----------
 
-    def __init__(self, expressions: list[Expression.Expression]) -> None:
-        self.expressions = expressions
+        def splitter(lst: list[str], symbol: str, excluders: list[str] = list(utils.bracket_pairs.keys())) -> list[str]:
+            res = []
+            for string in lst:
+                res.extend(string.strip().split(symbol))
+            return res
+
+        def stacker(string: str, lst: list[str]) -> list[str]:
+            res = []
+            for c in string:
+                if c in lst:
+                    res.append(c)
+            return res
+
+        def sub_to_poly(sub) -> Polynomial:
+            def pow_to_poly(subb: str) -> Polynomial:
+                individual_chars = splitter([subb], "^")
+                if len(individual_chars) == 2:
+                    bias = 1
+
+                    def extract_nums(indiv) -> Tuple[float, float]:
+                        try:
+                            power = float(indiv[bias % 2])
+                            prefix = 1
+                            if indiv[(bias+1) % 2] != var:
+                                prefix = float(
+                                    indiv[(bias+1) % 2].replace(var, ""))
+                            return prefix, power
+                        except Exception as e:
+                            raise e
+
+                    prefix, power = 1, 0
+                    try:
+                        prefix, power = extract_nums(individual_chars)
+                    except ValueError as e:
+                        bias += 1
+                        prefix, power = extract_nums(individual_chars)
+                    return Polynomial([prefix], [power])
+
+                elif len(individual_chars) == 1:
+                    text = individual_chars[0]
+                    if text == var:
+                        return Polynomial([1], [1])
+                    prefix = float(text.replace(var, ""))
+                    return Polynomial([prefix], [1 if var in text else 0])
+                assert False, "didnt think about that"
+
+            multiplication_stack = stacker(sub, ["*", "/"])
+            subs2 = splitter([sub], "*")
+            subs2 = splitter(subs2, "/")
+            res = pow_to_poly(subs2[0])
+            for i, s in enumerate(subs2[1:]):
+                if multiplication_stack[i] == "*":
+                    res *= pow_to_poly(s)
+                elif multiplication_stack[i] == "/":
+                    res /= pow_to_poly(s)
+
+            return res
+
+        def sign(op): return 1 if op == "+" else -1
+
+        # handle if input has brackets
+        if any(bracket in input for bracket in ["(", ")", "[", "]", "{", "}"]):
+            if not utils.validate_brackets(input):
+                raise ValueError("invalid brackets")
+            input = utils.open_power(input)
+            sub_inputs = utils.split_not_between_brackets(input, "*")
+            res = Polynomial.fromString(sub_inputs[0], var)
+            for sub_input in sub_inputs[1:]:
+                res *= Polynomial.fromString(sub_input, var)
+            return res
+        else:
+            # split with addition
+            addition_stack = stacker(input, ["+", "-"])
+            subs = splitter([input], "+")
+            subs = splitter(subs, "-")
+            subs = [sub for sub in subs if len(sub) > 0]
+            if len(addition_stack) == len(subs)-1:
+                addition_stack.insert(0, "+")
+
+            # foreach sub expression create a Poly with inner splitting by multiplication and add it acording to current addition operator
+            res = sign(addition_stack[0])*sub_to_poly(subs[0])
+            for i, sub in enumerate(subs[1:]):
+                res += sign(addition_stack[i])*sub_to_poly(sub)
+            return res
+
+    def __init__(self, prefixes: list, powers: list) -> None:
+        if len(prefixes) != len(powers):
+            if len(prefixes) == 1 and len(powers) == 0 and prefixes[0] == 0:
+                self.powers = []
+                self.prefixes = []
+                return
+            raise ValueError("Prefixes and powers must be of same length")
+
+        tuples = [(prefixes[i], powers[i]) for i in range(len(powers))]
+        POW = 1
+        PRE = 0
 
         def comparer(v1: Expression.Expression, v2: Expression.Expression) -> int:
+            # TODO what if one of them is complex? __lt__ need to be implemented, but how?
             bias = 1
-            if v1.p < v2.p:
+            if v1[POW] < v2[POW]:
                 return -bias
-            elif v1.p > v2.p:
+            elif v1[POW] > v2[POW]:
                 return bias
             else:
-                if v1.a < v2.a:
+                if v1[PRE] < v2[PRE]:
                     return -bias
-                elif v1.a > v2.a:
+                elif v1[PRE] > v2[PRE]:
                     return bias
                 else:
                     return 0
-        self.expressions.sort(key=functools.cmp_to_key(comparer), reverse=True)
+
+        tuples.sort(key=functools.cmp_to_key(comparer), reverse=True)
+        powers = [tuples[i][POW]
+                  for i in range(len(tuples)) if tuples[i][PRE] != 0]
+        prefixes = [tuples[i][PRE]
+                    for i in range(len(tuples)) if tuples[i][PRE] != 0]
+        self.prefixes = []
+        self.powers = []
+        i = 0
+        while i < len(powers):
+            p = powers[i]
+            count = powers.count(p)
+            if count > 1:
+                r = range(i, i+count)
+                sum = 0
+                for j in r:
+                    sum += prefixes[j]
+                    i += 1
+                i -= 1
+                self.prefixes.append(sum)
+                self.powers.append(p)
+            else:
+                self.prefixes.append(prefixes[i])
+                self.powers.append(p)
+            i += 1
+        self.powers = [self.powers[i]
+                       for i in range(len(self.powers)) if self.prefixes[i] != 0]
+        self.prefixes = [self.prefixes[i]
+                         for i in range(len(self.prefixes)) if self.prefixes[i] != 0]
 
     @property
     def roots(self) -> Vector.Vector:
         # TODO calculation of roots if possible
         pass
 
+    @property
+    def degree(self) -> float:
+        return self.powers[0] if len(self.powers) > 0 else 0
+
     def __str__(self) -> str:
-        # res = ""
-        # for e in self.expressions:
-        #     res += str(e) + " + "
-        return " + ".join([str(e) for e in self.expressions])
+        def one_to_str(i: int) -> str:
+            power = self.powers[i]
+            if power == int(power):
+                power = int(power)
+            prefix = self.prefixes[i]
+            if prefix == int(prefix):
+                prefix = int(prefix)
+            res = ""
+
+            if prefix == 0:
+                return ""
+            elif abs(prefix) == 1:
+                if power == 0:
+                    return "1"
+                if prefix == 1:
+                    return "X" if power == 1 else "X^" + str(power)
+                else:
+                    return "-X" if power == 1 else "-X^" + str(power)
+            else:
+                res += str(prefix)
+
+            if power == 0:
+                return res
+            elif power == 1:
+                return res+"X"
+            return f"{str(prefix)}X^{str(power)}"
+        return " + ".join([one_to_str(i) for i in range(len(self))])
 
     def __add__(self, other) -> Polynomial:
-        # TODO implement polinomial __add__
-        pass
+        if utils.isoneof(other, [int, float, Complex.Complex]):
+            if other == 0:
+                return Polynomial(self.prefixes, self.powers)
+            elif 0 in self.powers:
+                index = self.powers.index(0)
+                if self.prefixes[index] + other == 0:
+                    return Polynomial(self.prefixes[:index]+self.prefixes[index+1:], self.powers[:index]+self.powers[index+1:])
+                new_prefixes = self.prefixes[:index] + \
+                    [self.prefixes[index] + other] + self.prefixes[index+1:]
+                return Polynomial(new_prefixes, self.powers)
+            return Polynomial(self.prefixes+[other], self.powers+[0])
+        elif isinstance(other, Polynomial):
+            return Polynomial(self.prefixes+other.prefixes, self.powers+other.powers)
+        raise NotImplementedError(
+            f"Polynomial addition not implemented for {type(other)}")
 
     def __radd__(self, other) -> Polynomial:
-        # TODO implement polinomial __radd__
-        pass
+        return self.__add__(other)
+
+    def __sub__(self, other) -> Polynomial:
+        return self.__add__(-other)
+
+    def __rsub__(self, other) -> Polynomial:
+        return other + (-self)
+
+    def __neg__(self) -> Polynomial:
+        return self*(-1)
 
     def __mul__(self, other) -> Polynomial:
-        # TODO implement polinomial __mul__
-        pass
+        if utils.isoneof(other, [int, float, Complex.Complex]):
+            return Polynomial([other*pre for pre in self.prefixes], self.powers)
+        elif isinstance(other, Polynomial):
+            new_prefixes, new_powers = [], []
+            for i in range(len(other)):
+                for j in range(len(self)):
+                    new_prefixes.append(self.prefixes[j]*other.prefixes[i])
+                    new_powers.append(self.powers[j]+other.powers[i])
+            return Polynomial(new_prefixes, new_powers)
+        raise NotImplementedError(
+            f"Polynomial multiplication not implemented for {type(other)}")
 
     def __rmul__(self, other) -> Polynomial:
-        # TODO implement polinomial __rmul__
-        pass
-    # TODO implement other operators
+        return self.__mul__(other)
+
+    def __truediv__(self, other) -> Tuple[Polynomial, Polynomial]:
+        if self == other:
+            return Polynomial([1], [0]), 0
+        if utils.isoneof(other, [int, float, Complex.Complex]):
+            return self*(1/other), 0
+        elif isinstance(other, Polynomial):
+            if self.degree >= other.degree and len(self) > len(other):
+                quotient, remainder = Polynomial([0], [0]), None
+                current = self
+                prefix, power = 1, 1
+                while(current.degree >= other.degree):
+                    prefix = current.prefixes[0]/other.prefixes[0]
+                    power = current.prefixes[0] - other.powers[0]
+                    quotient += Polynomial([prefix], [power])
+                    subtructor = Polynomial(
+                        [quotient.prefixes[-1]*v for v in other.prefixes], [quotient.prefixes[-1]*v for v in other.powers])
+                    current -= subtructor
+                remainder, _ = current/other
+                return quotient, remainder
+            else:
+                if self.degree == 0:
+                    return self.prefixes[0]/other, 0
+                return None, 0
+        # TODO need to add?
+        raise NotImplementedError("Polynomial division not implemented")
+
+    def __rtruediv__(self, other) -> Polynomial:
+        if utils.isoneof(other, [int, float, Complex.Complex]):
+            pass
+        elif isinstance(other, Polynomial):
+            pass
+
+    def __pow__(self, pow) -> Polynomial:
+        if isinstance(pow, int):
+            if pow == 0:
+                return Polynomial([1], [0])
+            res = self
+            for _ in range(abs(pow)-1):
+                res *= self
+            if pow < 0:
+                return 1/res
+            return res
+
+    def __eq__(self, other: Polynomial) -> bool:
+        if utils.isoneof(other, [int, float, Complex.Complex]):
+            if other == 0:
+                return len(self) == 0
+            if len(self) != 1:
+                return False
+            return self.powers[0] == 0 and self.prefixes[0] == other
+        if isinstance(other, Polynomial):
+            if len(self) != len(other):
+                return False
+            for i in range(len(self)):
+                if self.prefixes[i] != other.prefixes[i] or self.powers[i] != other.powers[i]:
+                    return False
+            return True
+        raise NotImplementedError(
+            f"Polynomial equality not implemented for {type(other)}")
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
 
     def __call__(self, v):
-        # TODO implement polinomial __call__
-        pass
+        import Matrix
+        import LinearTransformation
+        if not utils.isoneof(v, [int, float, Complex.Complex, Polynomial, Matrix.Matrix, LinearTransformation.LinearTransformation]):
+            # TODO implement __call_ for matrix,operator,vector,etc
+            raise NotImplementedError(
+                "Polynomial __call__ not implemented for " + str(type(v)))
+        res = self.prefixes[0]*v**self.powers[0]
+        for i in range(1, len(self)):
+            res += self.prefixes[i]*v**self.powers[i]
+        return res
+
+    def __len__(self) -> int:
+        return len(self.powers)
 
     def gcd_with(self, other: Polynomial) -> Polynomial:
         # TODO implement gcd calculation
         pass
+
+    # TODO implement other operators
