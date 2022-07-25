@@ -1,18 +1,18 @@
 from __future__ import annotations
 from typing import Any, Tuple
-from utils import isoneof, areinstances
-from Complex import Complex
-from SimplePolynomial import SimplePolynomial
+from ...utils import isoneof, areinstances
+from ...la1 import Complex
+from .PolynomialSimple import PolynomialSimple
 
 
-class PolynomialFraction(SimplePolynomial):
+class PolynomialFraction:
     @staticmethod
     def fromString(string, var="x") -> PolynomialFraction:
         pass
 
     @staticmethod
-    def fromPolynomials(nominator: SimplePolynomial, denominator: SimplePolynomial) -> PolynomialFraction:
-        if not areinstances([nominator, denominator], SimplePolynomial):
+    def fromPolynomials(nominator: PolynomialSimple, denominator: PolynomialSimple) -> PolynomialFraction:
+        if not areinstances([nominator, denominator], PolynomialSimple):
             raise TypeError("nominator and denominator must be Polynomials")
         return PolynomialFraction(nominator.prefixes, nominator.powers, denominator.prefixes, denominator.powers)
 
@@ -23,8 +23,8 @@ class PolynomialFraction(SimplePolynomial):
         return PolynomialFraction([value], [0])
 
     def __init__(self, nominator_prefixes: list, nominator_powers: list, denominator_prefixes: list = [1], denominator_powers: list = [0]) -> None:
-        self.nominator = SimplePolynomial(nominator_prefixes, nominator_powers)
-        self.denominator = SimplePolynomial(
+        self.nominator = PolynomialSimple(nominator_prefixes, nominator_powers)
+        self.denominator = PolynomialSimple(
             denominator_prefixes, denominator_powers)
 
     def __add__(self, other) -> PolynomialFraction:
@@ -32,7 +32,7 @@ class PolynomialFraction(SimplePolynomial):
             n1, d1 = self.destructure()
             n2, d2 = other.destructure()
             return PolynomialFraction.fromPolynomials(n1*d2+n2*d1, d1*d2)
-        elif isinstance(other, SimplePolynomial):
+        elif isinstance(other, PolynomialSimple):
             return self+PolynomialFraction(other.prefixes, other.powers)
         elif isoneof(other, [int, float, Complex]):
             return self+PolynomialFraction.fromPrimitive(other)
@@ -54,7 +54,7 @@ class PolynomialFraction(SimplePolynomial):
     def __mul__(self, other) -> PolynomialFraction:
         if isinstance(other, PolynomialFraction):
             return PolynomialFraction.fromPolynomials(self.nominator*other.nominator, self.denominator*other.denominator)
-        elif isinstance(other, SimplePolynomial):
+        elif isinstance(other, PolynomialSimple):
             return self*PolynomialFraction(other.prefixes, other.powers)
         elif isoneof(other, [int, float, Complex]):
             return self*PolynomialFraction.fromPrimitive(other)
@@ -69,7 +69,7 @@ class PolynomialFraction(SimplePolynomial):
             n1, d1 = self.destructure()
             n2, d2 = other.destructure()
             return PolynomialFraction.fromPolynomials(n1*d2, d1*n2)
-        elif isinstance(other, SimplePolynomial):
+        elif isinstance(other, PolynomialSimple):
             return self / PolynomialFraction(other.prefixes, other.powers)
         elif isoneof(other, [int, float, Complex]):
             return self / PolynomialFraction.fromPrimitive(other)
@@ -81,7 +81,7 @@ class PolynomialFraction(SimplePolynomial):
         #     n1, d1 = self.destructure()
         #     n2, d2 = other.destructure()
         #     return Expression.fromPolynomials(n1*d2, d1*n2)
-        if isinstance(other, SimplePolynomial):
+        if isinstance(other, PolynomialSimple):
             return self / PolynomialFraction(other.prefixes, other.powers)
         elif isoneof(other, [int, float, Complex]):
             return PolynomialFraction.fromPrimitive(other) / self
@@ -94,7 +94,7 @@ class PolynomialFraction(SimplePolynomial):
             n2, d2 = other.destructure()
             # n1/d1 == n2/d2 <==> n1d2/d1d2 == n2d1/d1d2 <==> n1d2 == n2d1
             return n1*d2 == n2*d1
-        elif isinstance(other, SimplePolynomial):
+        elif isinstance(other, PolynomialSimple):
             return self == PolynomialFraction(other.prefixes, other.powers)
         elif isoneof(other, [int, float, Complex]):
             return self == PolynomialFraction.fromPrimitive(other)
@@ -119,7 +119,7 @@ class PolynomialFraction(SimplePolynomial):
         return str(self.nominator)
 
     def __call__(self, value) -> Any:
-        if isoneof(value, [int, float, Complex, SimplePolynomial]):
+        if isoneof(value, [int, float, Complex, PolynomialSimple]):
             try:
                 return self.nominator(value) / self.denominator(value)
             except ArithmeticError as e:
@@ -127,7 +127,7 @@ class PolynomialFraction(SimplePolynomial):
         else:
             assert False, "Expression.__call__() called with invalid argument"
 
-    def destructure(self) -> Tuple[SimplePolynomial, SimplePolynomial]:
+    def destructure(self) -> Tuple[PolynomialSimple, PolynomialSimple]:
         return self.nominator, self.denominator
 
     def simplify() -> PolynomialFraction:

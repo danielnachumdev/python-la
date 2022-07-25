@@ -1,25 +1,24 @@
 from __future__ import annotations
-import utils
-from utils import almost_equal
+from ..utils import almost_equal, isoneof
 from typing import Union, Any
-import Field
-import Complex
-t_vector = list[Union[float, Complex.Complex]]
+from .Field import Field, RealField, DefaultRealField
+from .Complex import Complex
 
 
 class Vector:
 
     @staticmethod
-    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field.Field = Field.DefaultRealField) -> Vector:
+    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field = DefaultRealField) -> Vector:
         return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])
 
     @staticmethod
     def fromSize(size: int, default_value: Any = 0) -> Vector:
         return Vector([default_value for _ in range(size)])
 
-    def __init__(self, values: t_vector, field: Field.Field = None) -> None:
+    def __init__(self, values: list[Any], field: Field = None) -> None:
         self.__values = values
-        self.field = Field.RealField(len(values)) if not field else field
+        # TODO add default field detection
+        self.field = RealField(len(values)) if not field else field
 
     @property
     def length(self):
@@ -27,8 +26,7 @@ class Vector:
 
     @property
     def adjoint(self) -> Vector:
-        # TODO implement adjoint for complex vector
-        return self.copy()
+        return [v.adjoint if hasattr(v, 'adjoint') else v for v in self.copy()]
 
     @property
     def has_no_zero(self) -> bool:
@@ -75,21 +73,21 @@ class Vector:
         return self.__mul__(num)
 
     def __truediv__(self, other) -> Vector:
-        if utils.isoneof(other, [int, float, Complex]):
+        if isoneof(other, [int, float, Complex]):
             return self.__mul__(1/other)
         raise ValueError("cant divide vector")
 
     def __rtruediv__(self, num: float) -> Vector:
         raise ValueError("cant divide by vector")
 
-    def __getitem__(self, index: int) -> Union[float, Complex.Complex]:
+    def __getitem__(self, index: int) -> Union[int, float, Complex]:
         return self.__values[index]
 
     def __iter__(self):
         return iter(self.__values)
 
     def __eq__(self, other: Vector) -> bool:
-        if not utils.isoneof(other, [Vector, list]):
+        if not isoneof(other, [Vector, list]):
             return False
         if isinstance(other, Vector):
             other = other.__values
@@ -142,7 +140,7 @@ class Vector:
         if is_span and value[0].length != self.length:
             raise ValueError(
                 "the span's vectors must have the same length as self")
-        from .InnerProduct import StandardInnerProduct as sip
+        from ..la2.InnerProduct import StandardInnerProduct as sip
         if not is_span:
             return sip(self, value)/sip(value, value)*value
         else:

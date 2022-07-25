@@ -1,10 +1,9 @@
 from __future__ import annotations
-from LinearTransformation import LinearTransformation
-from Field import Field
+from ..la1 import LinearMap, Field
 from typing import Callable
 
 
-class Operator(LinearTransformation):
+class Operator(LinearMap):
     def __init__(field: Field, func: Callable[[], ]) -> None:
         super().__init__(field, field, func)
 

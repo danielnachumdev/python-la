@@ -1,11 +1,9 @@
 from __future__ import annotations
 from enum import Enum
 import random
-import Complex
-import Vector
-from typing import Any, Callable, Union
-from utils import are_operators_implemnted, almost_equal
-import Matrix
+from ..utils import are_operators_implemnted, almost_equal
+from .Complex import Complex
+from typing import Any, Callable
 
 
 class Fields(Enum):
@@ -33,7 +31,7 @@ class Field:
     @staticmethod
     def is_field(field: Field) -> bool:
         N = 100
-        if not are_operators_implemnted(type(field._generate_one())):
+        if not are_operators_implemnted(type(field.random())):
             raise NotImplementedError(
                 "One of the nescesary operators for calculation was not implemented")
 
@@ -41,7 +39,7 @@ class Field:
             if exclude is None:
                 exclude = []
             for _ in range(N):
-                vars = [field._generate_one() for _ in range(var_count)]
+                vars = [field.random() for _ in range(var_count)]
                 for v in vars:
                     if v in exclude:
                         break
@@ -115,17 +113,17 @@ class Field:
         return type(self)
 
     def __str__(self) -> str:
-        return str(self._name)
+        return f"{self._name.value}{self._degree}%{self._modulu}"
 
     def __eq__(self, other: Field) -> bool:
         return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree and self._zero == other._zero and self._one == other._one
 
-    def __contains__(self, obj: Any) -> bool:
-        """
-        """
-        raise NotImplementedError("This is a virtual method")
+    # def __contains__(self, obj: Any) -> bool:
+    #     """
+    #     """
+    #     raise NotImplementedError("This is a virtual method")
 
-    def _generate_one(self, min: int = -10, max: int = 10) -> Any:
+    def random(self, min: int = -10, max: int = 10) -> Any:
         """
         This is a virtual method for derived classes to generate a random element from current field with degree 1
         e.g. if self is Rn hen Rn._generate_one() will return an elemnt from R1
@@ -133,22 +131,22 @@ class Field:
         """
         raise NotImplementedError("This is a virtual method")
 
-    def random(self, min: float = -10, max: float = 10) -> Vector:
-        """
-        will generate a random vector from this field
-        """
-        self._generate_one(min, max)
-        return Vector .Vector([
-            self._generate_one(min, max)
-            for _ in range(self._degree)
-        ], self)
+    # def random(self, min: float = -10, max: float = 10) -> Vector:
+    #     """
+    #     will generate a random vector from this field
+    #     """
+    #     self._generate_one(min, max)
+    #     return Vector .Vector([
+    #         self._generate_one(min, max)
+    #         for _ in range(self._degree)
+    #     ], self)
 
 
 class RationalField(Field):
     def __init__(self, degree=1, modulu=1):
         super().__init__(Fields.Q, 0, 1, degree, modulu)
 
-    def _generate_one(self, min: int = -10, max: int = 10) -> float:
+    def random(self, min: int = -10, max: int = 10) -> float:
         if min == max:
             raise ValueError(
                 "if 'min'=='max' you shouldnt use this function becuase there's no use to it")
@@ -162,13 +160,13 @@ class RationalField(Field):
             denominator = f(min, max)
         return sign*nominator/denominator
 
-    def __contains__(self, obj) -> bool:
-        """
-        NOT IMPLEMENTED
-        Due to how numbers are stored in python all fractional numbers are rational so this function is irrelevant
-        """
-        raise NotImplementedError(
-            "Due to how numbers are stored in python all fractional numbers are rational so this function is irrelevant")
+    # def __contains__(self, obj) -> bool:
+    #     """
+    #     NOT IMPLEMENTED
+    #     Due to how numbers are stored in python all fractional numbers are rational so this function is irrelevant
+    #     """
+    #     raise NotImplementedError(
+    #         "Due to how numbers are stored in python all fractional numbers are rational so this function is irrelevant")
 
 
 DefaultRationalField = RationalField()
@@ -178,17 +176,17 @@ class RealField(Field):
     def __init__(self, degree=1, modulu=1):
         super().__init__(Fields.R, 0, 1, degree, modulu)
 
-    def _generate_one(self, min: int = -10, max: int = 10) -> float:
+    def random(self, min: int = -10, max: int = 10) -> float:
         return random.uniform(min, max)
 
-    def __contains__(self, obj: Union[int, float, Vector.Vector]) -> bool:
-        if isinstance(obj, float) or isinstance(obj, int) and self._degree == 1:
-            return True
-        else:
-            if not isinstance(obj, Vector.Vector):
-                raise ValueError(
-                    "Can't check if object is not of type 'Vector'")
-            return obj.field == self
+    # def __contains__(self, obj: Union[int, float, Vector.Vector]) -> bool:
+    #     if isinstance(obj, float) or isinstance(obj, int) and self._degree == 1:
+    #         return True
+    #     else:
+    #         if not isinstance(obj, Vector.Vector):
+    #             raise ValueError(
+    #                 "Can't check if object is not of type 'Vector'")
+    #         return obj.field == self
 
 
 DefaultRealField = RealField()
@@ -196,34 +194,34 @@ DefaultRealField = RealField()
 
 class ComplexField(Field):
     def __init__(self, degree=1, modulu=1):
-        super().__init__(Fields.C, Complex.Complex(0, 0),
-                         Complex.Complex(1, 0), degree, modulu)
+        super().__init__(Fields.C, Complex(0, 0),
+                         Complex(1, 0), degree, modulu)
 
-    def _generate_one(self, min: int = -10, max: int = 10) -> Complex.Complex:
-        return Complex.Complex.random(min, max, random.uniform)
+    def random(self, min: int = -10, max: int = 10) -> Complex:
+        return Complex.random(min, max, random.uniform)
 
-    def __contains__(self, obj: Union[int, float, Complex.Complex, Vector.Vector]) -> bool:
-        if (isinstance(obj, Complex.Complex) or isinstance(obj, float) or isinstance(obj, int)) and self._degree == 1:
-            return True
-        else:
-            if not isinstance(obj, Vector.Vector):
-                raise ValueError(
-                    "Can't check if object is not of type 'Vector'")
-            return obj.field == self
+    # def __contains__(self, obj: Union[int, float, Complex, Vector.Vector]) -> bool:
+    #     if (isinstance(obj, Complex.Complex) or isinstance(obj, float) or isinstance(obj, int)) and self._degree == 1:
+    #         return True
+    #     else:
+    #         if not isinstance(obj, Vector.Vector):
+    #             raise ValueError(
+    #                 "Can't check if object is not of type 'Vector'")
+    #         return obj.field == self
 
 
 DefaultComplexField = ComplexField()
 
 
-class MatrixField(Field):
-    # TODO MatrixFIeld
+# class MatrixField(Field):
+#     # TODO MatrixFIeld
 
-    def __init__(self, n: int, field: Field,) -> None:
+#     def __init__(self, n: int, field: Field,) -> None:
 
-        pass
+#         pass
 
-    def _generate_one(self, min: int = -10, max: int = 10) -> Matrix.Matrix:
-        pass
+#     def _generate_one(self, min: int = -10, max: int = 10) -> Matrix.Matrix:
+#         pass
 
-    def __contains__(self, v) -> bool:
-        pass
+#     # def __contains__(self, v) -> bool:
+#     #     pass

@@ -1,8 +1,6 @@
-from Vector import Vector
 import random
-from typing import Callable
-from typing import Union, Callable
-from Complex import Complex
+from typing import Callable, Union
+from ..la1 import Complex, Vector
 
 
 class InnerProduct:

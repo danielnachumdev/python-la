@@ -1,7 +1,7 @@
-# import sys
+from src import Complex as c
+c  # import sys
 # sys.path.insert(1,
 #                 "C:\\Users\\danie\\OneDrive\\Desktop\\Code\\VCS\\linear-algebra\\LinearAlgebra")
-from Complex import Complex as c
 
 a = c(1, 1)
 b = c(1, 0)

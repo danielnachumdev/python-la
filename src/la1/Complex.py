@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Union
 import random
-import utils
+from ..utils import isoneof
 
 
 class Complex:
@@ -80,7 +80,7 @@ class Complex:
 
     def __pow__(self, p):
         # TODO: implement Complex**p fully
-        if not utils.isoneof(p, [int]):
+        if not isoneof(p, [int]):
             raise NotImplementedError(
                 "Complex.__pow__ only implemented for int right now")
 

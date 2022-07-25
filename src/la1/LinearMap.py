@@ -1,14 +1,15 @@
 from __future__ import annotations
-from Matrix import *
-from typing import Callable
-import Field
-from utils import composite_function, isoneof
+from typing import Callable, Any, Union
+from .Field import Field
+from ..utils import composite_function, isoneof
+from .Matrix import Matrix
+from .Vector import Vector
 
 
-class LinearTransformation:
+class LinearMap:
     # TODO rethink data structure
     @staticmethod
-    def isFuncLinearTransformation(func: Callable[[Any, Field.Field], Union[Vector.Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
+    def isFuncLinearTransformation(func: Callable[[Any, Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
         COUNT = 100
         for _ in range(COUNT):
             a, b = src_field._generate_one(), src_field._generate_one()
@@ -23,12 +24,12 @@ class LinearTransformation:
         return True
 
     @staticmethod
-    def fromMatrix(m: Matrix) -> LinearTransformation:
-        return LinearTransformation(m.field, type(m.field)(m.field._name), lambda x: m*x)
+    def fromMatrix(m: Matrix) -> LinearMap:
+        return LinearMap(m.field, type(m.field)(m.field._name), lambda x: m*x)
 
     @staticmethod
-    def id(field: int) -> LinearTransformation:
-        return LinearTransformation(field, field, lambda x, y: x)
+    def id(field: int) -> LinearMap:
+        return LinearMap(field, field, lambda x, y: x)
 
     def is_invariant_to(span: Span) -> bool:
         pass
@@ -41,52 +42,52 @@ class LinearTransformation:
             dst_field (Field): The Field which is the output oif this transformation
             func (Callable[[Any], Any]): the transformation function
         """
-        if not LinearTransformation.isFuncLinearTransformation(func, src_field, dst_field):
+        if not LinearMap.isFuncLinearTransformation(func, src_field, dst_field):
             raise ValueError("func is not a linear transformation")
         self.src_field = src_field
         self.dst_field = dst_field
         self.func = func
 
-    def __add__(self, other) -> LinearTransformation:
+    def __add__(self, other) -> LinearMap:
         # if isoneof(other, [int, float, complex]):
         # return LinearTransformation(self.src_field, self.dst_field, lambda x, y: self.func(x, y)+other*LinearTransformation())
-        if isinstance(other, LinearTransformation):
+        if isinstance(other, LinearMap):
             if self.src_field == other.src_field and self.dst_field == other.dst_field:
-                return LinearTransformation(self.src_field, self.dst_field, lambda x, y: self(x)+other(x))
+                return LinearMap(self.src_field, self.dst_field, lambda x, y: self(x)+other(x))
             raise ValueError(
                 "cant add linear transformations on diffrent fields")
         raise NotImplementedError(
             "addition with non-numeric type not implemented")
 
-    def __radd__(self, other) -> LinearTransformation:
+    def __radd__(self, other) -> LinearMap:
         return self.__add__(other)
 
-    def __sub__(self, other) -> LinearTransformation:
+    def __sub__(self, other) -> LinearMap:
         return self.__add__(-other)
 
-    def __rsub__(self, other) -> LinearTransformation:
+    def __rsub__(self, other) -> LinearMap:
         return other+(-self)
 
-    def __neg__(self) -> LinearTransformation:
+    def __neg__(self) -> LinearMap:
         return self.__mul__(-1)
 
-    def __mul__(self, other) -> LinearTransformation:
+    def __mul__(self, other) -> LinearMap:
         if isoneof(other, [int, float, Complex]):
-            return LinearTransformation(self.src_field, self.dst_field, lambda x, y: self.func(x, y)*other)
+            return LinearMap(self.src_field, self.dst_field, lambda x, y: self.func(x, y)*other)
         else:
             raise NotImplementedError(
                 "multiplication with non-numeric type not implemented")
 
-    def __rmul__(self, other) -> LinearTransformation:
+    def __rmul__(self, other) -> LinearMap:
         return self.__mul__(other)
 
-    def __pow__(self, other) -> LinearTransformation:
+    def __pow__(self, other) -> LinearMap:
         if isoneof(other, [int, float]):
             if not other == int(other) or other < 0:
                 raise NotImplementedError(
                     "only non negativ powers are implemented and you tried to raise the transformation to {}".format(other))
             if other == 0:
-                return LinearTransformation(self.src_field, self.dst_field, lambda x, y: x)
+                return LinearMap(self.src_field, self.dst_field, lambda x, y: x)
             if other == 1:
                 return self
 
@@ -94,16 +95,16 @@ class LinearTransformation:
             func = composite_function(self.func, self.func)
             for _ in range(abs(other)-2):
                 func = composite_function(func, self.func)
-            return LinearTransformation(self.src_field, self.dst_field, lambda x, y: func(x, y))
+            return LinearMap(self.src_field, self.dst_field, lambda x, y: func(x, y))
         else:
             raise NotImplementedError(
                 "multiplication with non-numeric type not implemented")
 
-    def __truediv__(self, other) -> LinearTransformation:
+    def __truediv__(self, other) -> LinearMap:
         # TODO
         pass
 
-    def __call__(self, v: Any) -> Union[Vector.Vector, Matrix]:
+    def __call__(self, v: Any) -> Union[Vector, Matrix]:
         """ apply the transformation on an object
         Args:
             v (Any): the object to apply the transformation on
@@ -127,9 +128,5 @@ class LinearTransformation:
         pass
 
 
-# class Hom(Field.Field):
-#     pass
-
-
-# class Operator(LinearTransformation):
-#     pass
+class LinearTransformation(LinearMap):
+    pass

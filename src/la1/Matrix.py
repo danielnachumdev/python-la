@@ -1,46 +1,45 @@
 from __future__ import annotations
-from utils import almost_equal
 from typing import Any, Union
-from Complex import Complex
-import Vector
-import Span
-import Field
 import copy
 import functools
-import SimplePolynomial
-from utils import areinstances, check_foreach, isoneof
-t_matrix = list[list[Union[float, Complex]]]
+from ..utils import almost_equal
+from .Complex import Complex
+from .Vector import Vector
+from .Field import Field, DefaultRealField
+from ..utils import areinstances, check_foreach, isoneof
+
+# TODO remove hardcoded solution vec and add it as parameter to solve with
 
 
 class Matrix:
 
     @staticmethod
-    def fromVector(vec: Vector.Vector, sol: Vector.Vector = None) -> Matrix:
+    def fromVector(vec: Vector, sol: Vector = None) -> Matrix:
         """
         will add the vector as a column
         """
         # return Matrix.fromVectors([vec])
         return Matrix([[v] for v in vec], sol)
 
-    @staticmethod
-    def fromSpan(span: Span.Span, sol: Vector.Vector) -> Matrix:
-        """
-        will create a matrix from the span in the order that the vectors appear and as columns
-        """
-        if not isinstance(span, Span.Span):
-            raise TypeError("span must be 'Span'")
-        return Matrix.fromVectors([v for v in span], sol)
+    # @staticmethod
+    # def fromSpan(span: Span.Span, sol: Vector) -> Matrix:
+    #     """
+    #     will create a matrix from the span in the order that the vectors appear and as columns
+    #     """
+    #     if not isinstance(span, Span.Span):
+    #         raise TypeError("span must be 'Span'")
+    #     return Matrix.fromVectors([v for v in span], sol)
 
     @staticmethod
-    def fromVectors(vecs: list[Vector.Vector], sol: Vector.Vector = None) -> Matrix:
+    def fromVectors(vecs: list[Vector], sol: Vector = None) -> Matrix:
         """
         will create a amtrix from the vectors in the order they appear and as columns
         """
-        if not areinstances(vecs, Vector.Vector):
+        if not areinstances(vecs, Vector):
             raise TypeError("all elements must be instances of class 'Vector'")
         if not check_foreach(vecs, lambda v: v.field == vecs[0].field):
             raise ValueError("vectors are not over the same field")
-        mat = []
+        mat: list[list[Any]] = []
         for i in range(vecs[0].length):
             mat.append([])
             for j in range(len(vecs)):
@@ -48,14 +47,14 @@ class Matrix:
         return Matrix(mat, sol, field=vecs[0].field)
 
     @staticmethod
-    def fromString(matrix_string: str, sol: Vector.Vector) -> Matrix:
+    def fromString(matrix_string: str, sol: Vector) -> Matrix:
         return Matrix([[int(num) for num in row.split()]
                        for row in matrix_string.split("\n")], sol)
 
     @staticmethod
-    def random(f: Field.Field = None, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
+    def random(f: Field = None, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
         if f is None:
-            f = Field.DefaultRealField
+            f = DefaultRealField
         # TODO how to check that defualt value is inside 'f'? what if 'f' is ratinals and has no __contains__ implemented?
         return Matrix([[f.random(min, max) if def_value is None else def_value for _ in range(degree)]for __ in range(degree)], field=f)
 
@@ -74,9 +73,7 @@ class Matrix:
             arr[i][i] = 1
         return Matrix(arr)
 
-    def __init__(self, mat: t_matrix, sol_vec: list[Union[float, Complex]] = None, field: Field.Field = None) -> None:
-        if field is None:
-            field = Field.DefaultRealField
+    def __init__(self, mat: list[list[Any]], sol_vec: list[Union[float, Complex]] = None, field: Field = DefaultRealField) -> None:
         self.__matrix = mat
         self.__rows = len(mat)
         self.__cols = len(mat[0])
@@ -85,12 +82,12 @@ class Matrix:
         self.field = field
 
     @property
-    def kernel(self) -> Span.Span:
+    def kernel(self) -> list[Vector]:
         solution = Matrix(
             self.__matrix, [0 for _ in range(self.__rows)]).solve()
 
     @property
-    def image(self) -> Span.Span:
+    def image(self) -> list[Vector]:
         # TODO implement image calculation
         pass
 
@@ -133,7 +130,7 @@ class Matrix:
         pass
 
     @property
-    def eigen_values(self) -> Vector.Vector:
+    def eigen_values(self) -> Vector:
         # TODO implement eigen value calculation
         pass
 
@@ -143,19 +140,19 @@ class Matrix:
         pass
 
     @property
-    def chain_basis(self) -> Span.Span:
+    def chain_basis(self) -> list[Vector]:
         # TODO implement chain basis calculation
         pass
 
-    @property
-    def characteristic_polynomial(self) -> SimplePolynomial.SimplePolynomial:
-        # TODO implement characteristic polynomial calculation
-        pass
+    # @property
+    # def characteristic_polynomial(self) -> SimplePolynomial.SimplePolynomial:
+    #     # TODO implement characteristic polynomial calculation
+    #     pass
 
-    @property
-    def minimal_polynomial(self) -> SimplePolynomial.SimplePolynomial:
-        # TODO implement minimal polynomial calculation
-        pass
+    # @property
+    # def minimal_polynomial(self) -> SimplePolynomial.SimplePolynomial:
+    #     # TODO implement minimal polynomial calculation
+    #     pass
 
     def __getitem__(self, index: int):
         if not isinstance(index, int):
@@ -190,7 +187,7 @@ class Matrix:
         return Matrix([[self.__matrix[i][j] - other.__matrix[i][j] for j in range(self.__cols)]
                        for i in range(self.__rows)])
 
-    def __mul__(self, other: Union[float, Complex, Vector.Vector, Matrix]) -> Union[float, Complex, Vector.Vector, Matrix]:
+    def __mul__(self, other: Union[float, Complex, Vector, Matrix]) -> Union[float, Complex, Vector, Matrix]:
         """
         self * other
         """
@@ -202,12 +199,12 @@ class Matrix:
             return res
             # return Matrix([[other * self.__matrix[i][j] for j in range(len[self[0]])]
             #                for i in range(len(self))])
-        if isinstance(other, Vector.Vector):
+        if isinstance(other, Vector):
             if self.__cols != other.length:
                 raise ValueError(
                     "Matrix and Vector must have the same number of rows")
-            return Vector.Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
-                                  for i in range(self.__rows)])
+            return Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
+                           for i in range(self.__rows)])
         if isinstance(other, Matrix):
             if self.__cols != other.__rows:
                 raise ValueError(
@@ -217,7 +214,7 @@ class Matrix:
         raise TypeError(
             "Matrix can only be multiplied by a number, Vector, or Matrix")
 
-    def __rmul__(self, other: Union[int, float, Complex, Vector.Vector, Matrix]) -> Union[float, Complex, Vector.Vector, Matrix]:
+    def __rmul__(self, other: Union[int, float, Complex, Vector, Matrix]) -> Union[float, Complex, Vector, Matrix]:
         """
         other * self
         """
@@ -279,7 +276,7 @@ class Matrix:
     def cofactor(self, row_to_ignore: int, col_to_ignore: int) -> Matrix:
         if(row_to_ignore >= self.__rows or col_to_ignore >= self.__cols):
             raise ValueError("Row or column index out of range")
-        res: t_matrix = []
+        res: list[list[Any]] = []
         for i, row in enumerate(self.__matrix):
             if i == row_to_ignore:
                 continue
@@ -344,7 +341,7 @@ class Matrix:
                     res.__solution_vector[r]
         return res
 
-    def solve(self, vec=None) -> Union[Vector.Vector, Span.Span, None]:
+    def solve(self, vec=None) -> Union[Vector, list[Vector], None]:
         """
         Solve the system of equations
         """
@@ -352,11 +349,11 @@ class Matrix:
             raise ValueError("Matrix must be square")
         if vec == None:
             vec = self.__solution_vector
-        if not isoneof(vec, [Vector.Vector, list]):
+        if not isoneof(vec, [Vector, list]):
             raise TypeError("Matrix must be solved for a vector")
         result_matrix = self.guassian_elimination(list(vec))
         for i, row in enumerate(result_matrix):
-            if (not Vector.Vector(row).has_no_zero) and result_matrix.__solution_vector[i] != 0:
+            if (not Vector(row).has_no_zero) and result_matrix.__solution_vector[i] != 0:
                 return None
         if result_matrix.rank != result_matrix.__rows:
             # FIXME
@@ -364,9 +361,9 @@ class Matrix:
             raise NotImplementedError(
                 "nullity rank was atleast 1, not yet implemented")
         else:
-            return Vector.Vector(result_matrix.__solution_vector)
+            return Vector(result_matrix.__solution_vector)
 
-    def get_eigen_space_of(eigenvalue) -> Span:
+    def get_eigen_vectors_of(eigenvalue) -> list[Vector]:
         # TODO calculate the eigen space of an eigen value
         pass
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
-from VectorSpace import VectorSpace
-from InnerProduct import InnerProduct
+from ..la1 import VectorSpace
+from .InnerProduct import InnerProduct
 
 
 class InnerProductSpace:
