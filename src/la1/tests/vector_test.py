@@ -1,4 +1,4 @@
-from ..Vector import *
+from ...la1 import Vector, Complex as c
 
 
 def test_sum():
@@ -12,6 +12,5 @@ def test_equality():
 
 def test_adjoint():
     assert Vector([0, 1, 2, 3]).adjoint() == Vector([0, 1, 2, 3])
-    from ..Complex import Complex as c
     assert Vector([c(1, 1), c(0, 2), c(1, 0)]) == Vector(
         [c(1, -1), c(0, -2), c(1, 0)])

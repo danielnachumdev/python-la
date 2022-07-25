@@ -37,9 +37,10 @@ class BilinearForm:
     def isAntiSymmetical(self) -> bool:
         pass
 
-    # @property
-    # def isSquare(self) -> bool:
-    #     pass
+    @property
+    def isSquare(self) -> Union[bool, None]:
+        return None
+
     def __call__(self, v, u):
         return self.func(v, u)
 

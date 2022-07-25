@@ -1,14 +1,13 @@
-from Matrix import Matrix
-from Field import RealField, Fields
+from ...la1 import Matrix, RealField, VectorSpace, Vector
 
 COUNT = 100
 N = 50
-Fn = RealField(N)
+V = VectorSpace(RealField(N))
 
 
 def test_from_vector():
     for _ in range(COUNT):
-        v = Fn.random()
+        v = V.random()
         m = Matrix.fromVector(v)
         for i in range(v.length):
             assert v[i] == m[i][0]
@@ -16,7 +15,7 @@ def test_from_vector():
 
 def test_from_vectors():
     for _ in range(int(COUNT/10)+1):
-        vecs = [Fn.random() for _ in range(10)]
+        vecs = [V.random() for _ in range(10)]
         m = Matrix.fromVectors(vecs)
         for i in range(len(vecs[0])):
             for j in range(len(vecs)):
@@ -39,8 +38,6 @@ def test_guassian_elimination():
 
 
 def test_solve():
-    from Span import Span
-    from Vector import Vector
     assert Matrix([[1, 1], [1, 1]]).solve(Vector([1, 2])) == None
     assert Matrix.id_matrix(2).solve() == Vector([0, 0])
     # FIXME
@@ -54,9 +51,3 @@ def test_solve():
 
 
 # test_kernel()
-
-
-def test_with_polynomial():
-    from SimplePolynomial import SimplePolynomial
-    assert SimplePolynomial.fromString("x^2")(
-        Matrix([[1, 0], [0, 1]])) == Matrix([[1, 0], [0, 1]])

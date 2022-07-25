@@ -4,6 +4,7 @@ from .Field import Field
 from ..utils import composite_function, isoneof
 from .Matrix import Matrix
 from .Vector import Vector
+from .Complex import Complex
 
 
 class LinearMap:
@@ -30,9 +31,6 @@ class LinearMap:
     @staticmethod
     def id(field: int) -> LinearMap:
         return LinearMap(field, field, lambda x, y: x)
-
-    def is_invariant_to(span: Span) -> bool:
-        pass
 
     def __init__(self, src_field: Field, dst_field: Field, func: Callable[[Any], Any]) -> None:
         """creates a new linear transformation

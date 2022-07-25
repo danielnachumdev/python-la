@@ -1,10 +1,10 @@
-from PolynomialFraction import *
-from Complex import Complex as c
 import random
-from utils import almost_equal
-id = PolynomialFraction([1], [1])
-times_two = PolynomialFraction([2], [1])
-plus_5 = PolynomialFraction([1, 5], [1, 0])
+from ....la1 import Complex as c
+from ....la2 import PolynomialFraction as pf
+
+id = pf([1], [1])
+times_two = pf([2], [1])
+plus_5 = pf([1, 5], [1, 0])
 x = random.uniform(-100, 100)
 
 

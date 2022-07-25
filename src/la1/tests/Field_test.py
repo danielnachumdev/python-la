@@ -1,5 +1,4 @@
-from Field import *
-c = Complex.Complex
+from ...la1 import Field, Complex as c, RealField, ComplexField, DefaultComplexField, DefaultRealField, DefaultRationalField
 
 
 def test_containment():

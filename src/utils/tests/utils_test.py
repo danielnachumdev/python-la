@@ -1,5 +1,5 @@
-from utils import *
-from Complex import Complex as comp
+from ...utils import *
+from ...la1 import Complex as comp
 
 
 def test_almost_equal():

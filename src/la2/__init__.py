@@ -1,4 +1,4 @@
-from .Calulable import Expression
+from .Calulable import *
 from .BilinearForm import *
 from .InnerProduct import *
 from .InnerProductSpace import *

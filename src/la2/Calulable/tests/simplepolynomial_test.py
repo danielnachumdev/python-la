@@ -1,4 +1,4 @@
-from SimplePolynomial import SimplePolynomial as p
+from ....la2 import PolynomialSimple as p
 
 x = p([1], [1])
 xp1 = p([1, 1], [1, 0])
@@ -17,7 +17,18 @@ def test_addition():
     assert x+p([2], [2]) == p([1, 2], [1, 2])
 
 
-test_addition()
+def test_with_Field():
+    from ....la1 import Vector, LinearMap, RealField
+    field = RealField(2)
+
+    def func(v, target_field):
+        return Vector([0, v[0]], target_field)
+    lt = LinearMap(field, field, func)
+    v = field.random()
+    # assert Polynomial.fromString("x^2")(lt)(v) == Vector([0, 0], field)
+    assert p.fromString("x^2+1")(lt)(v) == v
+    assert p.fromString(
+        "x+1")(lt)(v) == Vector([v[0], sum(v)], field)
 
 
 def test_subtraction():
@@ -39,6 +50,12 @@ def test_multiplication():
     assert xp1*xp1 == p([1, 2, 1], [2, 1, 0])
     assert p.fromString(
         "(x^2+2*x+5)")*p.fromString("1") == p.fromString("1")*p.fromString("(x^2+2*x+5)")
+
+
+def test_with_matrix():
+    from ....la1 import Matrix
+    assert p.fromString("x^2")(
+        Matrix([[1, 0], [0, 1]])) == Matrix([[1, 0], [0, 1]])
 
 
 def test_call():

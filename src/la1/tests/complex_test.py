@@ -1,4 +1,4 @@
-from src import Complex as c
+from ...la1 import Complex as c
 c  # import sys
 # sys.path.insert(1,
 #                 "C:\\Users\\danie\\OneDrive\\Desktop\\Code\\VCS\\linear-algebra\\LinearAlgebra")
