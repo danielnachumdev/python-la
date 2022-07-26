@@ -1,4 +1,4 @@
-from ....la2 import PolynomialSimple as p
+from ..PolynomialSimple import PolynomialSimple as p
 
 x = p([1], [1])
 xp1 = p([1, 1], [1, 0])
@@ -18,13 +18,13 @@ def test_addition():
 
 
 def test_with_Field():
-    from ....la1 import Vector, LinearMap, RealField
+    from ....la1 import Vector, LinearMap, RealField, VectorSpace
     field = RealField(2)
 
     def func(v, target_field):
         return Vector([0, v[0]], target_field)
     lt = LinearMap(field, field, func)
-    v = field.random()
+    v = VectorSpace(field).random()
     # assert Polynomial.fromString("x^2")(lt)(v) == Vector([0, 0], field)
     assert p.fromString("x^2+1")(lt)(v) == v
     assert p.fromString(

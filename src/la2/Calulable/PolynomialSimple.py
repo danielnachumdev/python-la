@@ -305,7 +305,8 @@ class PolynomialSimple(Calculable):
         return not self.__eq__(other)
 
     def __call__(self, v):
-        if not isoneof(v, [int, float, Complex, PolynomialSimple, Matrix, LinearMap]):
+        from .PolynomialFraction import PolynomialFraction
+        if not isoneof(v, [int, float, Complex, PolynomialSimple, Matrix, LinearMap, PolynomialFraction]):
             # TODO implement __call_ for matrix,operator,vector,etc
             raise NotImplementedError(
                 "Polynomial __call__ not implemented for " + str(type(v)))

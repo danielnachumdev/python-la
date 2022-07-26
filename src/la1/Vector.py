@@ -25,8 +25,8 @@ class Vector:
         return len(self.__values)
 
     @property
-    def adjoint(self) -> Vector:
-        return [v.adjoint if hasattr(v, 'adjoint') else v for v in self.copy()]
+    def conjugate(self) -> Vector:
+        return [v.conjugate if isinstance(v, Complex) else v for v in self]
 
     @property
     def has_no_zero(self) -> bool:

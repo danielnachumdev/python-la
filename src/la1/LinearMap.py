@@ -5,6 +5,7 @@ from ..utils import composite_function, isoneof
 from .Matrix import Matrix
 from .Vector import Vector
 from .Complex import Complex
+from .VectorSpace import VectorSpace
 
 
 class LinearMap:
@@ -12,9 +13,10 @@ class LinearMap:
     @staticmethod
     def isFuncLinearTransformation(func: Callable[[Any, Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
         COUNT = 100
+        V = VectorSpace(src_field)
         for _ in range(COUNT):
-            a, b = src_field._generate_one(), src_field._generate_one()
-            v1, v2 = src_field.random(), src_field.random()
+            a, b = src_field.random(), src_field.random()
+            v1, v2 = V.random(), V.random()
             try:
                 if not func(a*v1+b*v2, dst_field).almost_equal(a*func(v1, dst_field)+b*func(v2, dst_field)):
                     pass
@@ -32,7 +34,7 @@ class LinearMap:
     def id(field: int) -> LinearMap:
         return LinearMap(field, field, lambda x, y: x)
 
-    def __init__(self, src_field: Field, dst_field: Field, func: Callable[[Any], Any]) -> None:
+    def __init__(self, src_field: Field, dst_field: Field, func: Callable[[Any], Any], validate: bool = False) -> None:
         """creates a new linear transformation
 
         Args:
@@ -40,8 +42,9 @@ class LinearMap:
             dst_field (Field): The Field which is the output oif this transformation
             func (Callable[[Any], Any]): the transformation function
         """
-        if not LinearMap.isFuncLinearTransformation(func, src_field, dst_field):
-            raise ValueError("func is not a linear transformation")
+        if validate:
+            if not LinearMap.isFuncLinearTransformation(func, src_field, dst_field):
+                raise ValueError("func is not a linear transformation")
         self.src_field = src_field
         self.dst_field = dst_field
         self.func = func
@@ -82,8 +85,8 @@ class LinearMap:
     def __pow__(self, other) -> LinearMap:
         if isoneof(other, [int, float]):
             if not other == int(other) or other < 0:
-                raise NotImplementedError(
-                    "only non negativ powers are implemented and you tried to raise the transformation to {}".format(other))
+                raise ValueError(
+                    "only non negativ integer powers are implemented and you tried to raise the transformation to {}".format(other))
             if other == 0:
                 return LinearMap(self.src_field, self.dst_field, lambda x, y: x)
             if other == 1:
@@ -102,7 +105,7 @@ class LinearMap:
         # TODO
         pass
 
-    def __call__(self, v: Any) -> Union[Vector, Matrix]:
+    def __call__(self, v: Union[Vector, Matrix]) -> Union[Vector, Matrix]:
         """ apply the transformation on an object
         Args:
             v (Any): the object to apply the transformation on
@@ -114,8 +117,15 @@ class LinearMap:
         Returns:
             Any: the return value of the transformation's function
         """
-        if not v in self.src_field:
-            raise ValueError("value is not in the source field")
+        if not isoneof(v, [Vector, Matrix]):
+            raise ValueError(
+                "can only apply linear transformations on vectors and matrices")
+        if isinstance(v, Vector):
+            if not v.field == self.src_field:
+                raise ValueError("value is not in the source field")
+        else:
+            if not Vector(v[i][0] for i in range(v.__rows)).field == self.src_field:
+                raise ValueError("value is not in the source field")
         try:
             return self.func(v, self.dst_field)
         except Exception as e:

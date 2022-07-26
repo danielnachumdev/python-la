@@ -91,7 +91,7 @@ class Field:
             return all([addition(), multiplication()])
         return all([associativity(), commutativity(), distributivity(), identity(), inverses()])
 
-    def __init__(self, name: Fields,  zero, one, degree: int = 1, modulu: int = 1) -> None:
+    def __init__(self, name: Fields,  zero, one, degree: int = 1, modulu: int = 1, validate: bool = False) -> None:
         if not isinstance(name, Fields):
             raise TypeError("'name' must be from enum 'Fields'")
         if not isinstance(degree, int):
@@ -103,9 +103,10 @@ class Field:
         self._degree = degree
         self._zero = zero
         self._one = one
-        if not Field.is_field(self):
-            raise ValueError(
-                "This is not a field as one or more of the axioms do not check-out")
+        if validate:
+            if not Field.is_field(self):
+                raise ValueError(
+                    "This is not a field as one or more of the axioms do not check-out")
 
     @property
     def classOfInstance(self) -> Field:

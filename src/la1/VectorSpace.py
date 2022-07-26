@@ -23,10 +23,12 @@ class VectorSpace:
     def __contains__(self, value: Vector) -> bool:
         if not isinstance(value, Vector):
             raise TypeError("value must be an instance of class Vector")
-        return value.field == self.field
+        if value.field == self.field:
+            return True
+        return False
 
     def random(self, min: int = -10, max: int = 10) -> Vector:
-        return Vector([self.field.random(min, max) for _ in range(self.field._degree)])
+        return Vector([self.field.random(min, max) for _ in range(self.field._degree)], self.field)
 
     def standard_basis(self) -> list[Vector]:
         n = self.field._degree

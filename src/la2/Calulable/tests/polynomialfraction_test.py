@@ -1,5 +1,4 @@
 import random
-from ....la1 import Complex as c
 from ....la2 import PolynomialFraction as pf
 
 id = pf([1], [1])

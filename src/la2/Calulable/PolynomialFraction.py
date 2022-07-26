@@ -119,13 +119,14 @@ class PolynomialFraction:
         return str(self.nominator)
 
     def __call__(self, value) -> Any:
-        if isoneof(value, [int, float, Complex, PolynomialSimple]):
+        if isoneof(value, [int, float, Complex, PolynomialSimple, PolynomialFraction]):
             try:
                 return self.nominator(value) / self.denominator(value)
             except ArithmeticError as e:
                 raise e
         else:
-            assert False, "Expression.__call__() called with invalid argument"
+            raise ValueError(
+                "PolynomialFraction.__call__() called with invalid argument")
 
     def destructure(self) -> Tuple[PolynomialSimple, PolynomialSimple]:
         return self.nominator, self.denominator
