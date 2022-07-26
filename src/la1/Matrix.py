@@ -1,7 +1,9 @@
 from __future__ import annotations
 from typing import Any, Union
+import enum
 import copy
 import functools
+from typing import Tuple
 from ..utils import almost_equal
 from .Complex import Complex
 from .Vector import Vector
@@ -9,6 +11,40 @@ from .Field import Field, DefaultRealField
 from ..utils import areinstances, check_foreach, isoneof
 
 # TODO remove hardcoded solution vec and add it as parameter to solve with
+
+
+class MatrixOperationType(enum.Enum):
+    ROW_SWITCHING = "row_switching"
+    ROW_MULTIPLICATION = "row_multiplication"
+    ROW_ADDITION = "row_addition"
+    COL_SWITCHING = "column_switching"
+    COL_MULTIPLICATION = "column_multiplication"
+    COL_ADDITION = "column_addition"
+
+
+class MatrixOperation:
+    def __init__(self, operation_type: MatrixOperationType, iv1: Union[int, float], iv2: Union[int, float]):
+        self.operation_type = operation_type
+        self.iv1, self.iv2 = iv1, iv2
+
+    def __call__(self, matrix, operate_with: Union[Vector, Matrix] = None) -> Tuple[Matrix, Union[Vector, Matrix]]:
+        res = matrix
+        iv1, iv2 = self.iv1, self.iv2
+        match(self.operation_type):
+            case MatrixOperationType.ROW_SWITCHING:
+                res[iv1], res[iv2] = res[iv2], res[iv1]
+            case MatrixOperationType.COL_SWITCHING:
+                pass
+            case MatrixOperationType.ROW_MULTIPLICATION:
+                res[iv1] = [iv2*v for v in res[iv1]]
+            case MatrixOperationType.COL_MULTIPLICATION:
+                pass
+            case MatrixOperationType.ROW_ADDITION:
+                res[iv1] = [res[iv1][i]+res[iv2][i]
+                            for i in range(len(res[iv1]))]
+            case MatrixOperationType.COL_ADDITION:
+                pass
+        return res, operate_with
 
 
 class Matrix:
@@ -74,6 +110,8 @@ class Matrix:
         return Matrix(arr)
 
     def __init__(self, mat: list[list[Any]], sol_vec: list[Union[float, Complex]] = None, field: Field = DefaultRealField) -> None:
+        if not isinstance(mat, list) or not all([isinstance(v, list) for v in mat]):
+            raise TypeError("Matrix must be a 2d array")
         self.__matrix = mat
         self.__rows = len(mat)
         self.__cols = len(mat[0])
@@ -154,10 +192,20 @@ class Matrix:
     #     # TODO implement minimal polynomial calculation
     #     pass
 
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> Any:
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
         return self.__matrix[index]
+
+    def __setitem__(self, index: int, value: list[Any]) -> None:
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+        if not isinstance(value, list):
+            raise TypeError("Value must be a list")
+        if not 0 <= index < self.__rows:
+            raise ValueError("Index out of range")
+        # TODO validate all items in list are of same type of this matrix
+        self.__matrix[index] = value
 
     def __str__(self) -> str:
         result = ""
