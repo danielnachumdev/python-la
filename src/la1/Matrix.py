@@ -34,16 +34,19 @@ class MatrixOperation:
             case MatrixOperationType.ROW_SWITCHING:
                 res[iv1], res[iv2] = res[iv2], res[iv1]
             case MatrixOperationType.COL_SWITCHING:
-                pass
+                for i in range(len(res[0])):
+                    res[i][iv1], res[i][iv2] = res[i][iv2], res[i][iv1]
             case MatrixOperationType.ROW_MULTIPLICATION:
                 res[iv1] = [iv2*v for v in res[iv1]]
             case MatrixOperationType.COL_MULTIPLICATION:
-                pass
+                for i in range(len(res[0])):
+                    res[i][iv1] *= iv2
             case MatrixOperationType.ROW_ADDITION:
                 res[iv1] = [res[iv1][i]+res[iv2][i]
                             for i in range(len(res[iv1]))]
             case MatrixOperationType.COL_ADDITION:
-                pass
+                for i in range(len(res[0])):
+                    res[i][iv1] += res[i][iv2]
         return res, operate_with
 
 
@@ -375,7 +378,7 @@ class Matrix:
             if lead_value != 1:
                 for c in range(res.__cols):
                     res[r][c] /= lead_value
-                res.__solution_vector[r] /= lead_value
+                res.__solution_vector[r] *= 1/lead_value
                 lead_value = res[r][lead_index]
             for r2 in range(res.__rows):
                 if r == r2:
