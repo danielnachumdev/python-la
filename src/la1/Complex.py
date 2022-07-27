@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Union
 import random
-from ..utils import isoneof
+from ..utils import isoneof, almost_equal
 
 
 class Complex:
@@ -10,7 +10,26 @@ class Complex:
         self.imag = imag
 
     def __str__(self) -> str:
-        return f'{self.real} + {self.imag}i'
+        # get final string for real value
+        real = self.real
+        if almost_equal(round(self.real), self.real):
+            real = str(round(self.real))
+        else:
+            real = f"{real:.2f}"
+        # get final string for imag value
+        imag = self.imag
+        if almost_equal(round(self.imag), self.imag):
+            imag = str(round(self.imag))
+        else:
+            imag = f"{imag:.2f}"
+        # return string
+        if real == imag == "0":
+            return "0"
+        elif real != "0" == imag:
+            return real
+        elif real == "0" != imag:
+            return imag+"i"
+        return f'{real} + {imag}i'
 
     def __add__(self, other: Union[float, Complex]) -> Complex:
         if isinstance(other, float):
@@ -45,11 +64,11 @@ class Complex:
         return (self.real ** 2 + self.imag ** 2) ** 0.5
 
     def __eq__(self, other: Complex) -> bool:
-        if not isinstance(other, Complex) and not isinstance(self, float) and not isinstance(other, int):
+        if not isoneof(other, [int, float, Complex]):
             raise TypeError(f"cannot compare equality to type {type(other)}")
         if not isinstance(other, Complex):
             other = Complex(other, 0)
-        return self.real == other.real and self.imag == other.imag
+        return almost_equal(self.real, other.real) and almost_equal(self.imag, other.imag)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -103,14 +122,14 @@ class Complex:
         # TODO: implement base**Complex
         raise NotImplementedError("This is not implemented yet")
 
-    @property
+    @ property
     def conjugate(self):
         return Complex(self.real, -self.imag)
 
-    @property
+    @ property
     def norm(self):
         return (self * self.conjugate).real
 
-    @staticmethod
+    @ staticmethod
     def random(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
         return Complex(value_func(min_val, max_val), value_func(min_val, max_val))

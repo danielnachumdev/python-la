@@ -318,6 +318,9 @@ class PolynomialSimple(Calculable):
     def __len__(self) -> int:
         return len(self.powers)
 
+    def solve(self):
+        pass
+
     def gcd_with(self, other: PolynomialSimple) -> PolynomialSimple:
         # TODO implement gcd calculation
         pass

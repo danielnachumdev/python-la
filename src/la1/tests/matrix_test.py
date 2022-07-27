@@ -38,6 +38,7 @@ def test_guassian_elimination():
 
 
 def test_solve():
+    assert Matrix([[1, 3], [2, 5]]).solve(Vector([1, 2])) == Vector([1, 0])
     assert Matrix([[1, 1], [1, 1]]).solve(Vector([1, 2])) == None
     assert Matrix.id_matrix(2).solve() == Vector([0, 0])
     # FIXME

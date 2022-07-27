@@ -36,7 +36,10 @@ class Vector:
         return False
 
     def __str__(self) -> str:
-        return str(self.__values)
+        result = "["
+        for v in self:
+            result += str(v) + ", "
+        return result[:-2]+"]"
 
     def __add__(self, other: Vector) -> Vector:
         if not isinstance(other, Vector):

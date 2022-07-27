@@ -22,32 +22,35 @@ class MatrixOperationType(enum.Enum):
     COL_ADDITION = "column_addition"
 
 
-class MatrixOperation:
-    def __init__(self, operation_type: MatrixOperationType, iv1: Union[int, float], iv2: Union[int, float]):
-        self.operation_type = operation_type
-        self.iv1, self.iv2 = iv1, iv2
+MOT = MatrixOperationType
 
-    def __call__(self, matrix, operate_with: Union[Vector, Matrix] = None) -> Tuple[Matrix, Union[Vector, Matrix]]:
-        res = matrix
-        iv1, iv2 = self.iv1, self.iv2
-        match(self.operation_type):
-            case MatrixOperationType.ROW_SWITCHING:
-                res[iv1], res[iv2] = res[iv2], res[iv1]
-            case MatrixOperationType.COL_SWITCHING:
-                for i in range(len(res[0])):
-                    res[i][iv1], res[i][iv2] = res[i][iv2], res[i][iv1]
-            case MatrixOperationType.ROW_MULTIPLICATION:
-                res[iv1] = [iv2*v for v in res[iv1]]
-            case MatrixOperationType.COL_MULTIPLICATION:
-                for i in range(len(res[0])):
-                    res[i][iv1] *= iv2
-            case MatrixOperationType.ROW_ADDITION:
-                res[iv1] = [res[iv1][i]+res[iv2][i]
-                            for i in range(len(res[iv1]))]
-            case MatrixOperationType.COL_ADDITION:
-                for i in range(len(res[0])):
-                    res[i][iv1] += res[i][iv2]
-        return res, operate_with
+
+# class MatrixOperation:
+#     def __init__(self, operation_type: MatrixOperationType, iv1: Union[int, float], iv2: Union[int, float]):
+#         self.operation_type = operation_type
+#         self.iv1, self.iv2 = iv1, iv2
+
+#     def __call__(self, matrix, operate_with: Union[Vector, Matrix] = None) -> Tuple[Matrix, Union[Vector, Matrix]]:
+#         res = matrix
+#         iv1, iv2 = self.iv1, self.iv2
+#         match(self.operation_type):
+#             case MatrixOperationType.ROW_SWITCHING:
+#                 res[iv1], res[iv2] = res[iv2], res[iv1]
+#             case MatrixOperationType.COL_SWITCHING:
+#                 for i in range(len(res[0])):
+#                     res[i][iv1], res[i][iv2] = res[i][iv2], res[i][iv1]
+#             case MatrixOperationType.ROW_MULTIPLICATION:
+#                 res[iv1] = [iv2*v for v in res[iv1]]
+#             case MatrixOperationType.COL_MULTIPLICATION:
+#                 for i in range(len(res[0])):
+#                     res[i][iv1] *= iv2
+#             case MatrixOperationType.ROW_ADDITION:
+#                 res[iv1] = [res[iv1][i]+res[iv2][i]
+#                             for i in range(len(res[iv1]))]
+#             case MatrixOperationType.COL_ADDITION:
+#                 for i in range(len(res[0])):
+#                     res[i][iv1] += res[i][iv2]
+#         return res, operate_with
 
 
 class Matrix:
@@ -59,15 +62,6 @@ class Matrix:
         """
         # return Matrix.fromVectors([vec])
         return Matrix([[v] for v in vec], sol)
-
-    # @staticmethod
-    # def fromSpan(span: Span.Span, sol: Vector) -> Matrix:
-    #     """
-    #     will create a matrix from the span in the order that the vectors appear and as columns
-    #     """
-    #     if not isinstance(span, Span.Span):
-    #         raise TypeError("span must be 'Span'")
-    #     return Matrix.fromVectors([v for v in span], sol)
 
     @staticmethod
     def fromVectors(vecs: list[Vector], sol: Vector = None) -> Matrix:
@@ -91,11 +85,11 @@ class Matrix:
                        for row in matrix_string.split("\n")], sol)
 
     @staticmethod
-    def random(f: Field = None, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
+    def random(rows: int, cols: int, f: Field = None, min: float = -10, max: float = 10, degree: int = 10,  def_value=None) -> Matrix:
         if f is None:
             f = DefaultRealField
         # TODO how to check that defualt value is inside 'f'? what if 'f' is ratinals and has no __contains__ implemented?
-        return Matrix([[f.random(min, max) if def_value is None else def_value for _ in range(degree)]for __ in range(degree)], field=f)
+        return Matrix([[f.random(min, max) if def_value is None else def_value for _ in range(cols)]for __ in range(rows)], field=f)
 
     @staticmethod
     def fromJordanBlocks(lst: list[Matrix]) -> Matrix:
@@ -134,6 +128,7 @@ class Matrix:
 
     @property
     def rank(self) -> int:
+        # TODO fix rank calculation this is not correct
         self.reorgenize_rows()
         rank = 0
         for row in self.__matrix:
@@ -210,11 +205,30 @@ class Matrix:
         # TODO validate all items in list are of same type of this matrix
         self.__matrix[index] = value
 
-    def __str__(self) -> str:
-        result = ""
+    def __str__(self, turnc: int = 2) -> str:
+        def find_spaceing():
+            res = 0
+            for row in self:
+                for v in row:
+                    if hasattr(v, '__round__'):
+                        if almost_equal(round(v), v):
+                            v = round(v)
+                    res = max(res, len(str(v)))
+            return res
+        spacing = find_spaceing()+2
+        n = len(self[0])
+        vl = "|"
+        hl = (1+spacing)*n*"-" + "\n"
+        result = hl
         for i, row in enumerate(self.__matrix):
-            result += str(row)
-            result += " | "+str(self.__solution_vector[i]) + "\n"
+            result += vl
+            for v in row:
+                if hasattr(v, '__round__'):
+                    if almost_equal(round(v), v):
+                        v = round(v)
+                result += str(v).center(spacing)+vl
+            result += "\n"+hl
+            # result += " | "+str(self.__solution_vector[i]) + "\n"
         return result
 
     def __add__(self, other: Matrix) -> Matrix:
@@ -357,62 +371,119 @@ class Matrix:
         self.__matrix = sorted(
             self.__matrix, key=functools.cmp_to_key(comparer), reverse=True)
 
-    def guassian_elimination(self, sol=None) -> Matrix:
-        if not sol:
-            sol = self.__solution_vector
+    def apply_operation(self, operation: MatrixOperationType, iv1, iv2, operate_with=None) -> Matrix:
+        if not isinstance(operation, MatrixOperationType):
+            raise TypeError("can only apply MatrixOperationType")
+        match(operation):
+            case MOT.ROW_MULTIPLICATION:
+                self[iv1] = [iv2*v for v in self[iv1]]
+            case MOT.ROW_ADDITION:
+                self[iv1] = [self[iv1][i]+self[iv2][i]
+                             for i in range(len(self[iv1]))]
+            case MOT.ROW_SWITCHING:
+                self[iv1], self[iv2] = self[iv2], self[iv1]
+            case MOT.COL_SWITCHING:
+                for i in range(len(self[0])):
+                    self[i][iv1], self[i][iv2] = self[i][iv2], self[i][iv1]
+            case MOT.COL_MULTIPLICATION:
+                for i in range(len(self[0])):
+                    self[i][iv1] *= iv2
+            case MOT.COL_ADDITION:
+                for i in range(len(self[0])):
+                    self[i][iv1] += self[i][iv2]
+        return operate_with
 
-        def first_not_zero_index(row: list[float]) -> int:
-            for i in range(len(row)):
-                if row[i] != 0:
-                    break
-            return i
-        res = copy.deepcopy(self)
-        res.__solution_vector = sol
+    def concat(self, other) -> Matrix:
+        if not isoneof(other, [Vector, Matrix]):
+            raise TypeError("can only concat with a Vector or Matrix")
+        if len(other) != len(self):
+            raise TypeError(
+                "can only concat with a Matrix|Vector with the same number of rows")
+        if isinstance(other, Vector):
+            other = Matrix.fromVector(other)
+        res = []
+        for i in range(len(self)):
+            res.append(self[i] + other[i])
+        return Matrix(res)
+
+    def split(self, index: int) -> Tuple[Matrix, Matrix]:
+        if not isinstance(index, int):
+            raise TypeError("can only split at an int")
+        if not 0 <= index <= len(self[0]):
+            raise ValueError("index out of range")
+        if index == len(self[0]):
+            return self, None
+        return Matrix([[self[i][j] for j in range(index)] for i in range(len(self))], self.field), Matrix([[self[i][j] for j in range(index, len(self[0]))] for i in range(len(self))], self.field)
+
+    def guassian_elimination(self, solve_with: Union[Vector, Matrix] = None) -> Tuple[Matrix, Union[None, Matrix]]:
+        SPLIT_INDEX = len(self[0])
+        res = self
+        if solve_with is not None:
+            if not (isoneof(solve_with, [Vector, Matrix]) or solve_with is None):
+                raise TypeError("can only solve with a Vector or Matrix")
+            res = self.concat(solve_with)
+        # reorder rows
         res.reorgenize_rows()
-        # gaussian elimination
-        for r in range(res.__rows):
-            lead_index = first_not_zero_index(res[r])
-            lead_value = res[r][lead_index]
-            if lead_value == 0:
-                continue
+        # performe gaussian elimination
+        for curr_row_index in range(len(res)):
+            # find lead value for current row
+            for lead_index in range(curr_row_index, SPLIT_INDEX):
+                if res[curr_row_index][lead_index] != 0:
+                    break
+            else:
+                break
+            lead_value = res[curr_row_index][lead_index]
+            # make lead value equal one and change row acordingly
             if lead_value != 1:
-                for c in range(res.__cols):
-                    res[r][c] /= lead_value
-                res.__solution_vector[r] *= 1/lead_value
-                lead_value = res[r][lead_index]
-            for r2 in range(res.__rows):
-                if r == r2:
+                res.apply_operation(MOT.ROW_MULTIPLICATION,
+                                    curr_row_index, 1/lead_value)
+            for next_row_index in range(len(res)):
+                # skip current row
+                if next_row_index == curr_row_index:
                     continue
-                row_divider = res[r2][lead_index]/lead_value
-                if row_divider == 0:
+                # find if need to operate
+                for next_row_lead_index in range(lead_index, SPLIT_INDEX):
+                    if res[next_row_index][next_row_lead_index] != 0:
+                        break
+                else:
                     continue
-                for c in range(res.__cols):
-                    res[r2][c] -= row_divider * res[r][c]
-                res.__solution_vector[r2] -= row_divider * \
-                    res.__solution_vector[r]
-        return res
+                if next_row_lead_index == lead_index:
+                    row_multiplyer = res[next_row_index][next_row_lead_index]
+                    res.apply_operation(
+                        MOT.ROW_MULTIPLICATION, next_row_index, -1/row_multiplyer)
+                    res.apply_operation(
+                        MOT.ROW_ADDITION, next_row_index, curr_row_index)
+                    res.apply_operation(
+                        MOT.ROW_MULTIPLICATION, next_row_index, -row_multiplyer)
+        return res.split(SPLIT_INDEX)
 
-    def solve(self, vec=None) -> Union[Vector, list[Vector], None]:
+    def vectorize(self) -> Vector:
+        arr = []
+        for col in range(len(self[0])):
+            arr += [self[row][col] for row in range(len(self))]
+        return Vector(arr)
+
+    def solve(self, vec: Vector) -> Union[Vector, list[Vector], None]:
         """
         Solve the system of equations
         """
         if self.__rows != self.__cols:
             raise ValueError("Matrix must be square")
-        if vec == None:
-            vec = self.__solution_vector
-        if not isoneof(vec, [Vector, list]):
+        if not isinstance(vec, Vector):
             raise TypeError("Matrix must be solved for a vector")
-        result_matrix = self.guassian_elimination(list(vec))
+        result_matrix, sol = self.guassian_elimination(vec)
+        sol = sol.vectorize()
+        # if rank of matrix is equal to number of rows and cols return solution vector
+        if result_matrix.rank == len(result_matrix):
+            return sol
+        # if there is a row in result matrix which has all zeros and solution vector doesnt has a zero at that row there is no solution
         for i, row in enumerate(result_matrix):
-            if (not Vector(row).has_no_zero) and result_matrix.__solution_vector[i] != 0:
+            if (not Vector(row).has_no_zero) and sol[i] != 0:
                 return None
-        if result_matrix.rank != result_matrix.__rows:
-            # FIXME
-            # TODO implement solutions for nullity rank > 1
-            raise NotImplementedError(
-                "nullity rank was atleast 1, not yet implemented")
-        else:
-            return Vector(result_matrix.__solution_vector)
+        # otherwise there is a span of solutions
+        # TODO implement solutions for nullity rank > 1
+        raise NotImplementedError(
+            "nullity rank was atleast 1, not yet implemented")
 
     def get_eigen_vectors_of(eigenvalue) -> list[Vector]:
         # TODO calculate the eigen space of an eigen value
@@ -425,3 +496,38 @@ class Matrix:
     def geometric_multiplicity(eigenvalue) -> int:
         # TODO calculate the geometric multiplicity of an eigenvalue
         pass
+
+    # def guassian_elimination(self, sol=None) -> Matrix:
+    #     if not sol:
+    #         sol = self.__solution_vector
+
+    #     def first_not_zero_index(row: list[float]) -> int:
+    #         for i in range(len(row)):
+    #             if row[i] != 0:
+    #                 break
+    #         return i
+    #     res = copy.deepcopy(self)
+    #     res.__solution_vector = sol
+    #     res.reorgenize_rows()
+    #     # gaussian elimination
+    #     for r in range(res.__rows):
+    #         lead_index = first_not_zero_index(res[r])
+    #         lead_value = res[r][lead_index]
+    #         if lead_value == 0:
+    #             continue
+    #         if lead_value != 1:
+    #             for c in range(res.__cols):
+    #                 res[r][c] *= 1/lead_value
+    #             res.__solution_vector[r] *= 1/lead_value
+    #             lead_value = res[r][lead_index]
+    #         for r2 in range(res.__rows):
+    #             if r == r2:
+    #                 continue
+    #             row_divider = res[r2][lead_index]/lead_value
+    #             if row_divider == 0:
+    #                 continue
+    #             for c in range(res.__cols):
+    #                 res[r2][c] -= row_divider * res[r][c]
+    #             res.__solution_vector[r2] -= row_divider * \
+    #                 res.__solution_vector[r]
+    #     return res
