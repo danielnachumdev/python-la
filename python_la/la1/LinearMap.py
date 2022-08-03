@@ -28,7 +28,7 @@ class LinearMap:
 
     @staticmethod
     def fromMatrix(m: Matrix) -> LinearMap:
-        return LinearMap(m.field, type(m.field)(m.field._name), lambda x: m*x)
+        return LinearMap(m.field, type(m.field)(m.field.name), lambda x: m*x)
 
     @staticmethod
     def id(field: int) -> LinearMap:

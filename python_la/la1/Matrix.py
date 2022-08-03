@@ -158,7 +158,7 @@ class Matrix:
         rank = 0
         for i in range(min(len(tmp), len(tmp[0]))):
             for v in tmp[i]:
-                if v != tmp.field._zero:
+                if v != tmp.field.zero:
                     rank += 1
                     break
 
@@ -228,10 +228,12 @@ class Matrix:
         # TODO implement chain basis calculation
         pass
 
-    # @property
-    # def characteristic_polynomial(self) -> SimplePolynomial.SimplePolynomial:
-    #     # TODO implement characteristic polynomial calculation
-    #     pass
+    @property
+    def characteristic_polynomial(self):
+        from ..la2 import PolynomialSimple
+        if not self.is_square:
+            raise ValueError("Matrix must be square")
+        return (Matrix.id_matrix(len(self))*PolynomialSimple.fromString("x")-self).determinant
 
     # @property
     # def minimal_polynomial(self) -> SimplePolynomial.SimplePolynomial:
@@ -550,7 +552,7 @@ class Matrix:
         def comparer(a: list[float], b: list[float]) -> bool:
             def first_not_zero_index(row: list[float]) -> int:
                 for i in range(len(row)):
-                    if row[i] != self.field._zero:
+                    if row[i] != self.field.zero:
                         break
                 return i
             return -1 if first_not_zero_index(a) > first_not_zero_index(b) else 1
@@ -723,12 +725,12 @@ class Matrix:
                     for i in range(m.rank):
                         row = m[i]
                         for j, v in enumerate(row):
-                            if v != m.field._zero:
+                            if v != m.field.zero:
                                 sumrow[j] += 1
                     return sumrow
                 res = []
                 for i2, v in enumerate(sumrows(m)):
-                    if v == m.field._zero:
+                    if v == m.field.zero:
                         res.append(Vector.e(i2, len(m), m.field))
                 return res
 
@@ -738,9 +740,9 @@ class Matrix:
                 for row_index in range(m.rank):
                     row = m[row_index]
                     for candidate_index, candidate in enumerate(row):
-                        if candidate != m.field._zero:
+                        if candidate != m.field.zero:
                             for validator_index in range(candidate_index+1, len(row)):
-                                if row[validator_index] != m.field._zero:
+                                if row[validator_index] != m.field.zero:
                                     if validator_index not in value_depends_on_key:
                                         value_depends_on_key[validator_index] = set(
                                         )
@@ -749,9 +751,9 @@ class Matrix:
                             break
                 for key in value_depends_on_key:
                     tmp = [0 for _ in range(len(m[0]))]
-                    tmp[key] = m.field._one
+                    tmp[key] = m.field.one
                     for index in value_depends_on_key[key]:
-                        tmp[index] = -m.field._one
+                        tmp[index] = -m.field.one
                     res.append(Vector(tmp))
                 return res
 

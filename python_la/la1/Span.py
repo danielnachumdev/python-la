@@ -20,9 +20,9 @@ class Span:
         will return the standard span over F^n e.g : [e1,e2,...,en]
         """
         vecs = []
-        for i in range(field._degree):
-            v = Vector.fromSize(field._degree, field._zero)
-            v[i] = field._one
+        for i in range(field.degree):
+            v = Vector.fromSize(field.degree, field.zero)
+            v[i] = field.one
             vecs.append(v)
         return Span(vecs)
 

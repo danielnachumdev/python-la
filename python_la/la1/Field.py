@@ -76,18 +76,18 @@ class Field:
 
         def identity() -> bool:
             def addition() -> bool:
-                return checker(1, lambda a: almost_equal(a+field._zero, a, field._zero+a))
+                return checker(1, lambda a: almost_equal(a+field.zero, a, field.zero+a))
 
             def multiplication() -> bool:
-                return checker(1, lambda a: almost_equal(a*field._one, a, field._one*a))
+                return checker(1, lambda a: almost_equal(a*field.one, a, field.one*a))
             return all([addition(), multiplication()])
 
         def inverses() -> bool:
             def addition() -> bool:
-                return checker(1, lambda a: almost_equal(a + (-a), field._zero, (-a)+a))
+                return checker(1, lambda a: almost_equal(a + (-a), field.zero, (-a)+a))
 
             def multiplication() -> bool:
-                return checker(1, lambda a: almost_equal(a * (1/a), field._one, (1/a)*a), [0])
+                return checker(1, lambda a: almost_equal(a * (1/a), field.one, (1/a)*a), [0])
             return all([addition(), multiplication()])
         return all([associativity(), commutativity(), distributivity(), identity(), inverses()])
 
@@ -98,11 +98,11 @@ class Field:
             raise TypeError("'degree' must be of type 'int'")
         if not isinstance(modulu, int):
             raise TypeError("'modulu' must be of type 'int'")
-        self._name = name
-        self._modulu = modulu
-        self._degree = degree
-        self._zero = zero
-        self._one = one
+        self.name = name
+        self.modulu = modulu
+        self.degree = degree
+        self.zero = zero
+        self.one = one
         if validate:
             if not Field.is_field(self):
                 raise ValueError(
@@ -114,10 +114,10 @@ class Field:
         return type(self)
 
     def __str__(self) -> str:
-        return f"{self._name.value}{self._degree}%{self._modulu}"
+        return f"{self.name.value}{self.degree}%{self.modulu}"
 
     def __eq__(self, other: Field) -> bool:
-        return self._name == other._name and self._modulu == other._modulu and self._degree == other._degree and self._zero == other._zero and self._one == other._one
+        return self.name == other.name and self.modulu == other.modulu and self.degree == other.degree and self.zero == other.zero and self.one == other.one
 
     # def __contains__(self, obj: Any) -> bool:
     #     """

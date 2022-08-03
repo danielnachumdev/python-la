@@ -1,299 +1,41 @@
+# python-la : Python linear algebra
+## introduction
+The aim of this project is to implement programatically all of the mathematical operations you can in linear algebra, and more so - to implement themt in such a way that it will be written programmatically as close to mathematically as possible
 
-# py-la : Python linear algebra
+## How to install
+```pip install python-la```
+## Examples
+```python
+>> from python_la import Matrix, Span, Vector, PolynomialSimple, LinearMap, RealField, VectorSpace
 
-  
+>> Matrix([[1,2],[3,4]]).gaussian_elimination())
+---------
+| 1 | 0 |
+---------
+| 0 | 1 |
+---------
 
-## Field
-__Static methods:__
-```python
-create
-is_field
-```
-__Private methods:__
-```python
-__str__
-__eq__ virtual
-__contains__ virtual
+>> Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).characteristic_polynomial
+X^3 - 15X^2 - 18X
 
-_generate_one virtual
-random
-```
-__Properties:__
-```python
-classOfInstance
-```
-__Other classes:__
-```python
-class  RationalField(Field)
-class  RealField(Field)
-class  ComplexField(Field)
-class  MatrixField(Field)
+>> Matrix([[1, 0, 1],[0, 1, 1]]).kernel
+[-1, -1, 1]
 
-Fields(Enum)
-```
-__Instances:__
-```python
-DefaultRationalField
-DefaultRealField
-DefaultComplexField
-```
+>> v1, v2 = Vector([3, 4]), Vector([4, 5])
+>> Span([v1,v2]).toOrthonormal()
+[0.6, 0.8]
+[0.8, -0.6]
 
-## Complex
-__Static methods:__
-```python
-random(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
+>> R2 = RealField(2)
+>> src_field,dst_field = R2, R2
+>> lt = LinearMap(src_field, dst_field, lambda vector, result_field: Vector([field.zero, vector[0]], result_field))
+>> x_squared = PolynomialSimple.fromString("x^2")
+>> plus_1 = PolynomialSimple.fromString("x+1")
+>> v = VectorSpace(R2).random()
+>> P = plus_1(x_squared)
+>> P
+X^2 + 1
+>> P(lt)(v) == v
+True
 ```
-__Private methods:__
-```python
-__add__
-__radd__
-__sub__
-__rsub__
-__neg__
-__mul__
-__rmul__
-__truediv__
-__rtruediv__
-__abs__ := norm
-__eq__
-__ne__
-__pow__
-__rpow__ TBD
-```
-__Properties::__
-```python
-conjugate
-norm
-```
-## Vector
-__Static methods:__
-```python
-random(min: float = -10, max: float = 10, degree: int = 10, def_value=None, f: Field = Field.DefaultRealField) -> Vector
-
-fromSize(size: int, default_value: Any = 0) -> Vector
-```
-__Private methods:__
-```python
-__add__
-__radd__
-__sub__
-__rsub__
-__neg__
-__mul__
-__rmul__
-__truediv__
-__rtruediv__
-__eq__
-__ne__
-__getitem__
-__iter__
-__len__
-
-almost_equal
-set
-norm
-dot
-toOrthonormal
-projection_onto
-copy
-```
-__Properties:__
-```python
-length
-adjoint TBD
-has_no_zero
-```
-
-## Span
-__Static methods:__
-```python
-spanField(field: Field) -> Span
-```
-__Private methods:__
-```python
-__add__
-__eq__
-__ne__
-__getitem__
-__iter__
-__len__
-__contains__
-
-contains
-append
-toOrthonormal
-projection_of
-random
-is_spanning
-```
-__Properties:__
-```python
-dim
-basis
-has_lineart_dependency
-is_orthogonal
-is_orthonormal
-```
-
-## Matrix
-__Static methods:__
-```python
-fromVector
-fromVectors
-fromSpan
-fromString
-random
-fromJordanBlocks TBD
-createJordanBlcok TBD
-id_matrix
-```
-__Private methods:__
-```python
-__add__
-__sub__
-__neg__
-__mul__
-__rmul__
-__truediv__
-__rtruediv__
-__eq__
-__ne__
-__getitem__
-__len__
-
-almost_equal
-inverse
-cofactor
-minor
-tarnspose
-reorgenize_rows
-guassian_elimination
-solve TBD
-get_eigen_space_of TBD
-algebraic_multiplicity TBD
-geometric_multiplicity TBD
-```
-__Properties:__
-```python
-kernel TBD
-image TBD
-rank
-determinant
-is_invertible
-is_square
-is_diagonialable TBD
-is_nilpotent TBD
-eigen_values TBD
-jordan_form TBD
-chain_basis TBD
-characteristic_polynomial TBD
-minimal_polynomial TBD
-```
-Partially implemented
-
-## Linear Transformation
-__Static methods:__
-```python
-isFuncLinearTransformation
-fromMatrix
-id
-```
-__Private methods:__
-```python
-__add__
-__radd__
-__sub__
-__rsub__
-__neg__
-__mul__
-__rmul__
-__truediv__
-__call__
-
-toMatrix TBD
-```
-__Properties:__
-```python
-
-```
-Partially implemented
-
-  
-## Calculable
-An interface for the following subclasses:
-### Polynomial
-* #### SimplePolynomial
-	__Static methods:__
-	```python
-	fromString
-	```
-	__Private methods:__
-	```python
-	__add__
-	__radd__
-	__sub__
-	__rsub__
-	__neg__
-	__mul__
-	__rmul__
-	__truediv__
-	__rtruediv__
-	__pow__
-	__eq__
-	__ne__
-	__call__
-	__len__
-
-	gcd_with TBD
-	```
-	__Properties:__
-	```python
-	roots
-	degree
-	```
-* #### PolinomialFraction
-	 __Static methods:__
-	```python
-
-	```
-	__Private methods:__
-	```python
-
-	```
-	__Properties:__
-	```python
-
-	```
-
-### Expression - TBD
-__Static methods:__
-```python
-
-```
-__Private methods:__
-```python
-
-```
-__Properties:__
-```python
-
-```
-
-## InnerProduct
-
-__Static methods:__
-```python
-isInnerProduct
-```
-__Private methods:__
-```python
-__call__
-```
-__Properties:__
-```python
-
-```
-__Instances:__
-```python
-StandardInnerProduct
-```
+## Example

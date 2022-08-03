@@ -10,5 +10,5 @@ def test_is_field():
 def test_clone():
     r3 = RealField(3)
     r21 = r3.classOfInstance(2)
-    r23 = r3.classOfInstance.create(r3._name, 2)
+    r23 = r3.classOfInstance.create(r3.name, 2)
     assert r21 == r23

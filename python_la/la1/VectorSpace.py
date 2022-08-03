@@ -28,10 +28,10 @@ class VectorSpace:
         return False
 
     def random(self, min: int = -10, max: int = 10) -> Vector:
-        return Vector([self.field.random(min, max) for _ in range(self.field._degree)], self.field)
+        return Vector([self.field.random(min, max) for _ in range(self.field.degree)], self.field)
 
     def standard_basis(self) -> list[Vector]:
-        n = self.field._degree
+        n = self.field.degree
         empty = [0 for _ in range(n)]
         return [Vector(empty[:i]+[1]+empty[i+1:]) for i in range(n)]
 

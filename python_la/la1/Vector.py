@@ -24,13 +24,13 @@ class Vector:
             Vector: a vector of the given size with the given field and default value
         """
         if default_value is None:
-            default_value = field._zero
+            default_value = field.zero
         return Vector([default_value for _ in range(size)], field)
 
     @staticmethod
     def e(i: int, size: int, field: Field) -> Vector:
-        v = Vector.fromSize(size, field, field._zero)
-        v[i] = field._one
+        v = Vector.fromSize(size, field, field.zero)
+        v[i] = field.one
         return v
 
     def __init__(self, values: list[Any], field: Field = None) -> None:
