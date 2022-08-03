@@ -4,7 +4,7 @@ import os
 
 
 VERSION = '0.0.13'
-DESCRIPTION = 'Pythhon linear algebra liabrary'
+DESCRIPTION = 'Python linear algebra liabrary'
 
 # Setting up
 setup(
