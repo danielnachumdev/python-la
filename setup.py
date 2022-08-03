@@ -3,12 +3,12 @@ import codecs
 import os
 
 
-VERSION = '0.0.13'
+VERSION = '0.95'
 DESCRIPTION = 'Python linear algebra liabrary'
 
 # Setting up
 setup(
-    name="py-la",
+    name="python-la",
     version=VERSION,
     author="danielnachumdev (Daniel Nachum)",
     author_email="<danielnachumdev@gmail.com>",

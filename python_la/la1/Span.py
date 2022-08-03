@@ -6,6 +6,14 @@ from ..utils import are_operators_implemnted
 
 
 class Span:
+    # @staticmethod
+    # def fromMatrixColumnSpace(m: Matrix) -> Span:
+    #     pass
+
+    # @staticmethod
+    # def fromMatrixRowSpace(m: Matrix) -> Span:
+    #     pass
+
     @staticmethod
     def spanField(field: Field) -> Span:
         """
