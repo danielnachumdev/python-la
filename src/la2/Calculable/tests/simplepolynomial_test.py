@@ -1,4 +1,5 @@
 from ..PolynomialSimple import PolynomialSimple as p
+from ....la1 import Matrix
 
 x = p([1], [1])
 xp1 = p([1, 1], [1, 0])
@@ -106,3 +107,8 @@ def test_fromstring():
     assert f("((x+1))(x+1)") == p([1, 2, 1], [2, 1, 0]) == f("(x+1)^2")
     # TODO can run faster need to improve this
     assert f("((1)(x^2+2*x+5))^2") == f("X^4 + 4X^3 + 14X^2 + 20X + 25", "X")
+
+
+def test_with_matrix():
+    m = Matrix.id_matrix(2)
+    px = p.fromString("x")

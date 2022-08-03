@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple
+from typing import Tuple, Union
 import functools
 from .Calculable import Calculable
 from ...la1 import Vector, Complex, Matrix, LinearMap
@@ -225,7 +225,7 @@ class PolynomialSimple(Calculable):
     def __neg__(self) -> PolynomialSimple:
         return self*(-1)
 
-    def __mul__(self, other) -> PolynomialSimple:
+    def __mul__(self, other) -> Union[PolynomialSimple, Matrix]:
         if isoneof(other, [int, float, Complex]):
             return PolynomialSimple([other*pre for pre in self.prefixes], self.powers)
         elif isinstance(other, PolynomialSimple):
@@ -235,6 +235,8 @@ class PolynomialSimple(Calculable):
                     new_prefixes.append(self.prefixes[j]*other.prefixes[i])
                     new_powers.append(self.powers[j]+other.powers[i])
             return PolynomialSimple(new_prefixes, new_powers)
+        elif isinstance(other, Matrix):
+            return other*self
         raise NotImplementedError(
             f"Polynomial multiplication not implemented for {type(other)}")
 

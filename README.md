@@ -1,5 +1,5 @@
 
-# linear-algebra
+# py-la : Python linear algebra
 
   
 

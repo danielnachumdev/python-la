@@ -32,15 +32,15 @@ def test_id():
 
 def test_guassian_elimination():
     assert Matrix([[1, 1], [1, 1]]).guassian_elimination(
-    ) == Matrix([[1, 1], [0, 0]])
+    )[0] == Matrix([[1, 1], [0, 0]])
     assert Matrix.id_matrix(5).guassian_elimination(
-    ) == Matrix.id_matrix(5)
+    )[0] == Matrix.id_matrix(5)
 
 
 def test_solve():
     assert Matrix([[1, 3], [2, 5]]).solve(Vector([1, 2])) == Vector([1, 0])
     assert Matrix([[1, 1], [1, 1]]).solve(Vector([1, 2])) == None
-    assert Matrix.id_matrix(2).solve() == Vector([0, 0])
+    assert Matrix.id_matrix(2).solve(Vector([0, 0])) == Vector([0, 0])
     # FIXME
     # assert Matrix([[1, 1], [1, 1]]).solve() == Span([Vector([0, 1])])
 

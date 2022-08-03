@@ -256,12 +256,15 @@ class Matrix:
         """
         self * other
         """
-        if isoneof(other, [int, float, Complex]):
-            res = self
+        from ..la2 import Calculable
+        if isoneof(other, [int, float, Complex, Calculable]):
+            res: list[list[Any]] = []
+            # res = self
             for i in range(len(self)):
+                res.append([])
                 for j in range(len(self[0])):
-                    res[i][j] *= other
-            return res
+                    res[i].append(self[i][j] * other)
+            return Matrix(res)
             # return Matrix([[other * self.__matrix[i][j] for j in range(len[self[0]])]
             #                for i in range(len(self))])
         if isinstance(other, Vector):
@@ -276,6 +279,7 @@ class Matrix:
                     "Matrix and Matrix must have matching sizes: self.cols == other.rows")
             return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
                             for k in range(other.__cols)] for i in range(self.__rows)])
+
         raise TypeError(
             "Matrix can only be multiplied by a number, Vector, or Matrix")
 
