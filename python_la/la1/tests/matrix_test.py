@@ -13,6 +13,11 @@ def test_from_vector():
             assert v[i] == m[i][0]
 
 
+def test_rank():
+    assert Matrix.id_matrix(10).rank == 10
+    assert Matrix([[1, 1], [0, 0]]).rank == 1 == Matrix([[1, 0], [1, 0]]).rank
+
+
 def test_from_vectors():
     for _ in range(int(COUNT/10)+1):
         vecs = [V.random() for _ in range(10)]
@@ -31,14 +36,15 @@ def test_id():
 
 
 def test_guassian_elimination():
-    assert Matrix([[1, 1], [1, 1]]).guassian_elimination(
+    assert Matrix([[1, 1], [1, 1]]).gaussian_elimination_with(
     )[0] == Matrix([[1, 1], [0, 0]])
-    assert Matrix.id_matrix(5).guassian_elimination(
+    assert Matrix.id_matrix(5).gaussian_elimination_with(
     )[0] == Matrix.id_matrix(5)
 
 
 def test_solve():
-    assert Matrix([[1, 3], [2, 5]]).solve(Vector([1, 2])) == Vector([1, 0])
+    assert Matrix([[1, 3], [2, 5]]).solve(
+        Vector([1, 2])) == Vector([1, 0])
     assert Matrix([[1, 1], [1, 1]]).solve(Vector([1, 2])) == None
     assert Matrix.id_matrix(2).solve(Vector([0, 0])) == Vector([0, 0])
     # FIXME

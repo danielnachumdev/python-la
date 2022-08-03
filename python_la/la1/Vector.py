@@ -12,8 +12,26 @@ class Vector:
         return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])
 
     @staticmethod
-    def fromSize(size: int, default_value: Any = 0) -> Vector:
-        return Vector([default_value for _ in range(size)])
+    def fromSize(size: int, field: Field, default_value: Any = None) -> Vector:
+        """Create a vector of the given size with the given field and default value
+
+        Args:
+            size (int): the size of the vector
+            field (Field): the field of the vector
+            default_value (Any, optional): the value to intialize the vector with. if is None will default to field._zero.
+
+        Returns:
+            Vector: a vector of the given size with the given field and default value
+        """
+        if default_value is None:
+            default_value = field._zero
+        return Vector([default_value for _ in range(size)], field)
+
+    @staticmethod
+    def e(i: int, size: int, field: Field) -> Vector:
+        v = Vector.fromSize(size, field, field._zero)
+        v[i] = field._one
+        return v
 
     def __init__(self, values: list[Any], field: Field = None) -> None:
         self.__values = values
@@ -85,6 +103,14 @@ class Vector:
 
     def __getitem__(self, index: int) -> Union[int, float, Complex]:
         return self.__values[index]
+
+    def __setitem__(self, index: int, value: Any) -> None:
+        if not isinstance(index, int):
+            raise TypeError("index must be an integer")
+        if not (0 <= index < len(self)):
+            raise ValueError("index out of range")
+        # FIXME validate tha value is valid
+        self.__values[index] = value
 
     def __iter__(self):
         return iter(self.__values)
