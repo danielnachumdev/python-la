@@ -756,7 +756,7 @@ class Matrix:
                 return res
 
             return Span(get_solutions_from_columns(result_matrix)+get_solutions_from_rows(result_matrix))
-
+        # otherwise
         raise NotImplementedError(
             "solve for vector that is not V0 is not implemented yet")
 
