@@ -1,7 +1,7 @@
 # import Complex
 
 import math
-from typing import Tuple
+from typing import Tuple, Any
 
 
 def are_operators_implemnted(T) -> bool:
@@ -194,3 +194,30 @@ def split_not_between_brackets(input: str, symbol: str) -> list[str]:
 
 def composite_function(f, g):
     return lambda *args: f(g(*args), *args[1:])
+
+
+def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
+    res = ""
+    strs = [str(v)for v in lst]
+    prev_char_indecies = [0 for _ in range(len(lst))]
+    char_indecies = [0 for _ in range(len(lst))]
+    while sum(char_indecies) < sum([len(s) for s in strs]):
+        # find indecies for each entry
+        to_advance = set([i for i in range(len(lst))])
+        to_remove = set()
+        while len(to_advance) > 0:
+            for i in to_advance:
+                if strs[i][char_indecies[i]] == '\n':
+                    to_remove.add(i)
+                    continue
+                char_indecies[i] += 1
+            for v in to_remove:
+                to_advance.remove(v)
+            to_remove.clear()
+        # print acordingly
+        for vec_index in range(len(strs)):
+            res += strs[vec_index][prev_char_indecies[vec_index]:char_indecies[vec_index]]+sep
+            prev_char_indecies[vec_index] = char_indecies[vec_index]+1
+            char_indecies[vec_index] += 1
+        res += "\n"
+    return res+end

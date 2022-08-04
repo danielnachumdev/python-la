@@ -554,7 +554,11 @@ class Matrix:
                     if row[i] != self.field.zero:
                         break
                 return i
-            return -1 if first_not_zero_index(a) > first_not_zero_index(b) else 1
+            a_index = first_not_zero_index(a)
+            b_index = first_not_zero_index(b)
+            if a_index == b_index:
+                return 0
+            return -1 if a_index > b_index else 1
 
         self.__matrix = sorted(
             self.__matrix, key=functools.cmp_to_key(comparer), reverse=True)
@@ -627,6 +631,14 @@ class Matrix:
             return self, None
         return Matrix([[self[i][j] for j in range(index)] for i in range(len(self))], self.field), Matrix([[self[i][j] for j in range(index, len(self[0]))] for i in range(len(self))], self.field)
 
+    def duplicate(self) -> Matrix:
+        mat: list[list[Any]] = []
+        for i, row in enumerate(self):
+            mat.append([])
+            for v in row:
+                mat[i].append(v)
+        return Matrix(mat, self.field)
+
     def gaussian_elimination_with(self, solve_with: Union[Vector, Matrix] = None) -> Tuple[Matrix, Union[None, Matrix]]:
         """will perform gaussian elimination on the matrix and return the result in a new matrix and the solution if solve_with is given
 
@@ -640,7 +652,7 @@ class Matrix:
             Tuple[Matrix, Union[None, Matrix]]: the result of the gaussian elimination and the solution if solve_with is given
         """
         SPLIT_INDEX = len(self[0])
-        res = self
+        res = self.duplicate()
         if solve_with is not None:
             if not (isoneof(solve_with, [Vector, Matrix]) or solve_with is None):
                 raise TypeError("can only solve with a Vector or Matrix")
@@ -650,7 +662,7 @@ class Matrix:
         # performe gaussian elimination
         for curr_row_index in range(len(res)):
             # find lead value for current row
-            for lead_index in range(curr_row_index, SPLIT_INDEX):
+            for lead_index in range(SPLIT_INDEX):
                 if res[curr_row_index][lead_index] != 0:
                     break
             else:
@@ -678,6 +690,7 @@ class Matrix:
                         MOT.ROW_ADDITION, next_row_index, curr_row_index)
                     res.apply_operation(
                         MOT.ROW_MULTIPLICATION, next_row_index, -row_multiplyer)
+        res.reorgenize_rows()
         return res.split(SPLIT_INDEX)
 
     def gaussian_elimination(self) -> Matrix:
@@ -700,6 +713,20 @@ class Matrix:
         return Vector(arr)
 
     def solve(self, vec: Vector) -> Union[None, Vector, Span]:
+        """will solve the matrix with the given vector and return the solution
+
+        Args:
+            vec (Vector): the vector to solve with
+
+        Raises:
+            TypeError: will rise if vec is not a Vector
+            NotImplementedError: will rise if there is a span of solutions and vector!=V0 ,WILL BE IMPLEMENTED LATER
+
+        Returns:
+            None: if there is no solution
+            Vector: if there is a single solution
+            Span: if there are multiple solutions
+        """
         if not isinstance(vec, Vector):
             raise TypeError("Matrix must be solved for a vector")
         result_matrix, sol = self.gaussian_elimination_with(vec)

@@ -37,6 +37,7 @@ class Vector:
         self.__values = values
         # TODO add default field detection
         self.field = RealField(len(values)) if not field else field
+        self._max_str_length = self._calculate_max_str_length()
 
     @property
     def length(self):
@@ -53,11 +54,40 @@ class Vector:
                 return True
         return False
 
-    def __str__(self) -> str:
-        result = "["
+    def _calculate_max_str_length(self) -> int:
+        res = 0
         for v in self:
-            result += str(v) + ", "
-        return result[:-2]+"]"
+            l = len(str(v))
+            res = max(res, l)
+        return res
+
+    def _get_str_horizontal_seperator(self) -> str:
+        l = self._max_str_length
+        return "|"+"-"*(l+2)+"|\n"
+
+    def _get_str_for_row(self, i: int) -> str:
+        if not (0 <= i < len(self)):
+            raise ValueError("index out of range")
+        if not self._max_str_length:
+            self._max_str_length = self._calculate_max_str_length()
+        l = self._max_str_length
+        res = ""
+        hs = self._get_str_horizontal_seperator()
+        res += "|"+str(self[i]).center(l+2)+"|\n"
+
+    def __str__(self, raw: bool = False) -> str:
+        if raw:
+            result = "["
+            for v in self:
+                result += str(v) + ", "
+            return result[:-2]+"]"
+        res = ""
+        hs = self._get_str_horizontal_seperator()
+        res += hs
+        for v in self:
+            res += "|"+str(v).center(self._max_str_length+2)+"|\n"
+            res += hs
+        return res
 
     def __add__(self, other: Vector) -> Vector:
         if not isinstance(other, Vector):
