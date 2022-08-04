@@ -3,7 +3,7 @@ from __future__ import annotations
 
 class Calculable:
     @staticmethod
-    def fromString(s: str) -> Calculable:
+    def from_string(s: str) -> Calculable:
         raise NotImplementedError("This is a virtual method")
 
     def __init__(self):

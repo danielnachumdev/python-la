@@ -232,7 +232,7 @@ class Matrix:
         from ..la2 import PolynomialSimple
         if not self.is_square:
             raise ValueError("Matrix must be square")
-        return (Matrix.id_matrix(len(self))*PolynomialSimple.fromString("x")-self).determinant
+        return (Matrix.id_matrix(len(self))*PolynomialSimple.from_string("x")-self).determinant
 
     # @property
     # def minimal_polynomial(self) -> SimplePolynomial.SimplePolynomial:

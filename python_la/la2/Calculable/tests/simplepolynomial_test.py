@@ -27,8 +27,8 @@ def test_with_Field():
     lt = LinearMap(field, field, func)
     v = VectorSpace(field).random()
     # assert Polynomial.fromString("x^2")(lt)(v) == Vector([0, 0], field)
-    assert p.fromString("x^2+1")(lt)(v) == v
-    assert p.fromString(
+    assert p.from_string("x^2+1")(lt)(v) == v
+    assert p.from_string(
         "x+1")(lt)(v) == Vector([v[0], sum(v)], field)
 
 
@@ -49,13 +49,13 @@ def test_multiplication():
     assert x*5 == p([5], [1])
     assert x*x == p([1], [2])
     assert xp1*xp1 == p([1, 2, 1], [2, 1, 0])
-    assert p.fromString(
-        "(x^2+2*x+5)")*p.fromString("1") == p.fromString("1")*p.fromString("(x^2+2*x+5)")
+    assert p.from_string(
+        "(x^2+2*x+5)")*p.from_string("1") == p.from_string("1")*p.from_string("(x^2+2*x+5)")
 
 
 def test_with_matrix():
     from ....la1 import Matrix
-    assert p.fromString("x^2")(
+    assert p.from_string("x^2")(
         Matrix([[1, 0], [0, 1]])) == Matrix([[1, 0], [0, 1]])
 
 
@@ -99,7 +99,7 @@ def test_equals():
 
 
 def test_fromstring():
-    f = p.fromString
+    f = p.from_string
     assert f("x^2 +2x+1") == p([1, 2, 1], [2, 1, 0])
     assert f(
         "-x^7+x^6-34*x^5-x4-x^3+x^2") == p([-1, -1, 34, -1, -1, -4], [7, 6, 5, 3, 2, 1])
@@ -111,4 +111,4 @@ def test_fromstring():
 
 def test_with_matrix():
     m = Matrix.id_matrix(2)
-    px = p.fromString("x")
+    px = p.from_string("x")

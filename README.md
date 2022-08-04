@@ -8,7 +8,7 @@ The aim of this project is to implement programatically all of the mathematical 
 ```python
 >> from python_la import Matrix, Span, Vector, PolynomialSimple, LinearMap, RealField, VectorSpace
 
->> Matrix([[1,2],[3,4]]).gaussian_elimination())
+>> Matrix([[1,2],[3,4]]).gaussian_elimination()
 ---------
 | 1 | 0 |
 ---------
@@ -22,20 +22,20 @@ X^3 - 15X^2 - 18X
 [-1, -1, 1]
 
 >> v1, v2 = Vector([3, 4]), Vector([4, 5])
->> Span([v1,v2]).toOrthonormal()
+>> Span([v1,v2]).to_orthonormal()
 [0.6, 0.8]
 [0.8, -0.6]
 
 >> R2 = RealField(2)
 >> src_field, dst_field = R2, R2
 >> lm = LinearMap(src_field, dst_field, lambda vector, result_field: Vector([field.zero, vector[0]], result_field))
->> x_squared = PolynomialSimple.fromString("x^2")
->> plus_1 = PolynomialSimple.fromString("x+1")
+>> x_squared = PolynomialSimple.from_string("x^2")
+>> plus_1 = PolynomialSimple.from_string("x+1")
 >> v = VectorSpace(R2).random()
 >> P = plus_1(x_squared)
 >> P
 X^2 + 1
->> P(lt)(v) == v
+>> P(lm)(v) == v
 True
 ```
 ## Example

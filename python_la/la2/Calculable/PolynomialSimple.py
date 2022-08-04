@@ -8,7 +8,8 @@ from ...utils import *
 
 class PolynomialSimple(Calculable):
     @staticmethod
-    def fromString(input: str, var: str = "x") -> PolynomialSimple:
+    def from_string(input: str, var: str = "x") -> PolynomialSimple:
+        # FIXME "x-1" == "x+1" which is not good
         if var not in input:
             for c in input:
                 if not c.isdigit():
@@ -83,9 +84,9 @@ class PolynomialSimple(Calculable):
                 raise ValueError("invalid brackets")
             input = open_power(input)
             sub_inputs = split_not_between_brackets(input, "*")
-            res = PolynomialSimple.fromString(sub_inputs[0], var)
+            res = PolynomialSimple.from_string(sub_inputs[0], var)
             for sub_input in sub_inputs[1:]:
-                res *= PolynomialSimple.fromString(sub_input, var)
+                res *= PolynomialSimple.from_string(sub_input, var)
             return res
         else:
             # split with addition
@@ -159,9 +160,31 @@ class PolynomialSimple(Calculable):
                          for i in range(len(self.prefixes)) if self.prefixes[i] != 0]
 
     @property
-    def roots(self) -> Vector:
-        # TODO calculation of roots if possible
-        pass
+    def roots(self) -> list:
+        if self.degree == 0:
+            return []
+        if self.degree == 1:
+            a = self.prefixes[self.powers.index(1)]
+            if 0 in self.powers:
+                return [-a/self.prefixes[self.powers.index(0)]]
+            return [0]
+        elif self.degree == 2:
+            a, b, c = 0, 0, 0
+            a = self.prefixes[self.powers.index(2)]
+            if 1 in self.powers:
+                b = self.prefixes[self.powers.index(1)]
+            if 0 in self.powers:
+                c = self.prefixes[self.powers.index(0)]
+            delta = b**2 - 4*a*c
+            if delta < 0:
+                # FIXME implement complex
+                return []
+            x1 = (-b+math.sqrt(delta))/(2*a)
+            x2 = (-b-math.sqrt(delta))/(2*a)
+            return [x1, x2]
+        if 0 not in self.powers:
+            return [0] + PolynomialSimple(self.prefixes, [v-1 for v in self.powers]).roots
+        return []
 
     @property
     def degree(self) -> float:
