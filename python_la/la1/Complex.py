@@ -1,13 +1,39 @@
 from __future__ import annotations
 from typing import Union
+import math
 import random
-from ..utils import isoneof, almost_equal
+from ..utils import isoneof, alloneof, almost_equal
 
 
 class Complex:
+    @staticmethod
+    def fromPolar(r: float, theta: float) -> Complex:
+        real = r * math.cos(theta)
+        imag = r * math.sin(theta)
+        return Complex(real, imag)
+
+    @staticmethod
+    def fromPolarRadians(r: float, theta_radians: float) -> Complex:
+        return Complex.fromPolar(r, theta_radians*180/math.pi)
+
     def __init__(self, real: float, imag: float) -> None:
+        if not alloneof([real, imag], [int, float]):
+            raise TypeError(
+                "Complex.__init__: real and imag must be int or float")
         self.real = real
         self.imag = imag
+
+    @property
+    def r(self) -> float:
+        return math.sqrt(self.real**2+self.imag**2)
+
+    @property
+    def theta_radians(self) -> float:
+        return math.atan(self.imag / self.real)
+
+    @property
+    def theta(self) -> float:
+        return self.theta_radians * 180/math.pi
 
     def __str__(self) -> str:
         # get final string for real value
@@ -98,10 +124,10 @@ class Complex:
         return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
 
     def __pow__(self, p):
-        # TODO: implement Complex**p fully
         if not isoneof(p, [int]):
-            raise NotImplementedError(
-                "Complex.__pow__ only implemented for int right now")
+            raise TypeError(f"can only raise complex to [int]")
+        # TODO look at this again
+        # return Complex.fromPolar(self.r**p, self.theta**p)
 
         def fix_negativ(v) -> Complex:
             if p < 0:

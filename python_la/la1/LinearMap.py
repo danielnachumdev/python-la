@@ -11,7 +11,7 @@ from .VectorSpace import VectorSpace
 class LinearMap:
     # TODO rethink data structure
     @staticmethod
-    def isFuncLinearTransformation(func: Callable[[Any, Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
+    def is_func_linear_map(func: Callable[[Any, Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
         COUNT = 100
         V = VectorSpace(src_field)
         for _ in range(COUNT):
@@ -27,7 +27,7 @@ class LinearMap:
         return True
 
     @staticmethod
-    def fromMatrix(m: Matrix) -> LinearMap:
+    def from_matrix(m: Matrix) -> LinearMap:
         return LinearMap(m.field, type(m.field)(m.field.name), lambda x: m*x)
 
     @staticmethod
@@ -43,7 +43,7 @@ class LinearMap:
             func (Callable[[Any], Any]): the transformation function
         """
         if validate:
-            if not LinearMap.isFuncLinearTransformation(func, src_field, dst_field):
+            if not LinearMap.is_func_linear_map(func, src_field, dst_field):
                 raise ValueError("func is not a linear transformation")
         self.src_field = src_field
         self.dst_field = dst_field
@@ -101,11 +101,15 @@ class LinearMap:
             raise NotImplementedError(
                 "multiplication with non-numeric type not implemented")
 
-    def __truediv__(self, other) -> LinearMap:
-        # TODO
-        pass
+    def __truediv__(self, other: Any):
+        """
+        Raises:
+            NotImplementedError: can't divide linear transformations
+        """
+        raise NotImplementedError(
+            "LineraMap.__truediv__: cant devide Linear Maps")
 
-    def __call__(self, v: Union[Vector, Matrix]) -> Union[Vector, Matrix]:
+    def __call__(self, v: Union[Vector, Matrix, LinearMap]) -> Union[Vector, Matrix, LinearMap]:
         """ apply the transformation on an object
         Args:
             v (Any): the object to apply the transformation on
@@ -131,9 +135,13 @@ class LinearMap:
         except Exception as e:
             raise e
 
-    def toMatrix(self, base=None) -> Matrix:
-        # TODO implement calculation of operator over specific base
-        pass
+    def to_matrix(self, basis=None) -> Matrix:
+        if basis is None:
+            basis = VectorSpace(self.src_field).standard_basis()
+        vectors = []
+        for v in basis:
+            vectors.append(self(v))
+        return Matrix.fromVectors(vectors)
 
 
 class LinearTransformation(LinearMap):

@@ -64,3 +64,9 @@ def test_division():
 
 def test_pow():
     assert c(1, 1)**2 == c(0, 2)
+
+
+def test_theta():
+    import math
+    assert c(1, 1).theta == 45
+    assert c(1, 1).r == math.sqrt(2)

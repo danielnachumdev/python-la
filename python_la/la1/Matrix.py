@@ -10,7 +10,6 @@ from .Vector import Vector
 from .Field import Field, DefaultRealField
 from ..utils import areinstances, check_foreach, isoneof
 from .Span import Span
-# TODO remove hardcoded solution vec and add it as parameter to solve with
 
 
 class MatrixOperationType(enum.Enum):
@@ -266,7 +265,7 @@ class Matrix:
             raise ValueError("Index out of range")
         if not isinstance(value, list):
             raise TypeError("Value must be a list")
-        # TODO validate all items in list are of same type of this matrix
+        # FIXME validate all items in list are of same type of this matrix
         self.__matrix[index] = value
 
     def __str__(self, turnc: int = 2) -> str:
@@ -756,7 +755,7 @@ class Matrix:
                         tmp[index] = -m.field.one
                     res.append(Vector(tmp))
                 return res
-
+            # FIXME fix matrix.solve to support vectors who are not V0
             return Span(get_solutions_from_columns(result_matrix)+get_solutions_from_rows(result_matrix))
 
         raise NotImplementedError(
