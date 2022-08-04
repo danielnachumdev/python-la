@@ -1,4 +1,5 @@
 from .Field import Field
+from typing import Any
 import random
 
 
@@ -34,3 +35,21 @@ class RationalField(Field):
         while(denominator == 0):
             denominator = f(min, max)
         return sign*nominator/denominator
+
+    def __contains__(self, value: Any, quiet: bool = False) -> bool:
+        """checks if the value is in the field
+
+        Args:
+            value (Union[int, float]): the value to check
+            quiet (bool, optional): whether to supress warning. Defaults to False.
+
+        Returns:
+            bool: True if value is in the field, False otherwise
+        """
+        if not quiet:
+            print(
+                f"due to a finite amount of values, every number is rational so take note")
+            print("to turn these messages of off, use __contains__(value, quiet=True)")
+        if isinstance(value, [int, float]):
+            return True
+        return False

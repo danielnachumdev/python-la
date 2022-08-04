@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Callable
-from ...utils import are_operators_implemnted, almost_equal, areinstances
+from ...utils import are_operators_implemnted, almost_equal, areinstances, abstractmethod
 
 
 class Field:
@@ -129,6 +129,7 @@ class Field:
     def __eq__(self, other: Field) -> bool:
         return self.name == other.name and self.modulu == other.modulu and self.degree == other.degree and self.zero == other.zero and self.one == other.one
 
+    @abstractmethod
     def random(self, min: Any = -10, max: Any = 10) -> Any:
         """returns a random element of the field
 
@@ -137,9 +138,24 @@ class Field:
             max (Any, optional): the maximum value for an element. Defaults to 10.
 
         Raises:
-            NotImplementedError: will rise if this method is not implemented in a derived class as this is a virtual method
+            NotImplementedError: will rise if this method is not implemented in a derived class as this is an abstract method
 
         Returns:
             Any: a random element of the field
         """
-        raise NotImplementedError("This is a virtual method")
+        pass
+
+    @abstractmethod
+    def __contains__(self, value: Any, *args, **kwargs) -> bool:
+        """checks if a value is in the field
+
+        Args:
+            value (Any): the value to check
+
+        Raises:
+            NotImplementedError: will rise if this method is not implemented in a derived class as this is an abstract method
+
+        Returns:
+            bool: True if the value is in the field
+        """
+        pass

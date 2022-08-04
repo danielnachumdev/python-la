@@ -1,6 +1,7 @@
 from .Field import Field
 from ..Complex import Complex
 import random
+from typing import Any
 
 
 class ComplexField(Field):
@@ -25,3 +26,16 @@ class ComplexField(Field):
             Complex: _description_
         """
         return Complex.random(min, max, random.uniform)
+
+    def __contains__(self, value: Any) -> bool:
+        """checks if the value is in the field
+
+        Args:
+            value (Any): the value to check
+
+        Returns:
+            bool: True if value is in the field, False otherwise
+        """
+        if isinstance(value, [int, float, Complex]):
+            return True
+        return False

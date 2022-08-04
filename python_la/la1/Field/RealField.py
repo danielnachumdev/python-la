@@ -1,5 +1,6 @@
 import random
 from .Field import Field
+from typing import Any
 
 
 class RealField(Field):
@@ -23,3 +24,16 @@ class RealField(Field):
             float: _description_
         """
         return random.uniform(min, max)
+
+    def __contains__(self, value: Any) -> bool:
+        """checks if the value is in the field
+
+        Args:
+            value (Any): the value to check
+
+        Returns:
+            bool: True if value is in the field, False otherwise
+        """
+        if isinstance(value, [int, float]):
+            return True
+        return False
