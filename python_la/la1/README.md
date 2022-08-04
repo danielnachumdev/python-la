@@ -38,16 +38,14 @@ class RealField(Field)
 class ComplexField(Field)
 class MatrixField(Field)
 class Fields(Enum)
-DefaultRationalField
-DefaultRealField
-DefaultComplexField
+
 ```
 
 
 ## Vector
 __Static methods:__
 ```python
-random(min: float = -10, max: float = 10, degree: int = 10, def_value=None, f: Field = Field.DefaultRealField) -> Vector
+random(min: float = -10, max: float = 10, degree: int = 10, def_value=None, f: Field = Field) -> Vector
 
 fromSize(size: int, default_value: Any = 0) -> Vector
 ```

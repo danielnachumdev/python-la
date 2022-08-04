@@ -7,7 +7,7 @@ from typing import Tuple
 from ..utils import almost_equal
 from .Complex import Complex
 from .Vector import Vector
-from .Field import Field, DefaultRealField
+from .Field import Field, RealField
 from ..utils import areinstances, check_foreach, isoneof
 from .Span import Span
 
@@ -82,13 +82,13 @@ class Matrix:
     #                    for row in matrix_string.split("\n")])
 
     @staticmethod
-    def random(rows: int, cols: int, f: Field = DefaultRealField, min: float = -10, max: float = 10, ) -> Matrix:
+    def random(rows: int, cols: int, f: Field = RealField(), min: float = -10, max: float = 10, ) -> Matrix:
         """Create a random Matrux acording to params
 
         Args:
             rows (int): the amount of rows in matrix
             cols (int): the amount of columns in matrix
-            f (Field, optional): the field to create the matrix over. Defaults to DefaultRealField.
+            f (Field, optional): the field to create the matrix over. Defaults to RealField().
             min (float, optional): the minimum value from the field. Defaults to -10.
             max (float, optional): the maximum value from the field. Defaults to 10.
 
@@ -121,12 +121,12 @@ class Matrix:
             arr[i][i] = 1
         return Matrix(arr)
 
-    def __init__(self, mat: list[list[Any]], field: Field = DefaultRealField) -> None:
+    def __init__(self, mat: list[list[Any]], field: Field = RealField()) -> None:
         """Create a Matrix
 
         Args:
             mat (list[list[Any]]): a list of lists of elements (2D array)
-            field (Field, optional): the field that the elements of the matrix is over. Defaults to DefaultRealField.
+            field (Field, optional): the field that the elements of the matrix is over. Defaults to RealField().
 
         Raises:
             TypeError: will rise if mat is not a list of lists

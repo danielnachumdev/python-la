@@ -1,7 +1,7 @@
-from ... import Field, RealField, DefaultRealField, DefaultComplexField, DefaultRationalField
+from ... import Field, RealField, ComplexField, RationalField
 
 
 def test_is_field():
-    assert Field.is_field(DefaultComplexField)
-    assert Field.is_field(DefaultRealField)
-    assert Field.is_field(DefaultRationalField)
+    assert Field.is_field(ComplexField())
+    assert Field.is_field(RealField())
+    assert Field.is_field(RationalField())

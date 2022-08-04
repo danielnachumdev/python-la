@@ -1,14 +1,14 @@
 from __future__ import annotations
 from ..utils import almost_equal, isoneof
 from typing import Union, Any
-from .Field import Field, RealField, DefaultRealField
+from .Field import Field, RealField
 from .Complex import Complex
 
 
 class Vector:
 
     @staticmethod
-    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field = DefaultRealField) -> Vector:
+    def random(min: float = -10, max: float = 10, degree: int = 10,  def_value=None, f: Field = RealField()) -> Vector:
         return Vector([f.random(min, max) if def_value is None else def_value for _ in range(degree)])
 
     @staticmethod
