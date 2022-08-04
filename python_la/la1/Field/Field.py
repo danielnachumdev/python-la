@@ -109,15 +109,6 @@ class Field:
                 raise ValueError(
                     "This is not a field as one or more of the axioms do not check-out")
 
-    @property
-    def class_of_instance(self) -> Field:
-        """returns the class of the instance to be able to distinguish between different field instances
-
-        Returns:
-            Field: the class of the instance
-        """
-        return type(self)
-
     def __str__(self) -> str:
         """returns the string representation of the field
 

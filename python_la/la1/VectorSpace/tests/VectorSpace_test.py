@@ -1,4 +1,4 @@
-from ...la1 import VectorSpace, RealField, ComplexField, Vector
+from ... import VectorSpace, RealField, ComplexField, Vector
 
 
 def test_containment():

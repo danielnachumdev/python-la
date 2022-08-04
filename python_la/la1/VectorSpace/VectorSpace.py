@@ -1,11 +1,10 @@
 from __future__ import annotations
 from typing import Any
-from .Field import Field
-from .Vector import Vector
+from ..Field import Field
+from ..Vector import Vector
 
 
 class VectorSpace:
-
     def __init__(self, field: Field) -> None:
         """creates a new vector space
 
@@ -112,9 +111,3 @@ class VectorSpace:
         """
         n = self.field.degree
         return [self.e(i) for i in range(n)]
-
-
-# class PolynomialVectorSpace(VectorSpace):
-#     pass
-
-# TODO is oclidian, is hermitian

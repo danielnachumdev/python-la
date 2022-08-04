@@ -223,6 +223,11 @@ class Span:
         """
         return hash((v for v in self))
 
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Span):
+            return self.vectors == other.vectors
+        return False
+
     def contains(self, vector: Vector) -> bool:
         """checks whether there is a linear combinations of vectors in the span that equals the vector
 

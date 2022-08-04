@@ -27,8 +27,8 @@ X^3 - 15X^2 - 18X
 [0.8, -0.6]
 
 >> R2 = RealField(2)
->> src_field,dst_field = R2, R2
->> lt = LinearMap(src_field, dst_field, lambda vector, result_field: Vector([field.zero, vector[0]], result_field))
+>> src_field, dst_field = R2, R2
+>> lm = LinearMap(src_field, dst_field, lambda vector, result_field: Vector([field.zero, vector[0]], result_field))
 >> x_squared = PolynomialSimple.fromString("x^2")
 >> plus_1 = PolynomialSimple.fromString("x+1")
 >> v = VectorSpace(R2).random()

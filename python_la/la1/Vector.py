@@ -47,10 +47,10 @@ class Vector:
         """
         if default_value is None:
             default_value = field.zero
-        return Vector([default_value for _ in range(size)], field)
+        return Vector([default_value for _ in range(size)], field.__class__(size, field.modulu))
 
-    @depracated("Use VectorSpace(...).e(...) instead")
-    @staticmethod
+    @ depracated("Use VectorSpace(...).e(...) instead")
+    @ staticmethod
     def e(i: int, size: int, field: Field) -> Vector:
         """Create the ith element of the e vector of the given size and field
 
@@ -77,7 +77,7 @@ class Vector:
         # TODO add default field detection
         self.field = RealField(len(values)) if not field else field
 
-    @property
+    @ property
     def conjugate(self) -> Vector:
         """Return the conjugate of the vector
 
