@@ -53,7 +53,7 @@ def test_composit_functions():
     num = random.randint(1, 10)
     lt2 = num*lt
     assert lt2(v) == Vector([v[1]*num, v[0]*num], R2), 4
-    assert (lt2**2)(v).almost_equal(Vector([v[0]*num**2, v[1]*num**2], R2))
+    assert (lt2**2)(v) == (Vector([v[0]*num**2, v[1]*num**2], R2))
 
     def func(v, target):
         return Vector([0, v[0]], target)

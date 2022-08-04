@@ -9,7 +9,7 @@ def test_from_vector():
     for _ in range(COUNT):
         v = V.random()
         m = Matrix.fromVector(v)
-        for i in range(v.length):
+        for i in range(len(v)):
             assert v[i] == m[i][0]
 
 
@@ -21,7 +21,7 @@ def test_rank():
 def test_from_vectors():
     for _ in range(int(COUNT/10)+1):
         vecs = [V.random() for _ in range(10)]
-        m = Matrix.fromVectors(vecs)
+        m = Matrix.from_vectors(vecs)
         for i in range(len(vecs[0])):
             for j in range(len(vecs)):
                 assert vecs[j][i] == m[i][j]

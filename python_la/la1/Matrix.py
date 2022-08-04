@@ -44,7 +44,7 @@ class Matrix:
         return Matrix([[v] for v in vec], vec.field)
 
     @staticmethod
-    def fromVectors(vecs: list[Vector]) -> Matrix:
+    def from_vectors(vecs: list[Vector]) -> Matrix:
         """Create a Matrix from a list of Vectors, the matrix will have the same number of columns as the number of vectors and the same number of rows as the number of elements in a vector
 
         Args:
@@ -62,7 +62,7 @@ class Matrix:
         if not check_foreach(vecs, lambda v: v.field == vecs[0].field):
             raise ValueError("vectors are not over the same field")
         mat: list[list[Any]] = []
-        for i in range(vecs[0].length):
+        for i in range(len(vecs[0])):
             mat.append([])
             for j in range(len(vecs)):
                 mat[i].append(vecs[j][i])

@@ -76,7 +76,7 @@ class Span:
         """
         from .Matrix import Matrix
         result_indecies = []
-        for row in Matrix.fromVectors(self.vectors).gaussian_elimination():
+        for row in Matrix.from_vectors(self.vectors).gaussian_elimination():
             for vec_index, value in enumerate(row):
                 if value != self.field.zero:
                     result_indecies.append(vec_index)
@@ -241,7 +241,7 @@ class Span:
         from .Matrix import Matrix
         res = False
         try:
-            res = Matrix.fromVectors(self.vectors).solve(vector) != None
+            res = Matrix.from_vectors(self.vectors).solve(vector) != None
         except ValueError:
             res = True
         return res

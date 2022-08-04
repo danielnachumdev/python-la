@@ -67,4 +67,4 @@ class InnerProduct:
 #     return sum([a[i] * b[i] for i in range(a.length)])
 
 StandardInnerProduct = InnerProduct(
-    lambda a, b: sum([a[i] * b[i] for i in range(a.length)]))
+    lambda a, b: sum([a[i] * b[i] for i in range(len(a))]))

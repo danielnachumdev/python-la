@@ -141,7 +141,7 @@ class LinearMap:
         vectors = []
         for v in basis:
             vectors.append(self(v))
-        return Matrix.fromVectors(vectors)
+        return Matrix.from_vectors(vectors)
 
 
 class LinearTransformation(LinearMap):

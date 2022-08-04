@@ -93,7 +93,7 @@ class Vector:
                     arr.append(v.conjugate)
             else:
                 arr.append(v)
-        return Vector([arr])
+        return Vector(arr)
 
     def __str__(self, raw: bool = False) -> str:
         """Return a string representation of the vector
