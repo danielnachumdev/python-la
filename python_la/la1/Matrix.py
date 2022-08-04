@@ -140,7 +140,7 @@ class Matrix:
 
     @property
     def kernel(self) -> Union[Vector, Span]:
-        solution = self.solve(Vector.fromSize(len(self), self.field))
+        solution = self.solve(Vector.from_size(len(self), self.field))
         if solution is None:
             return Vector([0 for _ in range(len(self))])
         return solution
@@ -738,13 +738,15 @@ class Matrix:
 
         # if there is a row in result matrix which has all zeros and solution vector doesnt has a zero at that row there is no solution
         for i, row in enumerate(result_matrix):
-            if (not Vector(row).has_no_zero) and sol[i] != 0:
+            # if (not Vector(row).has_no_zero) and sol[i] != 0:
+            #     return None
+            has_no_zero = check_foreach(row, lambda x: x != 0)
+            if has_no_zero and sol[i] != 0:
                 return None
-
         # otherwise there is a span of solutions
 
         # solve for V0
-        if sol == Vector.fromSize(len(result_matrix), result_matrix.field):
+        if sol == Vector.from_size(len(result_matrix), result_matrix.field):
             def get_solutions_from_columns(m: Matrix) -> list[Vector]:
                 def sumrows(m: Matrix) -> list[int]:
                     sumrow = [0 for _ in range(len(m[0]))]

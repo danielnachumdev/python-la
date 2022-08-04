@@ -268,7 +268,7 @@ class Span:
         Returns:
             Span: orthonormal representation of self
         """
-        result = [self[0].toOrthonormal()]
+        result = [self[0].normalize()]
         from ..la2 import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
@@ -276,7 +276,7 @@ class Span:
             for prev in result:
                 curr_tag = curr_tag+sip(prev, current) * prev
             current = current-curr_tag
-            result.append(current.toOrthonormal())
+            result.append(current.normalize())
         return Span(result)
 
     def projection_of(self, v: Vector) -> Vector:
@@ -293,7 +293,7 @@ class Span:
         """
         if not isinstance(v, Vector):
             raise TypeError("can only project vectors")
-        res: Vector = Vector.fromSize(len(v), 0)
+        res: Vector = Vector.from_size(len(v), 0)
         for w in self.to_orthonormal():
             res += v.projection_onto(w)
         return res
@@ -311,7 +311,7 @@ class Span:
         """
         if not alloneof([min, max], [int, float]):
             raise TypeError("min and max must be of type int or float")
-        res = Vector.fromSize(len(self[0]), 0)
+        res = Vector.from_size(len(self[0]), 0)
         for v in self:
             res += random.uniform(min, max) * v
         return res

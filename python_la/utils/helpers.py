@@ -39,21 +39,6 @@ def alloneof(value: list, types: list):
 
 def almost_equal(*args):
     THRESHOLD = 0.000000000001
-    # def compare_two(a, b) -> bool:
-    #     # if b == 0:
-    #     #     try:
-    #     #         return a < THRESHOLD
-    #     #     except:
-    #     #         return a == 0
-    #     # if a == 0:
-    #     #     try:
-    #     #         return b < THRESHOLD
-    #     #     except:
-    #     #         return b == 0
-    #     if abs(a) > 100000 and abs(b) > 100000:
-    #         return abs(1-a/b) < THRESHOLD
-    #     return abs(a-b) < THRESHOLD
-    # return all([compare_two(args[0], args[i]) for i in range(1, len(args))])
 
     def wrapper(a, b):
         if alloneof([a, b], [int, float]):
@@ -217,7 +202,8 @@ def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
             to_remove.clear()
         # print acordingly
         for vec_index in range(len(strs)):
-            res += strs[vec_index][prev_char_indecies[vec_index]:char_indecies[vec_index]]+sep
+            res += strs[vec_index][prev_char_indecies[vec_index]
+                :char_indecies[vec_index]]+sep
             prev_char_indecies[vec_index] = char_indecies[vec_index]+1
             char_indecies[vec_index] += 1
         res += "\n"
