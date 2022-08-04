@@ -17,6 +17,7 @@ def are_operators_implemnted(T) -> bool:
         T.__rtruediv__
         T.__eq__
         T.__ne__
+        T.__hash__
         return True
     except AttributeError:
         return False

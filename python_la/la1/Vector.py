@@ -61,20 +61,6 @@ class Vector:
             res = max(res, l)
         return res
 
-    def _get_str_horizontal_seperator(self) -> str:
-        l = self._max_str_length
-        return "|"+"-"*(l+2)+"|\n"
-
-    def _get_str_for_row(self, i: int) -> str:
-        if not (0 <= i < len(self)):
-            raise ValueError("index out of range")
-        if not self._max_str_length:
-            self._max_str_length = self._calculate_max_str_length()
-        l = self._max_str_length
-        res = ""
-        hs = self._get_str_horizontal_seperator()
-        res += "|"+str(self[i]).center(l+2)+"|\n"
-
     def __str__(self, raw: bool = False) -> str:
         if raw:
             result = "["
@@ -82,7 +68,7 @@ class Vector:
                 result += str(v) + ", "
             return result[:-2]+"]"
         res = ""
-        hs = self._get_str_horizontal_seperator()
+        hs = "|"+"-"*(self._max_str_length+2)+"|\n"
         res += hs
         for v in self:
             res += "|"+str(v).center(self._max_str_length+2)+"|\n"
@@ -160,6 +146,9 @@ class Vector:
     def __len__(self) -> int:
         return self.length
 
+    def __hash__(self) -> int:
+        return hash((v for v in self))
+
     def almost_equal(self, other: Vector) -> bool:
         if not isinstance(other, Vector):
             raise TypeError("Vector can only be compared to another Vector")
@@ -191,12 +180,12 @@ class Vector:
         return the projection of self onto value which can be another vector or a Span
         """
         from .Span import Span
-        if not isinstance(value, Vector) and not isinstance(value, Span):
+        if not isoneof(value, [Vector, Span]):
             raise TypeError("v must be of type Vector or Span")
         is_span = isinstance(value, Span)
-        if not is_span and value.length != self.length:
+        if not is_span and len(value) != len(self):
             raise ValueError("value must have the same length as self")
-        if is_span and value[0].length != self.length:
+        if is_span and len(value[0]) != len(self):
             raise ValueError(
                 "the span's vectors must have the same length as self")
         from ..la2.InnerProduct import StandardInnerProduct as sip
