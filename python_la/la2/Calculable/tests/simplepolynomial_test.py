@@ -110,5 +110,5 @@ def test_fromstring():
 
 
 def test_with_matrix():
-    m = Matrix.id_matrix(2)
+    m = Matrix.identity(2)
     px = p.from_string("x")

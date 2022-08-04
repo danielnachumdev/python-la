@@ -14,7 +14,7 @@ def test_from_vector():
 
 
 def test_rank():
-    assert Matrix.id_matrix(10).rank == 10
+    assert Matrix.identity(10).rank == 10
     assert Matrix([[1, 1], [0, 0]]).rank == 1 == Matrix([[1, 0], [1, 0]]).rank
 
 
@@ -32,21 +32,21 @@ def test_determinant():
 
 
 def test_id():
-    assert Matrix.id_matrix(2) == Matrix([[1, 0], [0, 1]])
+    assert Matrix.identity(2) == Matrix([[1, 0], [0, 1]])
 
 
 def test_guassian_elimination():
     assert Matrix([[1, 1], [1, 1]]).gaussian_elimination_with(
     )[0] == Matrix([[1, 1], [0, 0]])
-    assert Matrix.id_matrix(5).gaussian_elimination_with(
-    )[0] == Matrix.id_matrix(5)
+    assert Matrix.identity(5).gaussian_elimination_with(
+    )[0] == Matrix.identity(5)
 
 
 def test_solve():
     assert Matrix([[1, 3], [2, 5]]).solve(
         Vector([1, 2])) == Vector([1, 0])
     assert Matrix([[1, 1], [1, 1]]).solve(Vector([1, 2])) == None
-    assert Matrix.id_matrix(2).solve(Vector([0, 0])) == Vector([0, 0])
+    assert Matrix.identity(2).solve(Vector([0, 0])) == Vector([0, 0])
     from ..Span import Span
     assert Matrix([[1, 1], [1, 1]]).solve(
         Vector([0, 0])) == Span([Vector([-1, 1])])

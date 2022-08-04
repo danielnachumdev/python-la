@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Tuple, Union
 import functools
 from .Calculable import Calculable
-from ...la1 import Vector, Complex, Matrix, LinearMap
+from ...la1 import Complex, Matrix, LinearMap
 from ...utils import *
 
 

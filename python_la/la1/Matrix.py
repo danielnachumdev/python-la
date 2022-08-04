@@ -99,15 +99,54 @@ class Matrix:
         return Matrix([[f.random(min, max) for _ in range(cols)]for __ in range(rows)], field=f)
 
     @staticmethod
-    def fromJordanBlocks(lst: list[Matrix]) -> Matrix:
-        pass
+    def from_jordan_blocks(blocks: list[Matrix]) -> Matrix:
+        """Create a Matrix from a list of Jordan blocks
+
+        Args:
+            blocks (list[Matrix]): the list of Jordan blocks to create a matrix from
+
+        Returns:
+            Matrix: the result
+        """
+        total_size = 0
+        hm: dict[Any, list[Matrix]] = dict()
+        for block in blocks:
+            if block[0][0] not in hm.keys():
+                hm[block[0][0]] = []
+            hm[block[0][0]].append(block)
+            total_size += len(block)
+        # sort blocks in order
+        for key in hm:
+            hm[key].sort(key=lambda x: len(x))
+        res = Matrix([[0 for __ in range(total_size)] for _ in range(total_size)],
+                     field=blocks[0].field)
+        offset = 0
+        for key in hm:
+            for block in hm[key]:
+                for i, row in enumerate(block):
+                    for j, v in enumerate(row):
+                        res[i + offset][j + offset] = v
+                offset += len(block)
+        return res
 
     @staticmethod
-    def createJordanBlock(size: int, eigenvalue) -> Matrix:
-        pass
+    def create_jordan_blcok(size: int, eigenvalue: Any) -> Matrix:
+        """Create a Jordan block from a size and an eigenvalue
+
+        Args:
+            size (int): the size of the block
+            eigenvalue (Any): the eigenvalue of the block
+
+        Returns:
+            Matrix: the result
+        """
+        m = Matrix.identity(size)-Matrix.identity(size)
+        for i in range(size-1):
+            m[i+1][i] = 1
+        return Matrix.identity(size)*eigenvalue + m
 
     @staticmethod
-    def id_matrix(size: int) -> Matrix:
+    def identity(size: int) -> Matrix:
         """Create identity matrix if given size
 
         Args:
@@ -140,6 +179,11 @@ class Matrix:
 
     @property
     def kernel(self) -> Union[Vector, Span]:
+        """Get the kernel of the matrix
+
+        Returns:
+            Union[Vector, Span]: the result
+        """
         solution = self.solve(Vector.from_size(len(self), self.field))
         if solution is None:
             return Vector([0 for _ in range(len(self))])
@@ -147,11 +191,21 @@ class Matrix:
 
     @property
     def image(self) -> list[Vector]:
+        """Get the image of the matrix
+
+        Returns:
+            list[Vector]: the result
+        """
         from .VectorSpace import VectorSpace
         return VectorSpace(self.field).standard_basis() - self.kernel
 
     @property
     def rank(self) -> int:
+        """Get the rank of the matrix
+
+        Returns:
+            int: the result
+        """
         # TODO fix rank calculation this is not correct
         tmp = self.gaussian_elimination()
         rank = 0
@@ -203,9 +257,50 @@ class Matrix:
         return self.__rows == self.__cols
 
     @property
+    def is_symmetrical(self) -> bool:
+        """returns wheter the matrix is symmetrical
+
+        Returns:
+            bool: True if the matrix is symmetrical, False otherwise
+        """
+        if not self.is_square:
+            return False
+        for i in range(len(self)):
+            for j in range(i, len(self)):
+                if self[i][j] != self[j][i]:
+                    return False
+        return True
+
+    @property
+    def is_asymmetrical(self) -> bool:
+        """returns wheter the matrix is asymmetrical
+
+        Returns:
+            bool: True if the matrix is asymmetrical, False otherwise
+        """
+        if not self.is_square:
+            return False
+        for i in range(len(self)):
+            for j in range(i, len(self)):
+                if self[i][j] != -self[j][i]:
+                    return False
+        return True
+
+    @property
+    def conjugate_transpose(self) -> Matrix:
+        return self.transpose().conjugate()
+
+    @property
     def is_diagonialable(self) -> bool:
-        # TODO implement diagonialability check
-        pass
+        """returns wheter the matrix is diagonialable
+
+        Returns:
+            bool: True if the matrix is diagonialable, False otherwise
+        """
+        for eigenvalue in set(self.eigenvalues):
+            if not (self.algebraic_multiplicity(eigenvalue) == self.geometric_multiplicity(eigenvalue)):
+                return False
+        return True
 
     @property
     def is_nilpotent(self) -> bool:
@@ -213,14 +308,31 @@ class Matrix:
         pass
 
     @property
-    def eigen_values(self) -> Vector:
-        # TODO implement eigen value calculation
-        pass
+    def eigenvalues(self) -> list:
+        """Get the eigenvalues of the matrix
+
+        Returns:
+            list: the result
+        """
+        return self.characteristic_polynomial.roots
 
     @property
     def jordan_form(self) -> Matrix:
-        # TODO implement jordan form calculation
-        pass
+        """Get the Jordan form of the matrix
+
+        Raises:
+            ValueError: will rise if the matrix is not square
+
+        Returns:
+            Matrix: the result
+        """
+        if not self.is_square:
+            raise ValueError("Matrix must be square")
+        blocks = []
+        for eigenvalue in self.eigenvalues:
+            blocks.append(self.create_jordan_blcok(
+                self.geometric_multiplicity(eigenvalue), eigenvalue))
+        return Matrix.from_jordan_blocks(blocks)
 
     @property
     def chain_basis(self) -> list[Vector]:
@@ -229,15 +341,32 @@ class Matrix:
 
     @property
     def characteristic_polynomial(self):
+        """Get the characteristic polynomial of the matrix
+
+        Raises:
+            ValueError: will rise if the matrix is not square
+
+        Returns:
+            PolynomialSimple: the result
+        """
         from ..la2 import PolynomialSimple
         if not self.is_square:
             raise ValueError("Matrix must be square")
-        return (Matrix.id_matrix(len(self))*PolynomialSimple.from_string("x")-self).determinant
+        return (Matrix.identity(len(self))*PolynomialSimple([1], [1])-self).determinant
 
-    # @property
-    # def minimal_polynomial(self) -> SimplePolynomial.SimplePolynomial:
-    #     # TODO implement minimal polynomial calculation
-    #     pass
+    @property
+    def minimal_polynomial(self):
+        """Get the minimal polynomial of the matrix
+
+        Returns:
+            _type_: the result
+        """
+        from ..la2 import PolynomialSimple
+        res = PolynomialSimple([1], [0])
+        for eigenvalue in set(self.eigenvalues):
+            res *= PolynomialSimple([1, -eigenvalue], [1, 0]
+                                    )**self.geometric_multiplicity(eigenvalue)
+        return res
 
     def __getitem__(self, index: int) -> list[Any]:
         """wil return the row at the given index
@@ -545,8 +674,26 @@ class Matrix:
         return Matrix([[self.__matrix[j][i] for j in range(self.__cols)]
                        for i in range(self.__rows)])
 
+    def conjugate(self) -> Matrix:
+        """will return the conjugate of the matrix
+
+        Returns:
+            Matrix: the conjugate of the matrix
+        """
+        arr: list[list[Any]] = []
+        for row in self:
+            arr.append([])
+            for v in row:
+                if hasattr(v, "conjugate"):
+                    if callable(getattr(v, "conjugate")):
+                        arr[-1].append(v.conjugate())
+                    arr[-1].append(v.conjugate)
+                else:
+                    arr[-1].append(v)
+        return Matrix(arr, self.field)
+
     def reorgenize_rows(self) -> None:
-        """will reorgenize the rows of the matrix acording to the order in which leading elements appear
+        """Reorgenizes the rows of the matrix
         """
         def comparer(a: list[float], b: list[float]) -> bool:
             def first_not_zero_index(row: list[float]) -> int:
@@ -790,14 +937,15 @@ class Matrix:
         raise NotImplementedError(
             "solve for vector that is not V0 is not implemented yet")
 
-    def get_eigen_vectors_of(eigenvalue) -> list[Vector]:
-        # TODO calculate the eigen space of an eigen value
-        pass
+    def get_eigen_vectors_of(self, eigenvalue) -> list[Vector]:
+        # assume that the matrix is square
+        m: Matrix = self-eigenvalue*Matrix.identity(len(self))
+        m **= self.algebraic_multiplicity(eigenvalue)
+        return m.kernel
 
-    def algebraic_multiplicity(eigenvalue) -> int:
-        # TODO calculate the algebraic multiplicity of an eigenvalue
-        pass
+    def algebraic_multiplicity(self, eigenvalue) -> int:
+        return self.eigenvalues.count(eigenvalue)
 
-    def geometric_multiplicity(eigenvalue) -> int:
-        # TODO calculate the geometric multiplicity of an eigenvalue
-        pass
+    def geometric_multiplicity(self, eigenvalue) -> int:
+        m: Matrix = self-eigenvalue*Matrix.identity(len(self))
+        return m.kernel.dim
