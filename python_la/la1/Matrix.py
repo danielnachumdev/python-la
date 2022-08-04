@@ -147,8 +147,8 @@ class Matrix:
 
     @property
     def image(self) -> list[Vector]:
-        # TODO implement image calculation
-        pass
+        from .VectorSpace import VectorSpace
+        return VectorSpace(self.field).standard_basis() - self.kernel
 
     @property
     def rank(self) -> int:

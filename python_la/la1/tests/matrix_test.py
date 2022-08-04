@@ -56,6 +56,3 @@ def test_kernel():
     from ..Span import Span
     from ..Vector import Vector
     assert Matrix([[1, 0], [0, 0]]).kernel == Span([Vector([0, 1])])
-
-
-# test_kernel()

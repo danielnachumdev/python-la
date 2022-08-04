@@ -8,13 +8,27 @@ from ..utils import are_operators_implemnted, concat_horizontally, isoneof, allo
 
 
 class Span:
-    # @staticmethod
-    # def fromMatrixColumnSpace(m: Matrix) -> Span:
-    #     pass
+    @staticmethod
+    def are_same_span(s1: Span, s2: Span) -> bool:
+        if s1.field != s2.field:
+            return False
+        s1 = s1.basis
+        s2 = s2.basis
 
-    # @staticmethod
-    # def fromMatrixRowSpace(m: Matrix) -> Span:
-    #     pass
+        max_dim = s1.field.degree  # ==s2.field.degree
+        # dimention constraints
+        if s1.dim == s2.dim == max_dim:
+            return True
+        elif (s1.dim == max_dim and s2.dim < max_dim) or (s1.dim < max_dim and s2.dim == max_dim):
+            return False
+
+        for v in s1:
+            if not s2.contains(v):
+                return False
+        for v in s2:
+            if not s1.contains(v):
+                return False
+        return True
 
     @staticmethod
     def span_field(field: Field) -> Span:
@@ -57,7 +71,7 @@ class Span:
             raise AttributeError(
                 "All objects must have a field attribute which is an Instance of class Field")
         # if all vectors in base are of the same field add then otherwise throw an error
-        self.field = example_item.field
+        self.field: Field = example_item.field
         for vector in objects:
             if vector.field != self.field:
                 raise ValueError(
@@ -99,6 +113,7 @@ class Span:
         Returns:
             bool: True if the span has a lineary dependent vector inside it, False otherwise
         """
+        # FIXME: this is not correct, or is it?
         return self != self.basis
 
     # FIXME they need inner product
@@ -247,7 +262,7 @@ class Span:
         res = False
         try:
             res = Matrix.from_vectors(self.vectors).solve(vector) != None
-        except ValueError:
+        except NotImplementedError:
             res = True
         return res
 
@@ -320,7 +335,3 @@ class Span:
         for v in self:
             res += random.uniform(min, max) * v
         return res
-
-    def is_spanning(self, field: Field) -> bool:
-        # TODO implement this
-        raise NotImplementedError("")
