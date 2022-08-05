@@ -1,6 +1,5 @@
 .vscode/
 main.py
-setup.py
 post-checkout
 # Byte-compiled / optimized / DLL files
 __pycache__/
