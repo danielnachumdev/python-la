@@ -155,11 +155,13 @@ def test_fromstring():
     f = p.from_string
     assert f("x^2 +2x+1") == p([1, 2, 1], [2, 1, 0])
     assert f(
-        "-x^7+x^6-34*x^5-x4-x^3+x^2") == p([-1, -1, 34, -1, -1, -4], [7, 6, 5, 3, 2, 1])
+        "-x^7+x^6-34*x^5-x4-x^3+x^2") == p([-1, 1, -34, -1, 1, -4], [7, 6, 5, 3, 2, 1])
     assert f("(x+1)") == p([1, 1], [1, 0])
     assert f("((x+1))(x+1)") == p([1, 2, 1], [2, 1, 0]) == f("(x+1)^2")
     # TODO can run faster need to improve this
     assert f("((1)(x^2+2*x+5))^2") == f("X^4 + 4X^3 + 14X^2 + 20X + 25", "X")
+    assert f("x+1") == p([1, 1], [1, 0])
+    assert f("x-1") == p([1, -1], [1, 0])
 
 
 def test_with_matrix():

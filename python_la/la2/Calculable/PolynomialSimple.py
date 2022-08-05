@@ -15,25 +15,11 @@ class PolynomialSimple(Calculable):
                 if not c.isdigit():
                     raise ValueError("")
             return PolynomialSimple([float(input)], [0])
-            raise ValueError("Variable not found in string")
         # --------helper functions----------
-
-        def splitter(lst: list[str], symbol: str, excluders: list[str] = list(bracket_pairs.keys())) -> list[str]:
-            res = []
-            for string in lst:
-                res.extend(string.strip().split(symbol))
-            return res
-
-        def stacker(string: str, lst: list[str]) -> list[str]:
-            res = []
-            for c in string:
-                if c in lst:
-                    res.append(c)
-            return res
 
         def sub_to_poly(sub) -> PolynomialSimple:
             def pow_to_poly(subb: str) -> PolynomialSimple:
-                individual_chars = splitter([subb], "^")
+                individual_chars = string_splitter([subb], "^")
                 if len(individual_chars) == 2:
                     bias = 1
 
@@ -65,8 +51,8 @@ class PolynomialSimple(Calculable):
                 assert False, "didnt think about that"
 
             multiplication_stack = stacker(sub, ["*", "/"])
-            subs2 = splitter([sub], "*")
-            subs2 = splitter(subs2, "/")
+            subs2 = string_splitter([sub], "*")
+            subs2 = string_splitter(subs2, "/")
             res = pow_to_poly(subs2[0])
             for i, s in enumerate(subs2[1:]):
                 if multiplication_stack[i] == "*":
@@ -75,8 +61,6 @@ class PolynomialSimple(Calculable):
                     res /= pow_to_poly(s)
 
             return res
-
-        def sign(op): return 1 if op == "+" else -1
 
         # handle if input has brackets
         if any(bracket in input for bracket in ["(", ")", "[", "]", "{", "}"]):
@@ -91,15 +75,16 @@ class PolynomialSimple(Calculable):
         else:
             # split with addition
             addition_stack = stacker(input, ["+", "-"])
-            subs = splitter([input], "+")
-            subs = splitter(subs, "-")
+            subs = string_splitter([input], "+")
+            subs = string_splitter(subs, "-")
             subs = [sub for sub in subs if len(sub) > 0]
             if len(addition_stack) == len(subs)-1:
                 addition_stack.insert(0, "+")
 
             # foreach sub expression create a Poly with inner splitting by multiplication and add it acording to current addition operator
             res = sign(addition_stack[0])*sub_to_poly(subs[0])
-            for i, sub in enumerate(subs[1:]):
+            for i in range(1, len(subs)):
+                sub = subs[i]
                 res += sign(addition_stack[i])*sub_to_poly(sub)
             return res
 
@@ -154,37 +139,57 @@ class PolynomialSimple(Calculable):
                 self.prefixes.append(prefixes[i])
                 self.powers.append(p)
             i += 1
-        self.powers = [self.powers[i]
-                       for i in range(len(self.powers)) if self.prefixes[i] != 0]
-        self.prefixes = [self.prefixes[i]
-                         for i in range(len(self.prefixes)) if self.prefixes[i] != 0]
+
+        check = True
+        for p in self.prefixes:
+            if p != 0:
+                check = False
+                break
+        if check:
+            self.prefixes = [0]
+            self.powers = [0]
+        else:
+            self.powers = [self.powers[i]
+                           for i in range(len(self.powers)) if self.prefixes[i] != 0]
+            self.prefixes = [self.prefixes[i]
+                             for i in range(len(self.prefixes)) if self.prefixes[i] != 0]
 
     @property
     def roots(self) -> list:
-        if self.degree == 0:
-            return []
-        if self.degree == 1:
-            a = self.prefixes[self.powers.index(1)]
-            if 0 in self.powers:
-                return [-a/self.prefixes[self.powers.index(0)]]
-            return [0]
-        elif self.degree == 2:
+        res = []
+        curr = self
+        if 0 not in self.powers:
+            lowest_power = self.powers[-1]
+            res += [0 for _ in range(lowest_power)]
+            curr = PolynomialSimple(
+                self.prefixes, [v-lowest_power for v in self.powers])
+        if curr.degree == 0:
+            return res
+        if curr.degree == 1:
+            a = curr.prefixes[curr.powers.index(1)]
+            return res+[a]
+        elif curr.degree == 2:
             a, b, c = 0, 0, 0
-            a = self.prefixes[self.powers.index(2)]
-            if 1 in self.powers:
-                b = self.prefixes[self.powers.index(1)]
-            if 0 in self.powers:
-                c = self.prefixes[self.powers.index(0)]
+            a = curr.prefixes[curr.powers.index(2)]
+            if 1 in curr.powers:
+                b = curr.prefixes[curr.powers.index(1)]
+            if 0 in curr.powers:
+                c = curr.prefixes[curr.powers.index(0)]
             delta = b**2 - 4*a*c
             if delta < 0:
                 # FIXME implement complex
                 return []
             x1 = (-b+math.sqrt(delta))/(2*a)
             x2 = (-b-math.sqrt(delta))/(2*a)
-            return [x1, x2]
-        if 0 not in self.powers:
-            return [0] + PolynomialSimple(self.prefixes, [v-1 for v in self.powers]).roots
-        return []
+            return res+[x1, x2]
+
+        x = 1
+        while not almost_equal(0, curr(x)):
+            x = newton_raphson(curr, x)
+        res += [x]
+        remainder, _ = curr / PolynomialSimple.from_string(f"x-{x}")
+        res += remainder.roots
+        return res
 
     @property
     def degree(self) -> float:
@@ -290,10 +295,12 @@ class PolynomialSimple(Calculable):
                 prefix, power = 1, 1
                 while(current.degree >= other.degree):
                     prefix = current.prefixes[0]/other.prefixes[0]
-                    power = current.prefixes[0] - other.powers[0]
-                    quotient += PolynomialSimple([prefix], [power])
-                    subtructor = PolynomialSimple(
-                        [quotient.prefixes[-1]*v for v in other.prefixes], [quotient.prefixes[-1]*v for v in other.powers])
+                    power = current.powers[0] - other.powers[0]
+                    current_quotient = PolynomialSimple([prefix], [power])
+                    quotient += current_quotient
+                    subtructor = current_quotient*other
+                    # PolynomialSimple(
+                    # [quotient.prefixes[-1]*v for v in other.prefixes], [quotient.prefixes[-1]*v for v in other.powers])
                     current -= subtructor
                 remainder, _ = current/other
                 return quotient, remainder
