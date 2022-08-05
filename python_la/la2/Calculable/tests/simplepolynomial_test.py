@@ -53,7 +53,7 @@ def test_multiplication():
         "(x^2+2*x+5)")*p.from_string("1") == p.from_string("1")*p.from_string("(x^2+2*x+5)")
 
 
-def test_with_matrix():
+def test_matrix():
     from ....la1 import Matrix
     assert p.from_string("x^2")(
         Matrix([[1, 0], [0, 1]])) == Matrix([[1, 0], [0, 1]])
@@ -71,14 +71,6 @@ def test_call():
     assert sqrt(4) == 2
 
 
-# def test_division():
-#     assert x/1 == (x, 0)
-#     # TODO finish implementing so tests will pass
-#     # assert 1/x == p([1], [-1])
-#     assert xp1/x == (p([1], [0]), p([1], [-1]))
-
-
-# test_division()
 def test_derivative():
     assert x.derivative == p([1], [0])
     assert xp1.derivative == p([1], [0])

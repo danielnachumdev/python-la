@@ -607,6 +607,10 @@ class Matrix:
         Returns:
             Matrix: the result of the power
         """
+        if isinstance(value, float):
+            if int(value) != value:
+                raise ValueError("value must be an integer")
+            value = int(value)
         if not isinstance(value, int):
             raise TypeError("value must be an int")
         if not (0 <= value):
@@ -930,7 +934,11 @@ class Matrix:
                     tmp[index] = -m.field.one
                 res.append(Vector(tmp))
             return res
-        return Span(get_solutions_from_columns(result_matrix)+get_solutions_from_rows(result_matrix), sol)
+        solution_span_as_arr = get_solutions_from_columns(
+            result_matrix)+get_solutions_from_rows(result_matrix)
+        if len(solution_span_as_arr) == 0:
+            return sol
+        return Span(solution_span_as_arr, sol)
 
     def get_eigen_vectors_of(self, eigenvalue) -> list[Vector]:
         # assume that the matrix is square

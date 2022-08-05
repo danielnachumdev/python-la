@@ -39,12 +39,6 @@ def test_add():
                               Span.span_field(RealField(3)))
 
 
-def test_append():
-    s = Span([v1, v2])
-    s.append(v3)
-    assert Span.are_same_span(s, Span.span_field(RealField(3)))
-
-
 def test_sub():
     pass
 

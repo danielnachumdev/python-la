@@ -322,14 +322,13 @@ class Vector:
             check_field_equality (bool, optional): wheter to check if the fields are identical. Defaults to True.
 
         Raises:
-            TypeError: if other is not a vector
             TypeError: if use_almost_equal and check_field_equality are not booleans
 
         Returns:
             bool: True if the vectors are equal, False otherwise
         """
         if not isinstance(other, Vector):
-            raise TypeError("Vector can only be compared to another Vector")
+            return False
         if not areinstances([use_almost_equal, check_field_equality], bool):
             raise TypeError("check_field_equality must be a boolean")
         if check_field_equality:
