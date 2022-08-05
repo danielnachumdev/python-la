@@ -42,21 +42,24 @@ def test_split_not_between_brackets():
 
 
 def test_composit_functions():
-    def func(v, target):
-        return Vector([v[1], v[0]], target)
     R2 = RealField(2)
-    lt = LinearTransformation(R2, R2, func)
+
+    def func(v):
+        return Vector([v[1], v[0]], R2)
+
+    lt = LinearTransformation.from_fields(R2, R2, func)
     v = VectorSpace(R2).random()
-    assert lt(lt(v)) == v, 1
-    assert (lt**2)(v) == v, 2
-    assert (lt**4)(v) == (lt**2)(v), 3
+    assert lt(lt(v)) == v
+    assert (lt**2)(v) == v
+    assert (lt**4)(v) == (lt**2)(v)
     num = random.randint(1, 10)
     lt2 = num*lt
-    assert lt2(v) == Vector([v[1]*num, v[0]*num], R2), 4
+    assert lt2(v) == Vector([v[1]*num, v[0]*num], R2)
     assert (lt2**2)(v) == (Vector([v[0]*num**2, v[1]*num**2], R2))
 
-    def func(v, target):
-        return Vector([0, v[0]], target)
-    lt = LinearTransformation(R2, R2, func)
+    def func(v):
+        return Vector([0, v[0]], R2)
+
+    lt = LinearTransformation.from_fields(R2, R2, func)
     v = VectorSpace(R2).random()
-    assert (num*lt**2)(v) == Vector([0, 0], R2), 6
+    assert (num*lt**2)(v) == Vector([0, 0], R2)

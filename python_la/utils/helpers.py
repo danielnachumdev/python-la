@@ -179,7 +179,7 @@ def split_not_between_brackets(input: str, symbol: str) -> list[str]:
 
 
 def composite_function(f, g):
-    return lambda *args: f(g(*args), *args[1:])
+    return lambda *args: f(g(*args))
 
 
 def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:

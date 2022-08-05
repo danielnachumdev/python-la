@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Callable, Any, Union
 from .Field import Field
-from ..utils import composite_function, isoneof
+from ..utils import composite_function, isoneof, areinstances
 from .Matrix import Matrix
 from .Vector import Vector
 from .Complex import Complex
@@ -18,11 +18,11 @@ class LinearMap:
             a, b = src_field.random(), src_field.random()
             v1, v2 = V.random(), V.random()
             try:
-                if not func(a*v1+b*v2, dst_field).almost_equal(a*func(v1, dst_field)+b*func(v2, dst_field)):
+                if not func(a*v1+b*v2, dst_field) == (a*func(v1, dst_field)+b*func(v2, dst_field)):
                     pass
             except Exception as e:
                 pass
-            if not func(a*v1+b*v2, dst_field).almost_equal(a*func(v1, dst_field)+b*func(v2, dst_field)):
+            if not func(a*v1+b*v2, dst_field) == (a*func(v1, dst_field)+b*func(v2, dst_field)):
                 return False
         return True
 
@@ -31,10 +31,14 @@ class LinearMap:
         return LinearMap(m.field, type(m.field)(m.field.name), lambda x: m*x)
 
     @staticmethod
-    def id(field: int) -> LinearMap:
-        return LinearMap(field, field, lambda x, y: x)
+    def from_fields(src_field, dst_field, func: Callable[[Any, Field], Any], validate: bool = False) -> LinearMap:
+        return LinearMap(VectorSpace(src_field), VectorSpace(dst_field), func, validate)
 
-    def __init__(self, src_field: Field, dst_field: Field, func: Callable[[Any], Any], validate: bool = False) -> None:
+    @staticmethod
+    def id(field: int) -> LinearMap:
+        return LinearMap(field, field, lambda x: x)
+
+    def __init__(self, src: VectorSpace, dst: VectorSpace, func: Callable[[Any], Any], validate: bool = False) -> None:
         """creates a new linear transformation
 
         Args:
@@ -42,19 +46,23 @@ class LinearMap:
             dst_field (Field): The Field which is the output oif this transformation
             func (Callable[[Any], Any]): the transformation function
         """
+        if not areinstances([src, dst], VectorSpace):
+            raise ValueError("src and dst must be of type VectorSpace")
+        if not callable(func):
+            raise ValueError("func must be a callable")
         if validate:
-            if not LinearMap.is_func_linear_map(func, src_field, dst_field):
+            if not LinearMap.is_func_linear_map(func, src, dst):
                 raise ValueError("func is not a linear transformation")
-        self.src_field = src_field
-        self.dst_field = dst_field
+        self.src = src
+        self.dst = dst
         self.func = func
 
     def __add__(self, other) -> LinearMap:
         # if isoneof(other, [int, float, complex]):
         # return LinearTransformation(self.src_field, self.dst_field, lambda x, y: self.func(x, y)+other*LinearTransformation())
         if isinstance(other, LinearMap):
-            if self.src_field == other.src_field and self.dst_field == other.dst_field:
-                return LinearMap(self.src_field, self.dst_field, lambda x, y: self(x)+other(x))
+            if self.src == other.src and self.dst == other.dst:
+                return LinearMap(self.src, self.dst, lambda x: self(x)+other(x))
             raise ValueError(
                 "cant add linear transformations on diffrent fields")
         raise NotImplementedError(
@@ -74,10 +82,11 @@ class LinearMap:
 
     def __mul__(self, other) -> LinearMap:
         if isoneof(other, [int, float, Complex]):
-            return LinearMap(self.src_field, self.dst_field, lambda x, y: self.func(x, y)*other)
-        else:
-            raise NotImplementedError(
-                "multiplication with non-numeric type not implemented")
+            return LinearMap(self.src, self.dst, lambda x: self.func(x)*other)
+        if isinstance(other, LinearMap):
+            return self(other)
+        raise NotImplementedError(
+            f"LinearMap * {type(other)} not implemented")
 
     def __rmul__(self, other) -> LinearMap:
         return self.__mul__(other)
@@ -88,18 +97,24 @@ class LinearMap:
                 raise ValueError(
                     "only non negativ integer powers are implemented and you tried to raise the transformation to {}".format(other))
             if other == 0:
-                return LinearMap(self.src_field, self.dst_field, lambda x, y: x)
+                return LinearMap(self.src, self.dst, lambda x: x)
             if other == 1:
                 return self
-
             other = int(other)
             func = composite_function(self.func, self.func)
             for _ in range(abs(other)-2):
                 func = composite_function(func, self.func)
-            return LinearMap(self.src_field, self.dst_field, lambda x, y: func(x, y))
+            return LinearMap(self.src, self.dst, lambda x: func(x))
         else:
             raise NotImplementedError(
                 "multiplication with non-numeric type not implemented")
+
+    def __eq__(self, other: LinearMap) -> bool:
+        if not isinstance(other, LinearMap):
+            return False
+        if not(self.src == other.src and self.dst == other.dst):
+            return False
+        return self.to_matrix() == other.to_matrix()
 
     def __truediv__(self, other: Any):
         """
@@ -109,7 +124,7 @@ class LinearMap:
         raise NotImplementedError(
             "LineraMap.__truediv__: cant devide Linear Maps")
 
-    def __call__(self, v: Union[Vector, Matrix, LinearMap]) -> Union[Vector, Matrix, LinearMap]:
+    def __call__(self, val: Union[Vector, Matrix, LinearMap]) -> Union[Vector, Matrix, LinearMap]:
         """ apply the transformation on an object
         Args:
             v (Any): the object to apply the transformation on
@@ -121,23 +136,31 @@ class LinearMap:
         Returns:
             Any: the return value of the transformation's function
         """
-        if not isoneof(v, [Vector, Matrix]):
+        if not isoneof(val, [Vector, Matrix, LinearMap]):
             raise ValueError(
                 "can only apply linear transformations on vectors and matrices")
-        if isinstance(v, Vector):
-            if not v.field == self.src_field:
+        # LinearMap
+        if isinstance(val, LinearMap):
+            if not self.dst == val.src:
+                raise ValueError(
+                    "outer dst vector space is not equal to inner src vector space")
+            return LinearMap(self.src, val.dst, lambda x: self.func(val(x)))
+
+        # Matrix or Vector
+        if isinstance(val, Vector):
+            if val not in self.src:
                 raise ValueError("value is not in the source field")
         else:
-            if not Vector(v[i][0] for i in range(v.__rows)).field == self.src_field:
+            if not Vector(val[i][0] for i in range(val.__rows)).field == self.src:
                 raise ValueError("value is not in the source field")
         try:
-            return self.func(v, self.dst_field)
+            return self.func(val)
         except Exception as e:
             raise e
 
     def to_matrix(self, basis=None) -> Matrix:
         if basis is None:
-            basis = VectorSpace(self.src_field).standard_basis()
+            basis = self.src.standard_basis()
         vectors = []
         for v in basis:
             vectors.append(self(v))

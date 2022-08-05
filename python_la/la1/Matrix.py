@@ -504,7 +504,7 @@ class Matrix:
                     res[i].append(self[i][j] * other)
             return Matrix(res)
         if isinstance(other, Vector):
-            if self.__cols != other.length:
+            if self.__cols != len(other):
                 raise ValueError(
                     "Matrix and Vector must have the same number of rows")
             return Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])

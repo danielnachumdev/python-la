@@ -1,6 +1,7 @@
 import random
 from .Field import Field
 from typing import Any
+from ...utils import isoneof
 
 
 class RealField(Field):
@@ -34,6 +35,6 @@ class RealField(Field):
         Returns:
             bool: True if value is in the field, False otherwise
         """
-        if isinstance(value, [int, float]):
+        if isoneof(value, [int, float]):
             return True
         return False
