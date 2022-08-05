@@ -190,6 +190,18 @@ class PolynomialSimple(Calculable):
     def degree(self) -> float:
         return self.powers[0] if len(self.powers) > 0 else 0
 
+    @property
+    def derivative(self) -> PolynomialSimple:
+        if self.degree == 0:
+            return PolynomialSimple([0], [0])
+        return PolynomialSimple([self.prefixes[i]*self.powers[i] for i in range(len(self.powers))], [self.powers[i] - 1 for i in range(len(self.powers))])
+
+    @property
+    def integral(self) -> PolynomialSimple:
+        if self.degree == 0:
+            return PolynomialSimple([0], [0])
+        return PolynomialSimple([self.prefixes[i]/(self.powers[i]+1) for i in range(len(self.powers))], [self.powers[i] + 1 for i in range(len(self.powers))])
+
     def __str__(self) -> str:
         def one_to_str(i: int) -> str:
             power = self.powers[i]
@@ -349,5 +361,3 @@ class PolynomialSimple(Calculable):
     def gcd_with(self, other: PolynomialSimple) -> PolynomialSimple:
         # TODO implement gcd calculation
         pass
-
-    # TODO implement other operators
