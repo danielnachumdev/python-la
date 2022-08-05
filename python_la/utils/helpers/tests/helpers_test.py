@@ -1,6 +1,6 @@
 import random
-from ...utils import *
-from ...la1 import Complex as comp, Vector, RealField, LinearTransformation, VectorSpace
+from ...helpers import *
+from ....la1 import Complex as comp, Vector, RealField, LinearMap, VectorSpace
 
 
 def test_almost_equal():
@@ -47,7 +47,7 @@ def test_composit_functions():
     def func(v):
         return Vector([v[1], v[0]], R2)
 
-    lt = LinearTransformation.from_fields(R2, R2, func)
+    lt = LinearMap.from_fields(R2, R2, func)
     v = VectorSpace(R2).random()
     assert lt(lt(v)) == v
     assert (lt**2)(v) == v
@@ -60,6 +60,6 @@ def test_composit_functions():
     def func(v):
         return Vector([0, v[0]], R2)
 
-    lt = LinearTransformation.from_fields(R2, R2, func)
+    lt = LinearMap.from_fields(R2, R2, func)
     v = VectorSpace(R2).random()
     assert (num*lt**2)(v) == Vector([0, 0], R2)

@@ -1,1 +1,1 @@
-from .VectorSpace import *
+from .VectorSpace import VectorSpace

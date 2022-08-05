@@ -1,66 +1,4 @@
-# import Complex
-
-import math
 from typing import Tuple, Any
-
-
-def are_operators_implemnted(T) -> bool:
-    try:
-        T.__add__
-        T.__radd__
-        T.__sub__
-        T.__rsub__
-        T.__neg__
-        T.__mul__
-        T.__rmul__
-        T.__truediv__
-        T.__rtruediv__
-        T.__eq__
-        T.__ne__
-        T.__hash__
-        return True
-    except AttributeError:
-        return False
-
-
-def isoneof(v, lst: list) -> bool:
-    for T in lst:
-        if isinstance(v, T):
-            return True
-    return False
-
-
-def alloneof(value: list, types: list):
-    for v in value:
-        if not isoneof(v, types):
-            return False
-    return True
-
-
-def almost_equal(*args):
-    THRESHOLD = 0.000000000001
-
-    def wrapper(a, b):
-        if alloneof([a, b], [int, float]):
-            return math.isclose(a, b, abs_tol=THRESHOLD)
-        else:  # they are Complex.Complex
-            try:
-                return math.isclose(a.real, b.real, abs_tol=THRESHOLD) and math.isclose(a.imag, b.imag, abs_tol=THRESHOLD)
-            except Exception as e:
-                assert False, "shouldnt be here"
-    return all([wrapper(args[0], args[i]) for i in range(1, len(args))])
-
-
-def areinstances(arr: list, T):
-    return check_foreach(arr, lambda v: isinstance(v, T))
-
-
-def check_foreach(arr: list, condition) -> bool:
-    for v in arr:
-        if not condition(v):
-            return False
-    return True
-
 
 bracket_pairs = {
     "(": ")",
@@ -178,10 +116,6 @@ def split_not_between_brackets(input: str, symbol: str) -> list[str]:
     return res
 
 
-def composite_function(f, g):
-    return lambda *args: f(g(*args))
-
-
 def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
     res = ""
     strs = [str(v)for v in lst]
@@ -202,8 +136,7 @@ def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
             to_remove.clear()
         # print acordingly
         for vec_index in range(len(strs)):
-            res += strs[vec_index][prev_char_indecies[vec_index]
-                :char_indecies[vec_index]]+sep
+            res += strs[vec_index][prev_char_indecies[vec_index]:char_indecies[vec_index]]+sep
             prev_char_indecies[vec_index] = char_indecies[vec_index]+1
             char_indecies[vec_index] += 1
         res += "\n"
