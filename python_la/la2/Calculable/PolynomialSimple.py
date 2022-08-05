@@ -184,8 +184,14 @@ class PolynomialSimple(Calculable):
             return res+[x1, x2]
 
         x = 1
-        while not almost_equal(0, curr(x)):
-            x = newton_raphson(curr, x)
+        der = curr.derivative
+        count = 0
+        MAX_COUNT = 100
+        while not almost_equal(0, curr(x)) and count < MAX_COUNT:
+            x = newton_raphson(curr, x, der)
+            count += 1
+        if count == MAX_COUNT:
+            return []
         res += [x]
         remainder, _ = curr / PolynomialSimple.from_string(f"x-{x}")
         res += remainder.roots
