@@ -893,49 +893,44 @@ class Matrix:
         # otherwise there is a span of solutions
 
         # solve for V0
-        if sol == Vector.from_size(len(result_matrix), result_matrix.field):
-            def get_solutions_from_columns(m: Matrix) -> list[Vector]:
-                def sumrows(m: Matrix) -> list[int]:
-                    sumrow = [0 for _ in range(len(m[0]))]
-                    for i in range(m.rank):
-                        row = m[i]
-                        for j, v in enumerate(row):
-                            if v != m.field.zero:
-                                sumrow[j] += 1
-                    return sumrow
-                res = []
-                for i2, v in enumerate(sumrows(m)):
-                    if v == m.field.zero:
-                        res.append(Vector.e(i2, len(m), m.field))
-                return res
+        def get_solutions_from_columns(m: Matrix) -> list[Vector]:
+            def sumrows(m: Matrix) -> list[int]:
+                sumrow = [0 for _ in range(len(m[0]))]
+                for i in range(m.rank):
+                    row = m[i]
+                    for j, v in enumerate(row):
+                        if v != m.field.zero:
+                            sumrow[j] += 1
+                return sumrow
+            res = []
+            for i2, v in enumerate(sumrows(m)):
+                if v == m.field.zero:
+                    res.append(Vector.e(i2, len(m), m.field))
+            return res
 
-            def get_solutions_from_rows(m: Matrix) -> list[Vector]:
-                res = []
-                value_depends_on_key: dict[int, set] = dict()
-                for row_index in range(m.rank):
-                    row = m[row_index]
-                    for candidate_index, candidate in enumerate(row):
-                        if candidate != m.field.zero:
-                            for validator_index in range(candidate_index+1, len(row)):
-                                if row[validator_index] != m.field.zero:
-                                    if validator_index not in value_depends_on_key:
-                                        value_depends_on_key[validator_index] = set(
-                                        )
-                                    value_depends_on_key[validator_index].add(
-                                        candidate_index)
-                            break
-                for key in value_depends_on_key:
-                    tmp = [0 for _ in range(len(m[0]))]
-                    tmp[key] = m.field.one
-                    for index in value_depends_on_key[key]:
-                        tmp[index] = -m.field.one
-                    res.append(Vector(tmp))
-                return res
-            # FIXME fix matrix.solve to support vectors who are not V0
-            return Span(get_solutions_from_columns(result_matrix)+get_solutions_from_rows(result_matrix))
-
-        raise NotImplementedError(
-            "solve for vector that is not V0 is not implemented yet")
+        def get_solutions_from_rows(m: Matrix) -> list[Vector]:
+            res = []
+            value_depends_on_key: dict[int, set] = dict()
+            for row_index in range(m.rank):
+                row = m[row_index]
+                for candidate_index, candidate in enumerate(row):
+                    if candidate != m.field.zero:
+                        for validator_index in range(candidate_index+1, len(row)):
+                            if row[validator_index] != m.field.zero:
+                                if validator_index not in value_depends_on_key:
+                                    value_depends_on_key[validator_index] = set(
+                                    )
+                                value_depends_on_key[validator_index].add(
+                                    candidate_index)
+                        break
+            for key in value_depends_on_key:
+                tmp = [0 for _ in range(len(m[0]))]
+                tmp[key] = m.field.one
+                for index in value_depends_on_key[key]:
+                    tmp[index] = -m.field.one
+                res.append(Vector(tmp))
+            return res
+        return Span(get_solutions_from_columns(result_matrix)+get_solutions_from_rows(result_matrix), sol)
 
     def get_eigen_vectors_of(self, eigenvalue) -> list[Vector]:
         # assume that the matrix is square

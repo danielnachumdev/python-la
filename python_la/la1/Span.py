@@ -10,6 +10,15 @@ from ..utils import are_operators_implemnted, concat_horizontally, isoneof, allo
 class Span:
     @staticmethod
     def are_same_span(s1: Span, s2: Span) -> bool:
+        """checks whether two spans are the same
+
+        Args:
+            s1 (Span): first span to check
+            s2 (Span): second span to check
+
+        Returns:
+            bool: True if the two spans are the same, False otherwise
+        """
         if s1.field != s2.field:
             return False
         s1 = s1.basis
@@ -47,7 +56,7 @@ class Span:
             raise TypeError("field must be of type Field")
         return Span(VectorSpace(field).standard_basis())
 
-    def __init__(self, objects: list[Any]) -> None:
+    def __init__(self, objects: list[Vector], offset: Vector = None) -> None:
         """initializes the span with the given vectors
 
         Args:
@@ -59,23 +68,29 @@ class Span:
             ValueError: if the objects are not in the same field
             AttributeError: if the objects don't have all nescesary operator implemented
         """
-        # if vectors != []:
+        if not isinstance(objects, list):
+            raise TypeError("Span must be initialized with a list of vectors")
         example_item = objects[0]
-        T = type(example_item)
-        for val in objects:
-            if not isinstance(val, T):
-                raise TypeError(
-                    "All elements of the base must be of the same type")
+        for v in objects:
+            if not v.field == example_item.field:
+                raise ValueError(
+                    "Span must be initialized with vectors in the same field")
+        # # if vectors != []:
+        # T = type(example_item)
+        # for val in objects:
+        #     if not isinstance(val, T):
+        #         raise TypeError(
+        #             "All elements of the base must be of the same type")
 
-        if not hasattr(example_item, "field"):
-            raise AttributeError(
-                "All objects must have a field attribute which is an Instance of class Field")
+        # if not hasattr(example_item, "field"):
+        #     raise AttributeError(
+        #         "All objects must have a field attribute which is an Instance of class Field")
         # if all vectors in base are of the same field add then otherwise throw an error
         self.field: Field = example_item.field
-        for vector in objects:
-            if vector.field != self.field:
-                raise ValueError(
-                    "Span can only be created from vectors of the same field")
+        # for vector in objects:
+        #     if vector.field != self.field:
+        #         raise ValueError(
+        #             "Span can only be created from vectors of the same field")
         self.vectors = objects
         if not are_operators_implemnted(type(self.vectors[0])):
             raise AttributeError(
@@ -158,26 +173,26 @@ class Span:
             other = Span([other])
         if not self.field == other.field:
             raise ValueError("Spans must be in the same field")
-        return Span([self.vectors + other.vectors])
+        return Span(list(set(self.vectors + other.vectors)))
 
-    def __sub__(self, other: Union[Vector, Span]) -> Span:
-        """returns the span of the vectors in the span minus the given vector or span
-            will perform what is mathematically equivelent to: self \ {other}
-        Args:
-            other (Union[Vector, Span]): vector or span to subtract from self
+    # def __sub__(self, other: Union[Vector, Span]) -> Span:
+    #     """returns the span of the vectors in the span minus the given vector or span
+    #         will perform what is mathematically equivelent to: self \ {other}
+    #     Args:
+    #         other (Union[Vector, Span]): vector or span to subtract from self
 
-        Raises:
-            TypeError: if the other object is not of type Vector or Span
+    #     Raises:
+    #         TypeError: if the other object is not of type Vector or Span
 
-        Returns:
-            Span: span of the vectors in the span minus the given vector or span
-        """
-        if not isoneof(other, [Vector, Span]):
-            raise TypeError("Span can only be subtracted by Vector|Span")
-        if isinstance(other, Vector):
-            other = Span([other])
-        res = set(self.vectors) - set(other.vectors)
-        return Span(list(res))
+    #     Returns:
+    #         Span: span of the vectors in the span minus the given vector or span
+    #     """
+    #     if not isoneof(other, [Vector, Span]):
+    #         raise TypeError("Span can only be subtracted by Vector|Span")
+    #     if isinstance(other, Vector):
+    #         other = Span([other])
+    #     res = set(self.vectors) - set(other.vectors)
+    #     return Span(list(res))
 
     def __getitem__(self, index: int) -> Vector:
         """returns the vector at the given index
@@ -225,10 +240,7 @@ class Span:
         if not isinstance(vector, Vector):
             raise TypeError(
                 "can only check containment of objects of type 'Vector'")
-        for v in self.vectors:
-            if vector == v:
-                return True
-        return False
+        return vector in self.vectors
 
     def __hash__(self) -> int:
         """returns a hash value for the span
@@ -242,6 +254,39 @@ class Span:
         if isinstance(other, Span):
             return self.vectors == other.vectors
         return False
+
+    def remove(self, vec: Vector) -> None:
+        """removes a vector from the span
+
+        Args:
+            vec (Vector): vector to remove
+
+        Raises:
+            TypeError: if the vector is not of type Vector
+
+        Returns:
+            bool: True if the vector was removed, False otherwise
+        """
+        if not isinstance(vec, Vector):
+            raise TypeError("can only remove vectors")
+        if vec in self.vectors:
+            self.vectors.remove(vec)
+
+    def remove_at(self, index: int) -> None:
+        """removes the vector at the given index from the span
+
+        Args:
+            index (int): index of the vector to remove
+
+        Raises:
+            TypeError: if the index is not of type int
+            ValueError: if the index is out of range
+        """
+        if not isinstance(index, int):
+            raise TypeError("can only remove vectors")
+        if not (0 <= index < len(self)):
+            raise ValueError("index out of range")
+        self.vectors.pop(index)
 
     def contains(self, vector: Vector) -> bool:
         """checks whether there is a linear combinations of vectors in the span that equals the vector
@@ -266,21 +311,21 @@ class Span:
             res = True
         return res
 
-    def append(self, vec: Vector) -> None:
-        """adds a vector to the span
+    # def append(self, vec: Vector) -> None:
+        # """adds a vector to the span
 
-        Args:
-            vec (Vector): vector to add
+        # Args:
+        #     vec (Vector): vector to add
 
-        Raises:
-            TypeError: if the vector is not of type Vector
-            ValueError: if the vector is not in the field of the span
-        """
-        if not isinstance(vec, Vector):
-            raise TypeError("can only append vectors")
-        if not vec.field == self.field:
-            raise ValueError("can only append vectors of the same field")
-        self.vectors.append(vec)
+        # Raises:
+        #     TypeError: if the vector is not of type Vector
+        #     ValueError: if the vector is not in the field of the span
+        # """
+        # if not isinstance(vec, Vector):
+        #     raise TypeError("can only append vectors")
+        # if not vec.field == self.field:
+        #     raise ValueError("can only append vectors of the same field")
+        # self.vectors.append(vec)
 
     def to_orthonormal(self) -> Span:
         """returns a span that is orthonormal representation of self in the same order
