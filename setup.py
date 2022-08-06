@@ -4,13 +4,13 @@ import codecs
 
 def read_file(path: str) -> list[str]:
     with codecs.open(path, 'r', 'utf-8') as f:
-        return f.readlines()
+        return [l.strip() for l in f.readlines()]
 
 
 README_PATH = 'README.md'
-VERSION = '0.96.0'
+VERSION = '0.96.10'
 DESCRIPTION = 'Python linear algebra liabrary'
-LONG_DESCRIPTION = ''.join(read_file(README_PATH))
+LONG_DESCRIPTION = '\n'.join(read_file(README_PATH))
 setup(
     name="python-la",
     version=VERSION,
