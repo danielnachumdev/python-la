@@ -414,13 +414,22 @@ class Matrix:
         Returns:
             str: the srtring representation
         """
+        def round_if_possible(v):
+            if hasattr(v, '__round__'):
+                if almost_equal(round(v), v):
+                    v = round(v)
+            return v
+
+        def turnacate(v):
+            v = str(v)
+            return v[:v.index(".")+1+turnc] if "." in v else v
+
         def find_spaceing():
             res = 0
             for row in self:
                 for v in row:
-                    if hasattr(v, '__round__'):
-                        if almost_equal(round(v), v):
-                            v = round(v)
+                    v = round_if_possible(v)
+                    v = turnacate(v)
                     res = max(res, len(str(v)))
             return res
         spacing = find_spaceing()+2
@@ -431,9 +440,8 @@ class Matrix:
         for i, row in enumerate(self.__matrix):
             result += vl
             for v in row:
-                if hasattr(v, '__round__'):
-                    if almost_equal(round(v), v):
-                        v = round(v)
+                v = round_if_possible(v)
+                v = turnacate(v)
                 result += str(v).center(spacing)+vl
             result += "\n"+hl
         return result
