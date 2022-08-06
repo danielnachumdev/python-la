@@ -1,3 +1,3 @@
-from .abstractmethod import abstractmethod
-from .depracated import depracated
-from .message import message
+from .class_decorators import *
+from .memory import *
+from .other import *
