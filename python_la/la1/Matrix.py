@@ -308,7 +308,7 @@ class Matrix:
         pass
 
     @property
-    def eigenvalues(self) -> list:
+    def eigenvalues(self) -> list[Any]:
         """Get the eigenvalues of the matrix
 
         Returns:
@@ -329,9 +329,17 @@ class Matrix:
         if not self.is_square:
             raise ValueError("Matrix must be square")
         blocks = []
-        for eigenvalue in self.eigenvalues:
-            blocks.append(self.create_jordan_blcok(
-                self.geometric_multiplicity(eigenvalue), eigenvalue))
+        eigenvalues = self.eigenvalues
+        for eigenvalue in set(eigenvalues):
+            geom = self.geometric_multiplicity(eigenvalue)
+            alge = eigenvalues.count(eigenvalue)
+            if geom == 1:
+                blocks.append(self.create_jordan_blcok(alge, eigenvalue))
+            elif geom == alge:
+                blocks.append(eigenvalue*Matrix.identity(alge))
+            else:
+                # alge>geom => chain_basis
+                pass
         return Matrix.from_jordan_blocks(blocks)
 
     @property
@@ -701,10 +709,13 @@ class Matrix:
         """
         def comparer(a: list[float], b: list[float]) -> bool:
             def first_not_zero_index(row: list[float]) -> int:
-                for i in range(len(row)):
+                i = 0
+                while i < len(row):
                     if row[i] != self.field.zero:
                         break
+                    i += 1
                 return i
+
             a_index = first_not_zero_index(a)
             b_index = first_not_zero_index(b)
             if a_index == b_index:
@@ -817,7 +828,9 @@ class Matrix:
                 if res[curr_row_index][lead_index] != 0:
                     break
             else:
-                break
+                continue
+            # else:
+            #     break
             lead_value = res[curr_row_index][lead_index]
             # make lead value equal one and change row acordingly
             if lead_value != 1:
