@@ -736,23 +736,23 @@ class Matrix:
     def apply_operation(self, operation: MatrixOperationType, iv1, iv2, operate_with=None) -> Matrix:
         if not isinstance(operation, MatrixOperationType):
             raise TypeError("can only apply MatrixOperationType")
-        match(operation):
-            case MOT.ROW_MULTIPLICATION:
-                self[iv1] = [iv2*v for v in self[iv1]]
-            case MOT.ROW_ADDITION:
-                self[iv1] = [self[iv1][i]+self[iv2][i]
-                             for i in range(len(self[iv1]))]
-            case MOT.ROW_SWITCHING:
-                self[iv1], self[iv2] = self[iv2], self[iv1]
-            case MOT.COL_SWITCHING:
-                for i in range(len(self[0])):
-                    self[i][iv1], self[i][iv2] = self[i][iv2], self[i][iv1]
-            case MOT.COL_MULTIPLICATION:
-                for i in range(len(self[0])):
-                    self[i][iv1] *= iv2
-            case MOT.COL_ADDITION:
-                for i in range(len(self[0])):
-                    self[i][iv1] += self[i][iv2]
+        if operation == MOT.ROW_MULTIPLICATION:
+            self[iv1] = [iv2*v for v in self[iv1]]
+        elif operation == MOT.ROW_ADDITION:
+            self[iv1] = [self[iv1][i]+self[iv2][i]
+                         for i in range(len(self[iv1]))]
+        elif operation == MOT.COL_SWITCHING:
+            self[iv1], self[iv2] = self[iv2], self[iv1]
+        elif operation == MOT.COL_SWITCHING:
+            for i in range(len(self[0])):
+                self[i][iv1], self[i][iv2] = self[i][iv2], self[i][iv1]
+        elif operation == MOT.COL_MULTIPLICATION:
+            for i in range(len(self[0])):
+                self[i][iv1] *= iv2
+        elif operation == MOT.COL_ADDITION:
+            for i in range(len(self[0])):
+                self[i][iv1] += self[i][iv2]
+
         return operate_with
 
     def concat(self, other: Union[Vector, Matrix]) -> Matrix:
