@@ -69,7 +69,7 @@ class Span:
             AttributeError: if the objects don't have all nescesary operator implemented
         """
         if not isinstance(objects, list):
-            raise TypeError("Span must be initialized with a list of vectors")
+            raise TypeError("obejcts must be of type list")
         example_item = objects[0]
         for v in objects:
             if not v.field == example_item.field:

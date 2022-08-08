@@ -69,6 +69,11 @@ def test_kernel():
     from ..Span import Span
     from ..Vector import Vector
     assert Matrix([[1, 0], [0, 0]]).kernel == Span([Vector([0, 1])])
+    assert Matrix([[1, 2, 3], [0, 1, 4]]).kernel == Span([Vector([5, -4, 1])])
+    assert Matrix([[1, 2], [0, 0]]).kernel == Span([Vector([-2, 1])])
+    assert Matrix([[2, 1], [0, 0]]).kernel == Span([Vector([-0.5, 1])])
+    assert Span.are_same_span(Matrix([[1, 2, 3], [0, 0, 0]]).kernel, Span(
+        [Vector([-3, 0, 1]), Vector([-2, 1, 0])]))
 
 
 def test_eigenvalues():

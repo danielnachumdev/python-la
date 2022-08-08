@@ -186,7 +186,7 @@ class Matrix:
         """
         solution = self.solve(Vector.from_size(len(self), self.field))
         if solution is None:
-            return Vector([0 for _ in range(len(self))])
+            return Span(Vector([0 for _ in range(len(self))]))
         return solution
 
     @property
@@ -935,8 +935,8 @@ class Matrix:
 
         def get_solutions_from_rows(m: Matrix) -> list[Vector]:
             res = []
-            value_depends_on_key: dict[int, set] = dict()
-            free_cofactors = [0 for _ in range(len(m[0]))]
+            # key is the index of the free factor, thve value is a dictionary which keys' are the row in which the free factor appearrs and the value are the indecies of the leading factors that depend on it
+            value_depends_on_key: dict[int, dict[int, set[int]]] = dict()
             for row_index in range(m.rank):
                 row = m[row_index]
                 for candidate_index, candidate in enumerate(row):
@@ -944,19 +944,20 @@ class Matrix:
                         for validator_index in range(candidate_index+1, len(row)):
                             if row[validator_index] != m.field.zero:
                                 if validator_index not in value_depends_on_key:
-                                    value_depends_on_key[validator_index] = set(
+                                    value_depends_on_key[validator_index] = dict(
                                     )
-                                    free_cofactors[validator_index] = row[validator_index]
-                                value_depends_on_key[validator_index].add(
+                                if row_index not in value_depends_on_key[validator_index]:
+                                    value_depends_on_key[validator_index][row_index] = set(
+                                    )
+                                value_depends_on_key[validator_index][row_index].add(
                                     candidate_index)
                         break
-            CANDIDATE_INDEX_INDEX = 0
-            ROW_INDEX_INDEX = 1
             for key in value_depends_on_key:
                 tmp = [0 for _ in range(len(m[0]))]
                 tmp[key] = m.field.one
-                for index in value_depends_on_key[key]:
-                    tmp[index] = -free_cofactors[key]  # m.field.one
+                for row_index in value_depends_on_key[key]:
+                    for index in value_depends_on_key[key][row_index]:
+                        tmp[index] = -m[row_index][key]
                 res.append(Vector(tmp))
             return res
         solution_span_as_arr = get_solutions_from_columns(
