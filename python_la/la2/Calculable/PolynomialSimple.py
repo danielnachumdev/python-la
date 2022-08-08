@@ -337,7 +337,7 @@ class PolynomialSimple(Calculable):
     def __eq__(self, other: PolynomialSimple) -> bool:
         if isoneof(other, [int, float, Complex]):
             if other == 0:
-                return len(self) == 0
+                return all([v == 0 for v in self.prefixes])
             if len(self) != 1:
                 return False
             return self.powers[0] == 0 and self.prefixes[0] == other
