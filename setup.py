@@ -8,7 +8,7 @@ def read_file(path: str) -> list[str]:
 
 
 README_PATH = 'README.md'
-VERSION = '0.96.10'
+VERSION = '0.96.11'
 DESCRIPTION = 'Python linear algebra liabrary'
 LONG_DESCRIPTION = '\n'.join(read_file(README_PATH))
 setup(

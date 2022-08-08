@@ -936,6 +936,7 @@ class Matrix:
         def get_solutions_from_rows(m: Matrix) -> list[Vector]:
             res = []
             value_depends_on_key: dict[int, set] = dict()
+            free_cofactors = [0 for _ in range(len(m[0]))]
             for row_index in range(m.rank):
                 row = m[row_index]
                 for candidate_index, candidate in enumerate(row):
@@ -945,14 +946,17 @@ class Matrix:
                                 if validator_index not in value_depends_on_key:
                                     value_depends_on_key[validator_index] = set(
                                     )
+                                    free_cofactors[validator_index] = row[validator_index]
                                 value_depends_on_key[validator_index].add(
                                     candidate_index)
                         break
+            CANDIDATE_INDEX_INDEX = 0
+            ROW_INDEX_INDEX = 1
             for key in value_depends_on_key:
                 tmp = [0 for _ in range(len(m[0]))]
                 tmp[key] = m.field.one
                 for index in value_depends_on_key[key]:
-                    tmp[index] = -m.field.one
+                    tmp[index] = -free_cofactors[key]  # m.field.one
                 res.append(Vector(tmp))
             return res
         solution_span_as_arr = get_solutions_from_columns(
