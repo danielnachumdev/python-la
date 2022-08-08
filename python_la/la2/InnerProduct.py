@@ -6,7 +6,7 @@ from ..la1 import Complex, Vector
 class InnerProduct:
 
     @staticmethod
-    def isInnerProduct(func: Callable[[Vector, Vector], float], generator_func: Callable[[bool], Vector]) -> bool:
+    def is_inner_product(func: Callable[[Vector, Vector], float], generator_func: Callable[[bool], Vector]) -> bool:
         MIN_VAL = -100
         MAX_VAL = 100
         REPETITIONS = 1000

@@ -13,15 +13,12 @@ class InnerProductSpace(VectorSpace):
     def apply(self, v: Vector, u: Vector) -> Union[int, float, Complex]:
         return self(v, u)
 
-    def inner_product(self, v: Vector, u: Vector) -> Union[int, float, Complex]:
-        return self(v, u)
-
     def __call__(self, v: Vector, u: Vector) -> Union[int, float, Complex]:
         if not areinstances([v, u], Vector):
             raise TypeError("v and u must be of type Vector")
         return self.inner_product(v, u)
 
-    def arePerpendicular(self, v: Vector, u: Vector) -> bool:
+    def are_perpendicular(self, v: Vector, u: Vector) -> bool:
         if not areinstances([v, u], Vector):
             raise TypeError("v and u must be of type Vector")
         if not check_foreach([v, u], lambda x: x in self):

@@ -7,4 +7,4 @@ def test_standard_gram_matrix():
     n = random.randint(1, 10)
     Vr2 = VectorSpace(RealField(n))
     g = BilinearForm(lambda x, y: sip(x, y), Vr2)
-    assert g.toMatrix() == Matrix.identity(n)
+    assert g.to_matrix() == Matrix.identity(n)

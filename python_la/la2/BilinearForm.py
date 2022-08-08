@@ -17,7 +17,7 @@ class BilinearForm:
     #     pass
 
     @staticmethod
-    def fromMatrix(mat: Matrix) -> BilinearForm:
+    def from_matrix(mat: Matrix) -> BilinearForm:
         pass
 
     def __init__(self, func: Callable[[Vector, Vector], Union[int, float, Complex]], vector_space: VectorSpace) -> None:
@@ -26,20 +26,20 @@ class BilinearForm:
 
     @property
     def kernel(self):
-        return self.toMatrix().kernel
+        return self.to_matrix().kernel
 
     @property
-    def isSymmetrical(self) -> bool:
+    def is_symmetrical(self) -> bool:
         pass
 
     @property
-    def isSquare(self) -> Union[bool, None]:
+    def is_square(self) -> Union[bool, None]:
         return None
 
     def __call__(self, v, u):
         return self.func(v, u)
 
-    def toMatrix(self) -> Matrix:
+    def to_matrix(self) -> Matrix:
         basis = self.vector_space.standard_basis()
         mat = [[0 for i in range(len(basis))] for j in range(len(basis))]
         for i, v in enumerate(basis):
@@ -47,7 +47,7 @@ class BilinearForm:
                 mat[i][j] = self.func(v, u)
         return Matrix(mat, field=self.vector_space.field)
 
-    def arePerpendicular(self, v1: Vector, v2: Vector) -> bool:
+    def are_perpendicular(self, v1: Vector, v2: Vector) -> bool:
         """
         will return true if result of the bilinear form calculation is 0
         """
@@ -56,11 +56,11 @@ class BilinearForm:
 
 class SquareBilinearForm(BilinearForm):
     @property
-    def isSquare(self) -> bool:
+    def is_square(self) -> bool:
         return True
 
     def __call__(self, v):
         return self.func(v, v)
 
-    def toMatrix(self) -> Matrix:
+    def to_matrix(self) -> Matrix:
         pass

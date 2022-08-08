@@ -368,8 +368,10 @@ class PolynomialSimple(Calculable):
     def __len__(self) -> int:
         return len(self.powers)
 
-    def solve(self):
-        pass
+    def solve(self, solve_for: PolynomialSimple = 0) -> list:
+        if not isinstance(solve_for, PolynomialSimple):
+            raise TypeError("solve_for must be a PolynomialSimple")
+        return (self-solve_for).roots
 
     def gcd_with(self, other: PolynomialSimple) -> PolynomialSimple:
         # TODO implement gcd calculation
