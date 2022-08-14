@@ -1,6 +1,8 @@
 import random
 from ...helpers import *
-from ....la1 import Complex as comp, Vector, RealField, LinearMap, VectorSpace
+from ....la1 import Complex as comp, Vector, RealField, LinearMap, VectorSpace, Span, Matrix
+from ....la2 import StandardInnerProduct as sip
+from math import sqrt
 
 
 def test_almost_equal():
@@ -63,3 +65,16 @@ def test_composit_functions():
     lt = LinearMap.from_fields(R2, R2, func)
     v = VectorSpace(R2).random()
     assert (num*lt**2)(v) == Vector([0, 0], R2)
+
+
+def test_check_forevery():
+    assert check_forevery([1, 2, 3, 4, 5, 6, 7, 8, 9],
+                          2, lambda x, y: x+y >= 3)
+    pt = Matrix([
+        [sqrt(3/2), sqrt(3/2), 0],
+        [-sqrt(1/2), sqrt(1/2), 0],
+        [-1, -1, 1]
+    ])
+    p = pt.transpose()
+    assert check_forevery([v for v in Span(p.column_space).to_orthonormal()], 2, lambda x,
+                          y: almost_equal(sip(x, y), 0))

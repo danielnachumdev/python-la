@@ -337,7 +337,7 @@ class Span:
         from ..la2 import StandardInnerProduct as sip
         for i in range(1, len(self.vectors)):
             current = self[i]
-            curr_tag = Vector([0 for _ in range(self[0].length)])
+            curr_tag = Vector([0 for _ in range(len(self[0]))])
             for prev in result:
                 curr_tag = curr_tag+sip(prev, current) * prev
             current = current-curr_tag

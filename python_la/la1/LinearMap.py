@@ -158,7 +158,7 @@ class LinearMap:
         except Exception as e:
             raise e
 
-    def to_matrix(self, basis=None) -> Matrix:
+    def to_matrix(self, basis: list[Vector] = None) -> Matrix:
         if basis is None:
             basis = self.src.standard_basis()
         vectors = []

@@ -99,9 +99,10 @@ class VectorSpace:
         """
         if not isinstance(i, int):
             raise TypeError("i must be an instance of int")
-        if not(0 <= i < self.field.degree):
-            raise ValueError("i must be between 0 and degree-1")
-        return Vector([0 if j != i else 1 for j in range(self.field.degree)], self.field)
+        if not(0 < i <= self.field.degree):
+            raise ValueError("i must be between 1 and degree")
+        arr = [0 if j != i-1 else 1 for j in range(self.field.degree)]
+        return Vector(arr, self.field)
 
     def standard_basis(self) -> list[Vector]:
         """returns the standard basis of this vector space
@@ -110,4 +111,4 @@ class VectorSpace:
             list[Vector]: the standard basis of this vector space
         """
         n = self.field.degree
-        return [self.e(i) for i in range(n)]
+        return [self.e(i+1) for i in range(n)]

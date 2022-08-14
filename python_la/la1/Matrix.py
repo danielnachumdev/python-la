@@ -108,6 +108,12 @@ class Matrix:
         Returns:
             Matrix: the result
         """
+        def comparer(b1, b2):
+            size1 = len(b1)
+            size2 = len(b2)
+            # TODO write comparer function properly
+            return size2-size1
+        blocks.sort(key=functools.cmp_to_key(comparer), reverse=True)
         total_size = 0
         hm: dict[Any, list[Matrix]] = dict()
         for block in blocks:
@@ -198,6 +204,20 @@ class Matrix:
         """
         from .VectorSpace import VectorSpace
         return VectorSpace(self.field).standard_basis() - self.kernel
+
+    @property
+    def row_space(self) -> list[Vector]:
+        return [Vector(r) for r in self]
+
+    @property
+    def column_space(self) -> list[Vector]:
+        res: list[Vector] = []
+        for j in range(len(self[0])):
+            arr = []
+            for i in range(len(self)):
+                arr.append(self[i][j])
+            res.append(Vector(arr))
+        return res
 
     @property
     def rank(self) -> int:
@@ -301,6 +321,10 @@ class Matrix:
             if not (self.algebraic_multiplicity(eigenvalue) == self.geometric_multiplicity(eigenvalue)):
                 return False
         return True
+
+    @property
+    def is_projection(self) -> bool:
+        return self**2 == self
 
     @property
     def is_nilpotent(self) -> bool:

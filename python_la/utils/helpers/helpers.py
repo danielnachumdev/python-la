@@ -1,5 +1,5 @@
 # import Complex
-
+from typing import Any, Callable
 import math
 from .instance_cheking import alloneof
 
@@ -46,3 +46,14 @@ def check_foreach(arr: list, condition) -> bool:
 
 def composite_function(f, g):
     return lambda *args: f(g(*args))
+
+
+def check_forevery(arr: list[Any], amount: int, condition: Callable[[], bool]) -> bool:
+    def helper(arr: list, current: list) -> bool:
+        if len(current) == amount:
+            return condition(*current)
+        for i, v in enumerate(arr):
+            if not helper(arr[i+1:], current+[v]):
+                return False
+        return True
+    return helper(arr, [])
