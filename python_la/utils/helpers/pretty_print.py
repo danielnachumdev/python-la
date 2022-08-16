@@ -1,5 +1,5 @@
 
-from .helpers import split_many, areinstances, split_if_any
+from ..helpers import split_many, areinstances, split_if_any
 from .math_symbols import python_la_superscript_n, subscript_n
 
 

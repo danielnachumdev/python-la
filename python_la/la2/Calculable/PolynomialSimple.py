@@ -229,10 +229,12 @@ class PolynomialSimple(Calculable):
                 if power == 0:
                     return "1"
                 if prefix == 1:
-                    return "X" if power == 1 else "X^" + str(power)
+                    return "+X" if power == 1 else "+X^" + str(power)
                 else:
                     return "-X" if power == 1 else "-X^" + str(power)
             else:
+                if prefix >= 0:
+                    res += "+"
                 res += str(prefix)
 
             if power == 0:
@@ -240,7 +242,10 @@ class PolynomialSimple(Calculable):
             elif power == 1:
                 return res+"X"
             return f"{str(prefix)}X^{str(power)}"
-        return " + ".join([one_to_str(i) for i in range(len(self))])
+        res = " ".join([one_to_str(i) for i in range(len(self))])
+        if self.prefixes[0] > 0:
+            res = res[1:]
+        return pretty_str(res)
 
     def __add__(self, other) -> PolynomialSimple:
         if isoneof(other, [int, float, Complex]):
