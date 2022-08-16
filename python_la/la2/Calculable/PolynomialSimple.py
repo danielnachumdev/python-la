@@ -166,8 +166,9 @@ class PolynomialSimple(Calculable):
         if curr.degree == 0:
             return res
         if curr.degree == 1:
-            a = curr.prefixes[curr.powers.index(1)]
-            return res+[a]
+            if 0 in curr.powers:
+                return res+[-curr.prefixes[-1]]
+            return res+[0]
         elif curr.degree == 2:
             a, b, c = 0, 0, 0
             a = curr.prefixes[curr.powers.index(2)]

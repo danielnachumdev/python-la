@@ -395,9 +395,24 @@ class Matrix:
         """
         from ..la2 import PolynomialSimple
         res = PolynomialSimple([1], [0])
-        for eigenvalue in set(self.eigenvalues):
-            res *= PolynomialSimple([1, -eigenvalue], [1, 0]
-                                    )**self.geometric_multiplicity(eigenvalue)
+        eigenvalues = self.eigenvalues
+        for eigenvalue in set(eigenvalues):
+            alg = eigenvalues.count(eigenvalue)
+            tmp_matrix: Matrix = (
+                self-eigenvalue*Matrix.identity(len(self)))**alg
+            power = 0
+            ker = tmp_matrix.kernel
+            if isinstance(ker, Span):
+                _0 = Vector([0 for _ in range(len(ker[0]))])
+                for v in ker:
+                    curr_power = 1
+                    u = tmp_matrix*v
+                    while u != _0:
+                        u = tmp_matrix*v
+                        curr_power += 1
+                    power = max(power, curr_power)
+
+            res *= PolynomialSimple([1, -eigenvalue], [1, 0])**power
         return res
 
     def __getitem__(self, index: int) -> list[Any]:
@@ -1004,4 +1019,7 @@ class Matrix:
 
     def geometric_multiplicity(self, eigenvalue) -> int:
         m: Matrix = self-eigenvalue*Matrix.identity(len(self))
-        return m.kernel.dim
+        res = self.kernel
+        if isinstance(res, Vector):
+            res = Span([res])
+        return res.dim
