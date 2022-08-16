@@ -415,7 +415,7 @@ class Matrix:
         """
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
-        if not (0 <= index <= self.__rows):
+        if not (0 <= index < self.__rows):
             raise ValueError("Index out of range")
         return self.__matrix[index]
 
@@ -659,6 +659,9 @@ class Matrix:
         for _ in range(value-1):
             res *= self
         return res
+
+    def __iter__(self) -> list:
+        return iter(self.__matrix)
 
     def inverse(self) -> Matrix:
         pass

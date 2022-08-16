@@ -136,10 +136,29 @@ def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
             to_remove.clear()
         # print acordingly
         for vec_index in range(len(strs)):
-            res += strs[vec_index][prev_char_indecies[vec_index]:char_indecies[vec_index]]+sep
+            res += strs[vec_index][prev_char_indecies[vec_index]
+                :char_indecies[vec_index]]+sep
             prev_char_indecies[vec_index] = char_indecies[vec_index]+1
             char_indecies[vec_index] += 1
         res += "\n"
     return res+end
 
 
+def split_many(lst: list[str], mark: str) -> list[str]:
+    res = []
+    for s in lst:
+        res.extend(s.split(mark))
+    return res
+
+
+def split_if_any(string: str, marks: list[str]) -> Tuple[list[str], list[str]]:
+    splits = []
+    order = []
+    start = 0
+    for end, c in enumerate(string):
+        if c in marks:
+            splits.append(string[start:end].strip())
+            order.append(c)
+            start = end+1
+    splits.append(string[start:].strip())
+    return splits, order
