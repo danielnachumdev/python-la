@@ -367,8 +367,13 @@ class PolynomialSimple(Calculable):
             raise NotImplementedError(
                 "Polynomial __call__ not implemented for " + str(type(v)))
         res = self.prefixes[0]*v**self.powers[0]
-        for i in range(1, len(self)):
+        diff = 0
+        if isinstance(v, Matrix) and 0 in self.powers:
+            diff = 1
+        for i in range(1, len(self)-diff):
             res += self.prefixes[i]*v**self.powers[i]
+        if isinstance(v, Matrix) and 0 in self.powers:
+            res += self.prefixes[-1] * Matrix.identity(len(v))
         return res
 
     def __len__(self) -> int:
