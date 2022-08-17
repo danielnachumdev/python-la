@@ -54,6 +54,10 @@ class Complex:
         elif real != "0" == imag:
             return real
         elif real == "0" != imag:
+            if imag == "1":
+                return "i"
+            elif imag == "-1":
+                return "-i"
             return imag+"i"
         return f'{real} + {imag}i'
 
