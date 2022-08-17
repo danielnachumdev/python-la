@@ -21,6 +21,11 @@ class PolynomialSimple(Calculable):
             def pow_to_poly(subb: str) -> PolynomialSimple:
                 individual_chars = string_splitter([subb], "^")
                 if len(individual_chars) == 2:
+                    if var not in subb:
+                        a, b = individual_chars[0], individual_chars[1]
+                        if check_foreach([a, b], python_la_is_number):
+                            return PolynomialSimple([(float(a))**(float(b))], [0])
+
                     bias = 1
 
                     def extract_nums(indiv) -> Tuple[float, float]:
@@ -50,9 +55,7 @@ class PolynomialSimple(Calculable):
                     return PolynomialSimple([prefix], [1 if var in text else 0])
                 assert False, "didnt think about that"
 
-            multiplication_stack = stacker(sub, ["*", "/"])
-            subs2 = string_splitter([sub], "*")
-            subs2 = string_splitter(subs2, "/")
+            subs2, multiplication_stack = split_if_any(sub, ["*", "/"])
             res = pow_to_poly(subs2[0])
             for i, s in enumerate(subs2[1:]):
                 if multiplication_stack[i] == "*":
@@ -64,29 +67,24 @@ class PolynomialSimple(Calculable):
 
         # handle if input has brackets
         if any(bracket in input for bracket in ["(", ")", "[", "]", "{", "}"]):
-            if not validate_brackets(input):
-                raise ValueError("invalid brackets")
-            input = open_power(input)
-            sub_inputs = split_not_between_brackets(input, "*")
-            res = PolynomialSimple.from_string(sub_inputs[0], var)
-            for sub_input in sub_inputs[1:]:
-                res *= PolynomialSimple.from_string(sub_input, var)
-            return res
-        else:
-            # split with addition
-            addition_stack = stacker(input, ["+", "-"])
-            subs = string_splitter([input], "+")
-            subs = string_splitter(subs, "-")
-            subs = [sub for sub in subs if len(sub) > 0]
-            if len(addition_stack) == len(subs)-1:
-                addition_stack.insert(0, "+")
-
-            # foreach sub expression create a Poly with inner splitting by multiplication and add it acording to current addition operator
-            res = sign(addition_stack[0])*sub_to_poly(subs[0])
-            for i in range(1, len(subs)):
-                sub = subs[i]
-                res += sign(addition_stack[i])*sub_to_poly(sub)
-            return res
+            raise ValueError("PolynomialSimple doesnt support brackets")
+            # if not validate_brackets(input):
+            #     raise ValueError("invalid brackets")
+            # input = open_power(input)
+            # sub_inputs = split_not_between_brackets(input, "*")
+            # res = PolynomialSimple.from_string(sub_inputs[0], var)
+            # for sub_input in sub_inputs[1:]:
+            #     res *= PolynomialSimple.from_string(sub_input, var)
+            # return res
+        # split with addition
+        subs, order = split_if_any(input, ["+", "-"])
+        if len(order) < len(subs):
+            order.insert(0, "+")
+        # foreach sub expression create a Poly with inner splitting by multiplication and add it acording to current addition operator
+        res = sign(order[0])*sub_to_poly(subs[0])
+        for i in range(1, len(subs)):
+            res += sign(order[i])*sub_to_poly(subs[i])
+        return res
 
     def __init__(self, prefixes: list, powers: list) -> None:
         if len(prefixes) != len(powers):
@@ -228,7 +226,7 @@ class PolynomialSimple(Calculable):
                 return ""
             elif abs(prefix) == 1:
                 if power == 0:
-                    return "1"
+                    return "+1"
                 if prefix == 1:
                     return "+X" if power == 1 else "+X^" + str(power)
                 else:

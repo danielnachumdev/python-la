@@ -3,7 +3,7 @@ from ..helpers import split_many, areinstances, split_if_any
 from .math_symbols import python_la_superscript_n, subscript_n
 
 
-def __is_number(string: str) -> bool:
+def python_la_is_number(string: str) -> bool:
     for s in string:
         if s not in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
             return False
@@ -14,7 +14,7 @@ def __get_superscript(string: str) -> str:
     res = ""
     j = string.index("^")
     num = string[j+1:]
-    if __is_number(num):
+    if python_la_is_number(num):
         res += string[:j]
         res += python_la_superscript_n(int(num))
     else:
@@ -29,7 +29,7 @@ def __get_subscript(string: str) -> str:
     if "^" in string:
         i = string.index("^")
     num = string[j+1:i]
-    if __is_number(num):
+    if python_la_is_number(num):
         res += string[:j]
         res += subscript_n(int(num))
     else:
