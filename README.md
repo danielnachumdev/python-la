@@ -38,4 +38,3 @@ X^2 + 1
 >> P(lm)(v) == v
 True
 ```
-## Example
