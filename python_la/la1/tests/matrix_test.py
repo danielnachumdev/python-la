@@ -89,4 +89,4 @@ def test_algebraic_multiplicity():
 
 def test_geometric_multiplicity():
     assert m1.geometric_multiplicity(0) == 1
-    assert m1.geometric_multiplicity(2) == 2
+    assert m1.geometric_multiplicity(2) == 1

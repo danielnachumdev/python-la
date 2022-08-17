@@ -98,22 +98,44 @@ def open_power(input: str) -> str:
     return input
 
 
-def split_not_between_brackets(input: str, symbol: str) -> list[str]:
+def split_not_between_brackets(input: str, symbols: list[str]) -> list[str]:
     input = insert_multiplication(input)
-    indecies = [0]
+    indecies = []
     stack = []
+    split_indecies = []
+    open_i = 0
     for i, c in enumerate(input):
+        if c in symbols:
+            split_indecies.append(i)
         if c in open_brackets:
             stack.append(c)
+            open_i = i
         elif c in close_brackets:
             if stack[-1] == bracket_pairs[c]:
                 stack.pop()
             if len(stack) == 0:
-                indecies.append(i)
+                indecies.append((open_i, i))
+    # remove indecies that are inside brackets
+    i = 0
+    while i < len(split_indecies):
+        index = split_indecies[i]
+        for j in indecies:
+            if j[0] < index < j[1]:
+                split_indecies.remove(index)
+                i -= 1
+                break
+        i += 1
+    # split
     res = []
-    for i in range(len(indecies)-1):
-        res.append(input[indecies[i]+1+2*i:indecies[i+1]])
-    return res
+    order = []
+    start = 0
+    for end in range(len(input)):
+        if end in split_indecies:
+            order.append(input[end])
+            res.append(input[start:end].strip())
+            start = end+1
+    res.append(input[start:].strip())
+    return res, order
 
 
 def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
@@ -136,8 +158,7 @@ def concat_horizontally(lst: list[Any], sep: str = " ", end: str = "") -> str:
             to_remove.clear()
         # print acordingly
         for vec_index in range(len(strs)):
-            res += strs[vec_index][prev_char_indecies[vec_index]
-                :char_indecies[vec_index]]+sep
+            res += strs[vec_index][prev_char_indecies[vec_index]:char_indecies[vec_index]]+sep
             prev_char_indecies[vec_index] = char_indecies[vec_index]+1
             char_indecies[vec_index] += 1
         res += "\n"

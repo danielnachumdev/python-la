@@ -4,11 +4,10 @@ import enum
 import copy
 import functools
 from typing import Tuple
-from ..utils import almost_equal
+from ..utils import almost_equal, areinstances, check_foreach, isoneof
 from .Complex import Complex
 from .Vector import Vector
 from .Field import Field, RealField
-from ..utils import areinstances, check_foreach, isoneof
 from .Span import Span
 
 
@@ -399,18 +398,32 @@ class Matrix:
         for eigenvalue in set(eigenvalues):
             alg = eigenvalues.count(eigenvalue)
             tmp_matrix: Matrix = (
-                self-eigenvalue*Matrix.identity(len(self)))**alg
+                self-eigenvalue*Matrix.identity(len(self)))
             power = 0
             ker = tmp_matrix.kernel
             if isinstance(ker, Span):
-                _0 = Vector([0 for _ in range(len(ker[0]))])
-                for v in ker:
-                    curr_power = 1
-                    u = tmp_matrix*v
-                    while u != _0:
+                if ker.dim == 1:
+                    power = alg
+                elif ker.dim == alg:
+                    power = 1
+                else:
+                    # M0 = Matrix.identity(len(self))*0
+                    # print(M0)
+                    # original = tmp_matrix
+                    # power += 1
+                    # print(tmp_matrix)
+                    # while tmp_matrix != M0:
+                    #     tmp_matrix *= original
+                    #     print(tmp_matrix)
+                    #     power += 1
+                    _0 = Vector([0 for _ in range(len(ker[0]))])
+                    for v in ker:
+                        curr_power = 1
                         u = tmp_matrix*v
-                        curr_power += 1
-                    power = max(power, curr_power)
+                        while u != _0:
+                            u = tmp_matrix*v
+                            curr_power += 1
+                        power = max(power, curr_power)
 
             res *= PolynomialSimple([1, -eigenvalue], [1, 0])**power
         return res
@@ -618,7 +631,10 @@ class Matrix:
         if self.__rows != other.__rows or self.__cols != other.__cols:
             return False
         if use_almost_equale:
-            return all([all([almost_equal(self[i][j], other[i][j])] for j in range(len(self[0]))) for i in range(len(self))])
+            for i in range(len(self)):
+                for j in range(len(self[i])):
+                    if not almost_equal(self[i][j], other[i][j]):
+                        return False
         if any([self.__matrix[i][j] != other.__matrix[i][j] for i in range(self.__rows) for j in range(self.__cols)]):
             return False
         return True

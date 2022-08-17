@@ -240,7 +240,7 @@ class PolynomialSimple(Calculable):
                 return res
             elif power == 1:
                 return res+"X"
-            return f"{str(prefix)}X^{str(power)}"
+            return f"{res}X^{str(power)}"
         res = " ".join([one_to_str(i) for i in range(len(self))])
         if self.prefixes[0] > 0:
             res = res[1:]

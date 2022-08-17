@@ -59,7 +59,8 @@ class Calculable:
         raise NotImplementedError("This is a virtual method")
 
     def __ne__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        raise NotImplementedError(
+            f"A function from {type(self)} resolved to Base Class function which is not implemented as it is a virtual method")
 
     def __call__(self, value):
         raise NotImplementedError("This is a virtual method")
