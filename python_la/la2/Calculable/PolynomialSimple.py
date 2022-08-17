@@ -175,11 +175,16 @@ class PolynomialSimple(Calculable):
             if 0 in curr.powers:
                 c = curr.prefixes[curr.powers.index(0)]
             delta = b**2 - 4*a*c
+            x1, x2 = 0, 0
             if delta < 0:
-                # FIXME implement complex
-                return []
-            x1 = (-b+math.sqrt(delta))/(2*a)
-            x2 = (-b-math.sqrt(delta))/(2*a)
+                img = Complex(0, math.sqrt(abs(delta)))
+                x1 = -b+img
+                x2 = -b-img
+            else:
+                x1 = -b+math.sqrt(delta)
+                x2 = -b-math.sqrt(delta)
+            x1 /= 2*a
+            x2 /= 2*a
             return res+[x1, x2]
 
         x = 1

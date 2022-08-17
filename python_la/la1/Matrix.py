@@ -387,6 +387,8 @@ class Matrix:
                 if counts[0] == 1:
                     blocks.append(J(alg, eigenvalue))
             else:
+                diagram = [[0 for _ in range(counts[0])]
+                           for __ in range(counts[-1])]
                 pass
         return Block(blocks)
 
