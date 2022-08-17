@@ -383,5 +383,13 @@ class PolynomialSimple(Calculable):
         return (self-solve_for).roots
 
     def gcd_with(self, other: PolynomialSimple) -> PolynomialSimple:
-        # TODO implement gcd calculation
-        pass
+        def intersection(lst1, lst2):
+            return [value for value in set(lst1) if value in set(lst2)]
+        common_roots = intersection(self.roots, other.roots)
+        res = 1
+        for root in common_roots:
+            if root < 0:
+                res *= PolynomialSimple.from_string(f"x+{abs(root)}")
+            else:
+                res *= PolynomialSimple.from_string(f"x-{root}")
+        return res

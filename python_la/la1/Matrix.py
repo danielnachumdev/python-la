@@ -205,6 +205,11 @@ class Matrix:
         return VectorSpace(self.field).standard_basis() - self.kernel
 
     @property
+    def adjugate(self) -> Matrix:
+        pass
+        # TODO implement adjugate
+
+    @property
     def row_space(self) -> list[Vector]:
         return [Vector(r) for r in self]
 
@@ -265,6 +270,14 @@ class Matrix:
             bool: True if the matrix is invertible, False otherwise
         """
         return self.determinant != 0
+
+    @property
+    def inverse(self) -> Matrix:
+
+        if not self.is_invertiable:
+            raise ValueError("Matrix must be invertible")
+        _, res = self.gaussian_elimination_with(Matrix.identity(len(self)))
+        return res
 
     @property
     def is_square(self) -> bool:
@@ -693,13 +706,6 @@ class Matrix:
 
     def __iter__(self) -> list:
         return iter(self.__matrix)
-
-    def inverse(self) -> Matrix:
-        pass
-        # if not self.is_invertiable:
-        #     raise ValueError("Matrix must be invertible")
-        # return Matrix([[self.minor(i, j) / self.determinant for j in range(self.__cols)]
-        #                for i in range(self.__rows)])
 
     def cofactor(self, row_to_ignore: int, col_to_ignore: int) -> Matrix:
         """will return the cofactor of the matrix at the given position
