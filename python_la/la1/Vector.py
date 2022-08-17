@@ -8,7 +8,6 @@ from .Complex import Complex
 
 class Vector:
 
-    @depracated("Use VectorSpace(...).random(...) instead")
     @staticmethod
     def random(min: Any = -10, max: Any = 10, size: int = 10,  def_value: Any = None, f: Field = RealField()) -> Vector:
         """Generate a random vector with random values in the given range.
@@ -49,7 +48,6 @@ class Vector:
             default_value = field.zero
         return Vector([default_value for _ in range(size)], field.__class__(size, field.modulu))
 
-    @ depracated("Use VectorSpace(...).e(...) instead")
     @ staticmethod
     def e(i: int, size: int, field: Field) -> Vector:
         """Create the ith element of the e vector of the given size and field

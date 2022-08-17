@@ -107,31 +107,38 @@ class Matrix:
         Returns:
             Matrix: the result
         """
-        def comparer(b1, b2):
+        # group blocks by eigenvectors
+        eigenvalues = set([m[0][0] for m in blocks])
+        matricies: list[list[Matrix]] = []
+        for eigenvalue in eigenvalues:
+            matricies.append([])
+            for m in blocks:
+                if m[0][0] == eigenvalue:
+                    matricies[-1].append(m)
+
+        def inside_sorter(b1, b2):
             size1 = len(b1)
             size2 = len(b2)
-            # TODO write comparer function properly
             return size2-size1
-        blocks.sort(key=functools.cmp_to_key(comparer), reverse=True)
-        total_size = 0
-        hm: dict[Any, list[Matrix]] = dict()
-        for block in blocks:
-            if block[0][0] not in hm.keys():
-                hm[block[0][0]] = []
-            hm[block[0][0]].append(block)
-            total_size += len(block)
-        # sort blocks in order
-        for key in hm:
-            hm[key].sort(key=lambda x: len(x))
+        # sort each sub list for big to small
+        for i in range(len(eigenvalues)):
+            matricies[i].sort(key=functools.cmp_to_key(inside_sorter))
+        # rebuild blocks array
+        blocks = []
+        for mat_list in matricies:
+            blocks.extend(mat_list)
+        # calculate final size
+        total_size = sum([len(m) for m in blocks])
+        # initialize result
         res = Matrix([[0 for __ in range(total_size)] for _ in range(total_size)],
                      field=blocks[0].field)
+        # set values inside result
         offset = 0
-        for key in hm:
-            for block in hm[key]:
-                for i, row in enumerate(block):
-                    for j, v in enumerate(row):
-                        res[i + offset][j + offset] = v
-                offset += len(block)
+        for block in blocks:
+            for i in range(len(block)):
+                for j in range(len(block)):
+                    res[i+offset][j+offset] = block[i][j]
+            offset += len(block)
         return res
 
     @staticmethod
@@ -364,19 +371,24 @@ class Matrix:
         """
         if not self.is_square:
             raise ValueError("Matrix must be square")
+        Block = Matrix.from_jordan_blocks
+        J = Matrix.create_jordan_blcok
         blocks = []
         eigenvalues = self.eigenvalues
+        V0 = Vector([0 for _ in range(len(self))])
+        In = Matrix.identity(len(self))
         for eigenvalue in set(eigenvalues):
-            geom = self.geometric_multiplicity(eigenvalue)
-            alge = eigenvalues.count(eigenvalue)
-            if geom == 1:
-                blocks.append(self.create_jordan_blcok(alge, eigenvalue))
-            elif geom == alge:
-                blocks.append(eigenvalue*Matrix.identity(alge))
+            alg = eigenvalues.count(eigenvalue)
+            counts = []
+            M_lamda: Matrix = self-eigenvalue*In
+            for k in range(1, alg):
+                counts.append((M_lamda**k).kernel.dim)
+            if len(counts) == 1:
+                if counts[0] == 1:
+                    blocks.append(J(alg, eigenvalue))
             else:
-                # alge>geom => chain_basis
                 pass
-        return Matrix.from_jordan_blocks(blocks)
+        return Block(blocks)
 
     @property
     def chain_basis(self) -> list[Vector]:
@@ -561,7 +573,7 @@ class Matrix:
         return Matrix([[self.__matrix[i][j] - other.__matrix[i][j] for j in range(self.__cols)]
                        for i in range(self.__rows)])
 
-    def __mul__(self, other: Any) -> Any:
+    def __mul__(self, other: Any) -> Union[Matrix, Vector]:
         """will multiply the matrix with the given value and return the result
 
         Args:
