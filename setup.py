@@ -8,7 +8,7 @@ def read_file(path: str) -> list[str]:
 
 
 README_PATH = 'README.md'
-VERSION = '0.96.12'
+VERSION = '0.96.5'
 DESCRIPTION = 'Python linear algebra liabrary'
 LONG_DESCRIPTION = '\n'.join(read_file(README_PATH))
 setup(
@@ -21,7 +21,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
-    install_requires=[],
+    install_requires=["danielutils"],
     keywords=['python', 'linear algebra', 'vector', 'matrix',
               'field', 'vector field', 'span', 'linear maps', 'bilinear form', 'inner product', 'linear transformation'],
     classifiers=[

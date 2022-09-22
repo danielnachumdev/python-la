@@ -1,6 +1,7 @@
 .vscode/
 main.py
 post-checkout
+tmp.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,25 +1,35 @@
 from __future__ import annotations
-from typing import Union
+from typing import Union, Callable
 import math
 import random
-from ..utils import isoneof, alloneof, almost_equal
+from ..utils import alloneof, almost_equal
+from danielutils import isoneof, validate, NotImplemented
 
 
-class Complex:
+class Complex__:
+    # only purpos is to easily allow type validation
+    pass
+
+
+class Complex(Complex__):
+
+    __int_float = [[int, float], None, None]
+    __int_float_complex = [[int, float, Complex__], None, None]
+
     @staticmethod
-    def fromPolar(r: float, theta: float) -> Complex:
+    @validate(__int_float, __int_float)
+    def from_polar(r: Union[int, float], theta: Union[int, float]) -> Complex:
         real = r * math.cos(theta)
         imag = r * math.sin(theta)
         return Complex(real, imag)
 
     @staticmethod
-    def fromPolarRadians(r: float, theta_radians: float) -> Complex:
-        return Complex.fromPolar(r, theta_radians*180/math.pi)
+    @validate(__int_float, __int_float)
+    def from_polar_radians(r: Union[int, float], theta_radians: Union[int, float]) -> Complex:
+        return Complex.from_polar(r, theta_radians*180/math.pi)
 
-    def __init__(self, real: float, imag: float) -> None:
-        if not alloneof([real, imag], [int, float]):
-            raise TypeError(
-                "Complex.__init__: real and imag must be int or float")
+    @validate(None, __int_float, __int_float)
+    def __init__(self, real: Union[int, float], imag: Union[int, float]) -> None:
         self.real = real
         self.imag = imag
 
@@ -61,52 +71,57 @@ class Complex:
             return imag+"i"
         return f'{real} + {imag}i'
 
-    def __add__(self, other: Union[float, Complex]) -> Complex:
-        if isinstance(other, float):
-            return Complex(self.real + other, self.imag)
-        else:
-            return Complex(self.real + other.real, self.imag + other.imag)
+    def __repr__(self) -> str:
+        return str(self)
 
-    def __radd__(self, other: Union[float, Complex]) -> Complex:
+    @validate(None, __int_float_complex)
+    def __add__(self, other: Union[int, float, Complex]) -> Complex:
+        if isoneof(other, [int, float]):
+            return Complex(self.real + other, self.imag)
+        return Complex(self.real + other.real, self.imag + other.imag)
+
+    @validate(None, __int_float_complex)
+    def __radd__(self, other: Union[int, float, Complex]) -> Complex:
         return self.__add__(other)
 
-    def __mul__(self, other: Union[float, Complex]) -> Complex:
-        if isinstance(other, float):
+    @validate(None, __int_float_complex)
+    def __mul__(self, other: Union[int, float, Complex]) -> Complex:
+        if isoneof(other, [int, float]):
             return Complex(self.real * other, self.imag * other)
-        else:
-            return Complex(self.real * other.real - self.imag * other.imag,
-                           self.real * other.imag + self.imag * other.real)
+        return Complex(self.real * other.real - self.imag * other.imag,
+                       self.real * other.imag + self.imag * other.real)
 
-    def __rmul__(self, other: Union[float, Complex]) -> Complex:
+    @validate(None, __int_float_complex)
+    def __rmul__(self, other: Union[int, float, Complex]) -> Complex:
         return self.__mul__(other)
 
     def __neg__(self) -> Complex:
         return Complex(-self.real, -self.imag)
 
-    def __sub__(self, other: Union[float, Complex]) -> Complex:
+    @validate(None, __int_float_complex)
+    def __sub__(self, other: Union[int, float, Complex]) -> Complex:
         return self + (-other)
 
-    def __rsub__(self, other: Union[float, Complex]) -> Complex:
+    @validate(None, __int_float_complex)
+    def __rsub__(self, other: Union[int, float, Complex]) -> Complex:
         # other-self==-(self-other)
         return -self.__sub__(other)
 
     def __abs__(self) -> float:
         return (self.real ** 2 + self.imag ** 2) ** 0.5
 
-    def __eq__(self, other: Complex) -> bool:
-        if not isoneof(other, [int, float, Complex]):
-            raise TypeError(f"cannot compare equality to type {type(other)}")
+    @validate(None, __int_float_complex)
+    def __eq__(self, other: Union[int, float, Complex]) -> bool:
         if not isinstance(other, Complex):
             other = Complex(other, 0)
         return almost_equal(self.real, other.real) and almost_equal(self.imag, other.imag)
 
-    def __ne__(self, other):
+    @validate(None, __int_float_complex)
+    def __ne__(self, other: Union[int, float, Complex]):
         return not self.__eq__(other)
 
+    @validate(None, __int_float_complex)
     def __truediv__(self, other: Union[int, float, Complex]) -> Complex:
-        if not isinstance(other, Complex) and not isinstance(other, float) and not isinstance(other, int):
-            raise TypeError(
-                "can only divide complex by [int, float , complex]")
         if other == 0:
             raise ZeroDivisionError("Cannot divide by zero")
 
@@ -117,19 +132,16 @@ class Complex:
         denominator = other*other.conjugate
         return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
 
-    def __rtruediv__(self, other) -> Complex:
-        if not isinstance(other, Complex) and not isinstance(other, float) and not isinstance(other, int):
-            raise TypeError(
-                "can only divide [int, float , complex] by complex")
+    @validate(None, __int_float_complex)
+    def __rtruediv__(self, other: Union[int, float, Complex]) -> Complex:
         if not isinstance(other, Complex):
             other = Complex(other, 0)
         nominator = other*self.conjugate
         denominator = self*self.conjugate
         return Complex(nominator.real/denominator.real, nominator.imag/denominator.real)
 
-    def __pow__(self, p):
-        if not isoneof(p, [int]):
-            raise TypeError(f"can only raise complex to [int]")
+    @validate(None, int)
+    def __pow__(self, p: int):
         # TODO look at this again
         # return Complex.fromPolar(self.r**p, self.theta**p)
 
@@ -148,9 +160,9 @@ class Complex:
                 res *= self
             return fix_negativ(res)
 
+    @NotImplemented
     def __rpow__(self, other):
-        # TODO: implement base**Complex
-        raise NotImplementedError("This is not implemented yet")
+        pass
 
     @ property
     def conjugate(self):
@@ -161,5 +173,6 @@ class Complex:
         return (self * self.conjugate).real
 
     @ staticmethod
+    @validate(__int_float, __int_float, Callable)
     def random(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
         return Complex(value_func(min_val, max_val), value_func(min_val, max_val))
