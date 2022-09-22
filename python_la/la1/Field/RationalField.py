@@ -1,10 +1,14 @@
 from .Field import Field
 from typing import Any
 import random
+from danielutils import validate
 
 
 class RationalField(Field):
-    def __init__(self, degree=1, modulu=1):
+    __int_float = [[int, float], None, None]
+
+    @validate(None, int, int)
+    def __init__(self, degree: int = 1, modulu: int = 1):
         """Constructor for RationalField class
 
         Args:
@@ -13,6 +17,7 @@ class RationalField(Field):
         """
         super().__init__("Q", 0, 1, degree, modulu)
 
+    @validate(None, __int_float, __int_float)
     def random(self, min: int = -10, max: int = 10) -> float:
         """returns a random element of the field
 
@@ -32,10 +37,11 @@ class RationalField(Field):
         sign = 1 if f(0, 1) == 1 else -1
         nominator = f(min, max)
         denominator = f(min, max)
-        while(denominator == 0):
+        while (denominator == 0):
             denominator = f(min, max)
         return sign*nominator/denominator
 
+    @validate(None, None, bool)
     def __contains__(self, value: Any, quiet: bool = False) -> bool:
         """checks if the value is in the field
 

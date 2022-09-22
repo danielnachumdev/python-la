@@ -112,7 +112,7 @@ class LinearMap:
     def __eq__(self, other: LinearMap) -> bool:
         if not isinstance(other, LinearMap):
             return False
-        if not(self.src == other.src and self.dst == other.dst):
+        if not (self.src == other.src and self.dst == other.dst):
             return False
         return self.to_matrix() == other.to_matrix()
 

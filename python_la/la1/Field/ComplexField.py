@@ -5,7 +5,8 @@ from typing import Any
 
 
 class ComplexField(Field):
-    def __init__(self, degree=1, modulu=1) -> None:
+    # validated at super().__init__
+    def __init__(self, degree: int = 1, modulu: int = 1) -> None:
         """_summary_
 
         Args:

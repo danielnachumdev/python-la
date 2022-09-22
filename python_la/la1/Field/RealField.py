@@ -1,11 +1,14 @@
 import random
 from .Field import Field
-from typing import Any
-from ...utils import isoneof
+from typing import Any, Union
+from danielutils import isoneof, validate
 
 
 class RealField(Field):
-    def __init__(self, degree=1, modulu=1):
+    __int_float = [[int, float], None, None]
+
+    @validate(None, int, int)
+    def __init__(self, degree: int = 1, modulu: int = 1):
         """Constructor for RealField class
 
         Args:
@@ -14,7 +17,8 @@ class RealField(Field):
         """
         super().__init__("R", 0, 1, degree, modulu)
 
-    def random(self, min: int = -10, max: int = 10) -> float:
+    @validate(None, __int_float, __int_float)
+    def random(self, min: Union[int, float] = -10, max: Union[int, float] = 10) -> float:
         """returns a random element of the field
 
         Args:
