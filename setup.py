@@ -20,7 +20,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     packages=find_packages(
-        exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+        exclude=["*.tests", "*.tests.*", "tests.*", "tests", "archive"]),
     install_requires=["danielutils"],
     keywords=['python', 'linear algebra', 'vector', 'matrix',
               'field', 'vector field', 'span', 'linear maps', 'bilinear form', 'inner product', 'linear transformation'],

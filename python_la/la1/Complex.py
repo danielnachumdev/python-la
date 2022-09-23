@@ -4,17 +4,13 @@ import math
 import random
 from ..utils import alloneof, almost_equal
 from danielutils import isoneof, validate, NotImplemented
+from .BaseClasses import Complex____
 
 
-class Complex__:
-    # only purpos is to easily allow type validation
-    pass
-
-
-class Complex(Complex__):
+class Complex(Complex____):
 
     __int_float = [[int, float], None, None]
-    __int_float_complex = [[int, float, Complex__], None, None]
+    __int_float_complex = [[int, float, Complex____], None, None]
 
     @staticmethod
     @validate(__int_float, __int_float)

@@ -3,17 +3,14 @@ from typing import Any, Callable
 from ...utils import are_operators_implemnted, almost_equal, areinstances
 from danielutils import validate, abstractmethod
 
-
-class Field__:
-    # only here for easy type checking
-    pass
+from ..BaseClasses import Field____
 
 
-class Field(Field__):
+class Field(Field____):
     """An interface class to create derived classes
     """
     @staticmethod
-    @validate(Field__, int)
+    @validate(Field____, int)
     def is_field(field: Field, iterations: int = 100) -> bool:
         """will check if all of the field axioms hold, returns a probablistic answer!
 
@@ -125,7 +122,7 @@ class Field(Field__):
         """
         return f"{self.name.value}{self.degree}%{self.modulu}"
 
-    @validate(None, Field__)
+    @validate(None, Field____)
     def __eq__(self, other: Field) -> bool:
         return self.name == other.name and self.modulu == other.modulu and self.degree == other.degree and self.zero == other.zero and self.one == other.one
 

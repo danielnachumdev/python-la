@@ -1,43 +1,17 @@
 from __future__ import annotations
 from typing import Callable, Any, Union
 from .Field import Field
-from ..utils import composite_function, isoneof, areinstances
+from ..utils import composite_function, areinstances
 from .Matrix import Matrix
 from .Vector import Vector
 from .Complex import Complex
 from .VectorSpace import VectorSpace
+from danielutils import validate, isoneof
+from .BaseClasses import LinearMap____
 
 
-class LinearMap:
-    # TODO rethink data structure
-    @staticmethod
-    def is_func_linear_map(func: Callable[[Any, Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
-        COUNT = 100
-        V = VectorSpace(src_field)
-        for _ in range(COUNT):
-            a, b = src_field.random(), src_field.random()
-            v1, v2 = V.random(), V.random()
-            try:
-                if not func(a*v1+b*v2, dst_field) == (a*func(v1, dst_field)+b*func(v2, dst_field)):
-                    pass
-            except Exception as e:
-                pass
-            if not func(a*v1+b*v2, dst_field) == (a*func(v1, dst_field)+b*func(v2, dst_field)):
-                return False
-        return True
-
-    @staticmethod
-    def from_matrix(m: Matrix) -> LinearMap:
-        return LinearMap(m.field, type(m.field)(m.field.name), lambda x: m*x)
-
-    @staticmethod
-    def from_fields(src_field, dst_field, func: Callable[[Any, Field], Any], validate: bool = False) -> LinearMap:
-        return LinearMap(VectorSpace(src_field), VectorSpace(dst_field), func, validate)
-
-    @staticmethod
-    def id(field: int) -> LinearMap:
-        return LinearMap(field, field, lambda x: x)
-
+class LinearMap__(LinearMap____):
+    @validate(None, VectorSpace, VectorSpace, Callable, bool)
     def __init__(self, src: VectorSpace, dst: VectorSpace, func: Callable[[Any], Any], validate: bool = False) -> None:
         """creates a new linear transformation
 
@@ -46,10 +20,6 @@ class LinearMap:
             dst_field (Field): The Field which is the output oif this transformation
             func (Callable[[Any], Any]): the transformation function
         """
-        if not areinstances([src, dst], VectorSpace):
-            raise ValueError("src and dst must be of type VectorSpace")
-        if not callable(func):
-            raise ValueError("func must be a callable")
         if validate:
             if not LinearMap.is_func_linear_map(func, src, dst):
                 raise ValueError("func is not a linear transformation")
@@ -57,57 +27,54 @@ class LinearMap:
         self.dst = dst
         self.func = func
 
+    @validate(None, LinearMap____)
     def __add__(self, other) -> LinearMap:
         # if isoneof(other, [int, float, complex]):
         # return LinearTransformation(self.src_field, self.dst_field, lambda x, y: self.func(x, y)+other*LinearTransformation())
-        if isinstance(other, LinearMap):
-            if self.src == other.src and self.dst == other.dst:
-                return LinearMap(self.src, self.dst, lambda x: self(x)+other(x))
-            raise ValueError(
-                "cant add linear transformations on diffrent fields")
-        raise NotImplementedError(
-            "addition with non-numeric type not implemented")
+        if self.src == other.src and self.dst == other.dst:
+            return LinearMap(self.src, self.dst, lambda x: self(x)+other(x))
+        raise ValueError(
+            "cant add linear transformations on diffrent fields")
 
+    @validate(None, LinearMap____)
     def __radd__(self, other) -> LinearMap:
         return self.__add__(other)
 
+    @validate(None, LinearMap____)
     def __sub__(self, other) -> LinearMap:
         return self.__add__(-other)
 
+    @validate(None, LinearMap____)
     def __rsub__(self, other) -> LinearMap:
         return other+(-self)
 
     def __neg__(self) -> LinearMap:
         return self.__mul__(-1)
 
+    @validate(None, [[int, float, Complex, LinearMap____], None, None])
     def __mul__(self, other) -> LinearMap:
         if isoneof(other, [int, float, Complex]):
             return LinearMap(self.src, self.dst, lambda x: self.func(x)*other)
         if isinstance(other, LinearMap):
             return self(other)
-        raise NotImplementedError(
-            f"LinearMap * {type(other)} not implemented")
 
     def __rmul__(self, other) -> LinearMap:
         return self.__mul__(other)
 
+    @validate(None, [[int, float], None, None])
     def __pow__(self, other) -> LinearMap:
-        if isoneof(other, [int, float]):
-            if not other == int(other) or other < 0:
-                raise ValueError(
-                    "only non negativ integer powers are implemented and you tried to raise the transformation to {}".format(other))
-            if other == 0:
-                return LinearMap(self.src, self.dst, lambda x: x)
-            if other == 1:
-                return self
-            other = int(other)
-            func = composite_function(self.func, self.func)
-            for _ in range(abs(other)-2):
-                func = composite_function(func, self.func)
-            return LinearMap(self.src, self.dst, lambda x: func(x))
-        else:
-            raise NotImplementedError(
-                "multiplication with non-numeric type not implemented")
+        if not other == int(other) or other < 0:
+            raise ValueError(
+                "only non negativ integer powers are implemented and you tried to raise the transformation to {}".format(other))
+        if other == 0:
+            return LinearMap(self.src, self.dst, lambda x: x)
+        if other == 1:
+            return self
+        other = int(other)
+        func = composite_function(self.func, self.func)
+        for _ in range(abs(other)-2):
+            func = composite_function(func, self.func)
+        return LinearMap(self.src, self.dst, lambda x: func(x))
 
     def __eq__(self, other: LinearMap) -> bool:
         if not isinstance(other, LinearMap):
@@ -116,14 +83,7 @@ class LinearMap:
             return False
         return self.to_matrix() == other.to_matrix()
 
-    def __truediv__(self, other: Any):
-        """
-        Raises:
-            NotImplementedError: can't divide linear transformations
-        """
-        raise NotImplementedError(
-            "LineraMap.__truediv__: cant devide Linear Maps")
-
+    @validate(None, [[Vector, Matrix, LinearMap____], None, None])
     def __call__(self, val: Union[Vector, Matrix, LinearMap]) -> Union[Vector, Matrix, LinearMap]:
         """ apply the transformation on an object
         Args:
@@ -157,6 +117,38 @@ class LinearMap:
             return self.func(val)
         except Exception as e:
             raise e
+
+
+class LinearMap(LinearMap__):
+    # TODO rethink data structure
+    @staticmethod
+    def is_func_linear_map(func: Callable[[Any, Field], Union[Vector, Matrix]], src_field: Field, dst_field: Field) -> bool:
+        COUNT = 100
+        V = VectorSpace(src_field)
+        for _ in range(COUNT):
+            a, b = src_field.random(), src_field.random()
+            v1, v2 = V.random(), V.random()
+            try:
+                if not func(a*v1+b*v2, dst_field) == (a*func(v1, dst_field)+b*func(v2, dst_field)):
+                    pass
+            except Exception as e:
+                pass
+            if not func(a*v1+b*v2, dst_field) == (a*func(v1, dst_field)+b*func(v2, dst_field)):
+                return False
+        return True
+
+    @staticmethod
+    @validate(Matrix)
+    def from_matrix(m: Matrix) -> LinearMap:
+        return LinearMap(m.field, type(m.field)(m.field.name), lambda x: m*x)
+
+    @staticmethod
+    def from_fields(src_field, dst_field, func: Callable[[Any, Field], Any], validate: bool = False) -> LinearMap:
+        return LinearMap(VectorSpace(src_field), VectorSpace(dst_field), func, validate)
+
+    @staticmethod
+    def id(field: int) -> LinearMap:
+        return LinearMap(field, field, lambda x: x)
 
     def to_matrix(self, basis: list[Vector] = None) -> Matrix:
         if basis is None:

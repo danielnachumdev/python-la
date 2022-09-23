@@ -2,9 +2,12 @@ from __future__ import annotations
 from typing import Any
 from ..Field import Field
 from ..Vector import Vector
+from ..BaseClasses import VectorSpace____
+from danielutils import validate
 
 
-class VectorSpace:
+class VectorSpace__(VectorSpace____):
+    @validate(None, Field)
     def __init__(self, field: Field) -> None:
         """creates a new vector space
 
@@ -21,7 +24,7 @@ class VectorSpace:
         """
         return f"V_{str(self.field)}"
 
-    def __eq__(self, other: VectorSpace) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """checks if this vector space is equal to another vector space
 
         Args:
@@ -34,10 +37,10 @@ class VectorSpace:
             bool: True if this vector space is equal to the other vector space
         """
         if not isinstance(other, VectorSpace):
-            raise TypeError("other must be an instance of class VectorSpace")
+            False
         return self.field == other.field
 
-    def __ne__(self, other: VectorSpace) -> bool:
+    def __ne__(self, other: Any) -> bool:
         """checks if this vector space is not equal to another vector space
 
         Args:
@@ -49,12 +52,9 @@ class VectorSpace:
         Returns:
             bool: True if this vector space is not equal to the other vector space
         """
-        try:
-            return not self.__eq__(other)
-        except TypeError as e:
-            raise e
+        return not self.__eq__(other)
 
-    def __contains__(self, value: Vector) -> bool:
+    def __contains__(self, value: Any) -> bool:
         """checks if a vector is in this vector space
 
         Args:
@@ -67,10 +67,13 @@ class VectorSpace:
             bool: True if the vector is in this vector space
         """
         if not isinstance(value, Vector):
-            raise TypeError("value must be an instance of class Vector")
+            False
         if value.field == self.field:
             return True
         return False
+
+
+class VectorSpace(VectorSpace__):
 
     def random(self, min: Any = -10, max: Any = 10) -> Vector:
         """returns a random vector in this vector space
@@ -84,6 +87,7 @@ class VectorSpace:
         """
         return Vector([self.field.random(min, max) for _ in range(self.field.degree)], self.field)
 
+    @validate(None, int)
     def e(self, i: int) -> Vector:
         """returns the i-th standard basis vector of this vector space
 
@@ -97,9 +101,7 @@ class VectorSpace:
         Returns:
             Vector: the i-th standard basis vector of this vector space
         """
-        if not isinstance(i, int):
-            raise TypeError("i must be an instance of int")
-        if not(0 < i <= self.field.degree):
+        if not (0 < i <= self.field.degree):
             raise ValueError("i must be between 1 and degree")
         arr = [0 if j != i-1 else 1 for j in range(self.field.degree)]
         return Vector(arr, self.field)

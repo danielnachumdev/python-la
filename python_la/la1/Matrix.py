@@ -1,14 +1,16 @@
 from __future__ import annotations
-from typing import Any, Union
+from typing import Any, Union, Sequence
 import enum
 import copy
 import functools
 from typing import Tuple
-from ..utils import almost_equal, areinstances, check_foreach, isoneof
+from ..utils import almost_equal, areinstances, check_foreach
 from .Complex import Complex
 from .Vector import Vector
 from .Field import Field, RealField
 from .Span import Span
+from danielutils import validate, isoneof, NotImplemented
+from .BaseClasses import Matrix____
 
 
 class MatrixOperationType(enum.Enum):
@@ -23,9 +25,298 @@ class MatrixOperationType(enum.Enum):
 MOT = MatrixOperationType
 
 
-class Matrix:
+class Matrix__:
+    @validate(None, Sequence, Field)
+    def __init__(self, mat: list[list[Any]], field: Field = RealField()) -> None:
+        """Create a Matrix
+
+        Args:
+            mat (list[list[Any]]): a list of lists of elements (2D array)
+            field (Field, optional): the field that the elements of the matrix is over. Defaults to RealField().
+
+        Raises:
+            TypeError: will rise if mat is not a list of lists
+        """
+        if not isinstance(mat, list) or not all([isinstance(v, list) for v in mat]):
+            raise TypeError("Matrix must be a 2d array")
+        self.__matrix = mat
+        self.__rows = len(mat)
+        self.__cols = len(mat[0])
+        self.field = field
+
+    @validate(None, int)
+    def __getitem__(self, index: int) -> list[Any]:
+        """wil return the row at the given index
+
+        Args:
+            index (int): the index of desire row
+
+        Raises:
+            TypeError: will rise if index is not an int
+            ValueError: will rise if index is out of range
+
+        Returns:
+            list[Any]: the row at the given index
+        """
+        if not (0 <= index < self.__rows):
+            raise ValueError("Index out of range")
+        return self.__matrix[index]
+
+    @validate(None, int, list)
+    def __setitem__(self, index: int, value: list[Any]) -> None:
+        if not 0 <= index < self.__rows:
+            raise ValueError("Index out of range")
+        # FIXME validate all items in list are of same type of this matrix
+        self.__matrix[index] = value
+
+    @validate(None, int)
+    def __str__(self, turnc: int = 2) -> str:
+        """will return a string representation of the matrix
+
+        Args:
+            turnc (int, optional): how many digist to turnicate. Defaults to 2.
+
+        Returns:
+            str: the srtring representation
+        """
+        def round_if_possible(v):
+            if hasattr(v, '__round__'):
+                if almost_equal(round(v), v):
+                    v = round(v)
+            return v
+
+        def turnacate(v):
+            v = str(v)
+            return v[:v.index(".")+1+turnc] if "." in v else v
+
+        def find_spaceing():
+            res = 0
+            for row in self:
+                for v in row:
+                    v = round_if_possible(v)
+                    v = turnacate(v)
+                    res = max(res, len(str(v)))
+            return res
+        spacing = find_spaceing()+2
+        n = len(self[0])
+        vl = "|"
+        hl = (1+spacing)*n*"-" + "-" + "\n"
+        result = hl
+        for i, row in enumerate(self.__matrix):
+            result += vl
+            for v in row:
+                v = round_if_possible(v)
+                v = turnacate(v)
+                result += str(v).center(spacing)+vl
+            result += "\n"+hl
+        return result
+
+    @validate(None, Matrix____)
+    def __add__(self, other: Matrix__) -> Matrix__:
+        """will add two matrices together and return the result
+
+        Args:
+            other (Matrix): the matrix to add to current one
+
+        Raises:
+            TypeError: will rise if other is not a matrix
+            ValueError: will rise if the matrices are not of the same size
+
+        Returns:
+            Matrix: the result matrix
+        """
+        if not isinstance(other, Matrix):
+            raise TypeError("Matrix can only be added to another Matrix")
+        if self.__rows != other.__rows or self.__cols != other.__cols:
+            raise ValueError("Matrices must have the same dimensions")
+        return Matrix([[self.__matrix[i][j] + other.__matrix[i][j] for j in range(self.__cols)]
+                       for i in range(self.__rows)])
+
+    def __neg__(self) -> Matrix__:
+        """will return the negative of the matrix
+
+        Returns:
+            Matrix: the negative matrix
+        """
+        return Matrix([[-self.__matrix[i][j] for j in range(self.__cols)]
+                       for i in range(self.__rows)])
+
+    @validate(None, Matrix____)
+    def __sub__(self, other: Matrix__) -> Matrix__:
+        """will subtract two matrices and return the result
+
+        Args:
+            other (Matrix): the matrix to subtract from current one
+
+        Raises:
+            TypeError: will rise if other is not a matrix
+            ValueError: will rise if the matrices are not of the same size
+
+        Returns:
+            Matrix: the result matrix
+        """
+        if not isinstance(other, Matrix):
+            raise TypeError(
+                "Matrix can only be subtracted from another Matrix")
+        if self.__rows != other.__rows or self.__cols != other.__cols:
+            raise ValueError("Matrices must have the same dimensions")
+        return Matrix([[self.__matrix[i][j] - other.__matrix[i][j] for j in range(self.__cols)]
+                       for i in range(self.__rows)])
+
+    def __mul__(self, other: Any) -> Union[Matrix__, Vector]:
+        """will multiply the matrix with the given value and return the result
+
+        Args:
+            other (Union[int, float, Complex, Vector, Matrix, Calculable]): the value to multiply with
+
+        Raises:
+            ValueError: will rise if the value is not one of the above types
+
+        Returns:
+            Any: [int, float, Complex, Vector, Matrix, Calculable]
+        """
+        from ..la2 import Calculable
+        if not isoneof(other, [int, float, complex, Vector, Matrix, Calculable]):
+            raise ValueError(
+                "Can only multiply with a int, float, complex, Vector, Matrix or Calculable")
+        if isoneof(other, [int, float, Complex, Calculable]):
+            res: list[list[Any]] = []
+            for i in range(len(self)):
+                res.append([])
+                for j in range(len(self[0])):
+                    res[i].append(self[i][j] * other)
+            return Matrix(res)
+        if isinstance(other, Vector):
+            if self.__cols != len(other):
+                raise ValueError(
+                    "Matrix and Vector must have the same number of rows")
+            return Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
+                           for i in range(self.__rows)])
+        if isinstance(other, Matrix):
+            if self.__cols != other.__rows:
+                raise ValueError(
+                    "Matrix and Matrix must have matching sizes: self.cols == other.rows")
+            return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
+                            for k in range(other.__cols)] for i in range(self.__rows)])
+
+    def __rmul__(self, other: Union[int, float, Complex, Vector, Matrix__]) -> Union[float, Complex, Vector, Matrix__]:
+        """will multiply the matrix with the given value and return the result
+
+        Args:
+            other (Union[int, float, Complex, Vector, Matrix, Calculable]): the value to multiply with
+
+        Raises:
+            ValueError: will rise if the value is not one of the above types
+
+        Returns:
+            Any: [int, float, Complex, Vector, Matrix, Calculable]
+        """
+        if isoneof(other, [int, float, Complex]):
+            return self.__mul__(other)
+        if isinstance(other, Vector):
+            raise TypeError(
+                "Matrix can only be multiplied by a vector from the right")
+        if isinstance(other, Matrix):
+            if self.__cols != other.__rows:
+                raise ValueError(
+                    "Matrix and Matrix must have the same number of columns")
+            return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
+                            for k in range(other.__cols)] for i in range(self.__rows)])
+        raise TypeError(
+            f"cant perform {type(other)}*Matrix.\ncan only be multiplied by a:\n\tint\n\tfloat\n\tComplex\n\tVector\n\tMatrix]")
+
+    @validate(None, Matrix____, bool)
+    def __eq__(self, other: Matrix__, use_almost_equale: bool = True) -> bool:
+        """will compare two matrices and return True if they are equal
+
+        Args:
+            other (Matrix): the other matrix to compare to
+            use_almost_equale (bool, optional): Specifies wheter to use almost_equal when comparing Matricies. Defaults to True.
+
+        Raises:
+            TypeError: will rise it the other object is not a Matrix
+            TypeError: wiil rise if use_almost_equale is not a bool
+
+        Returns:
+            bool: True if the objects are equal, False otherwise
+        """
+        if not isinstance(other, Matrix):
+            raise TypeError(f"cant complare 'Matrix' with '{type(other)}'")
+        if not isinstance(use_almost_equale, bool):
+            raise TypeError("use_almost_equale must be a boolean")
+        if self.__rows != other.__rows or self.__cols != other.__cols:
+            return False
+        if use_almost_equale:
+            for i in range(len(self)):
+                for j in range(len(self[i])):
+                    if not almost_equal(self[i][j], other[i][j]):
+                        return False
+        if any([self.__matrix[i][j] != other.__matrix[i][j] for i in range(self.__rows) for j in range(self.__cols)]):
+            return False
+        return True
+
+    @validate(None, Matrix____, bool)
+    def __ne__(self, other: Matrix__, use_almost_equale: bool = True) -> bool:
+        """will compare two matrices and return True if they are not equal
+
+        Args:
+            other (Matrix): the other matrix to compare to
+            use_almost_equale (bool, optional): Specifies wheter to use almost_equal when comparing Matricies. Defaults to True.
+
+        Raises:
+            TypeError: will rise if __eq__ would raise an error
+
+        Returns:
+            bool: True if the objects are not equal, False otherwise
+        """
+        try:
+            return not self.__eq__(other, use_almost_equale)
+        except TypeError as e:
+            raise e
+
+    def __len__(self) -> int:
+        """will return the number of rows in the matrix
+
+        Returns:
+            int: the number of rows in the matrix
+        """
+        return self.__rows
+
+    @validate(None, int)
+    def __pow__(self, value: int) -> Matrix__:
+        """will raise the matrix to the given power and return the result in a new matrix
+
+        Args:
+            value (int): the power to raise the matrix to
+
+        Raises:
+            TypeError: will rise if value is not an int
+            ValueError: will rise if value is less than 0
+
+        Returns:
+            Matrix: the result of the power
+        """
+        if isinstance(value, float):
+            if int(value) != value:
+                raise ValueError("value must be an integer")
+            value = int(value)
+        if not isinstance(value, int):
+            raise TypeError("value must be an int")
+        if not (0 <= value):
+            raise ValueError("value must be atleast than 0")
+        res = self
+        for _ in range(value-1):
+            res *= self
+        return res
+
+    def __iter__(self) -> list:
+        return iter(self.__matrix)
+
+
+class Matrix(Matrix__):
 
     @staticmethod
+    @validate(Vector)
     def fromVector(vec: Vector) -> Matrix:
         """Create a Matrix from a single Vector, the matrix will have 1 column and the same number of rows as the vector
 
@@ -43,7 +334,8 @@ class Matrix:
         return Matrix([[v] for v in vec], vec.field)
 
     @staticmethod
-    def from_vectors(vecs: list[Vector]) -> Matrix:
+    @validate([Sequence, lambda seq: areinstances(seq, Vector), "all elements must be instances of class 'Vector'"])
+    def from_vectors(vecs: Sequence[Vector]) -> Matrix:
         """Create a Matrix from a list of Vectors, the matrix will have the same number of columns as the number of vectors and the same number of rows as the number of elements in a vector
 
         Args:
@@ -56,8 +348,6 @@ class Matrix:
         Returns:
             Matrix: the result
         """
-        if not areinstances(vecs, Vector):
-            raise TypeError("all elements must be instances of class 'Vector'")
         if not check_foreach(vecs, lambda v: v.field == vecs[0].field):
             raise ValueError("vectors are not over the same field")
         mat: list[list[Any]] = []
@@ -67,20 +357,8 @@ class Matrix:
                 mat[i].append(vecs[j][i])
         return Matrix(mat, field=vecs[0].field)
 
-    # @staticmethod
-    # def fromString(matrix_string: str) -> Matrix:
-    #     """Create a Matrix from a string representation of a matrix
-
-    #     Args:
-    #         matrix_string (str): the sr
-
-    #     Returns:
-    #         Matrix: _description_
-    #     """
-    #     return Matrix([[int(num) for num in row.split()]
-    #                    for row in matrix_string.split("\n")])
-
     @staticmethod
+    @validate(int, int, Field, float, float)
     def random(rows: int, cols: int, f: Field = RealField(), min: float = -10, max: float = 10, ) -> Matrix:
         """Create a random Matrux acording to params
 
@@ -94,11 +372,11 @@ class Matrix:
         Returns:
             Matrix: the result
         """
-
         return Matrix([[f.random(min, max) for _ in range(cols)]for __ in range(rows)], field=f)
 
     @staticmethod
-    def from_jordan_blocks(blocks: list[Matrix]) -> Matrix:
+    @validate([Sequence, lambda seq: areinstances(seq, Matrix), None])
+    def from_jordan_blocks(blocks: Sequence[Matrix]) -> Matrix:
         """Create a Matrix from a list of Jordan blocks
 
         Args:
@@ -142,6 +420,7 @@ class Matrix:
         return res
 
     @staticmethod
+    @validate(int, None)
     def create_jordan_blcok(size: int, eigenvalue: Any) -> Matrix:
         """Create a Jordan block from a size and an eigenvalue
 
@@ -158,6 +437,7 @@ class Matrix:
         return Matrix.identity(size)*eigenvalue + m
 
     @staticmethod
+    @validate([int, lambda x: x > 0, "must be positive integer"])
     def identity(size: int) -> Matrix:
         """Create identity matrix if given size
 
@@ -171,23 +451,6 @@ class Matrix:
         for i in range(size):
             arr[i][i] = 1
         return Matrix(arr)
-
-    def __init__(self, mat: list[list[Any]], field: Field = RealField()) -> None:
-        """Create a Matrix
-
-        Args:
-            mat (list[list[Any]]): a list of lists of elements (2D array)
-            field (Field, optional): the field that the elements of the matrix is over. Defaults to RealField().
-
-        Raises:
-            TypeError: will rise if mat is not a list of lists
-        """
-        if not isinstance(mat, list) or not all([isinstance(v, list) for v in mat]):
-            raise TypeError("Matrix must be a 2d array")
-        self.__matrix = mat
-        self.__rows = len(mat)
-        self.__cols = len(mat[0])
-        self.field = field
 
     @property
     def kernel(self) -> Union[Vector, Span]:
@@ -212,6 +475,7 @@ class Matrix:
         return VectorSpace(self.field).standard_basis() - self.kernel
 
     @property
+    @NotImplemented
     def adjugate(self) -> Matrix:
         pass
         # TODO implement adjugate
@@ -455,272 +719,7 @@ class Matrix:
             res *= PolynomialSimple([1, -eigenvalue], [1, 0])**power
         return res
 
-    def __getitem__(self, index: int) -> list[Any]:
-        """wil return the row at the given index
-
-        Args:
-            index (int): the index of desire row
-
-        Raises:
-            TypeError: will rise if index is not an int
-            ValueError: will rise if index is out of range
-
-        Returns:
-            list[Any]: the row at the given index
-        """
-        if not isinstance(index, int):
-            raise TypeError("Index must be an integer")
-        if not (0 <= index < self.__rows):
-            raise ValueError("Index out of range")
-        return self.__matrix[index]
-
-    def __setitem__(self, index: int, value: list[Any]) -> None:
-        if not isinstance(index, int):
-            raise TypeError("Index must be an integer")
-        if not 0 <= index < self.__rows:
-            raise ValueError("Index out of range")
-        if not isinstance(value, list):
-            raise TypeError("Value must be a list")
-        # FIXME validate all items in list are of same type of this matrix
-        self.__matrix[index] = value
-
-    def __str__(self, turnc: int = 2) -> str:
-        """will return a string representation of the matrix
-
-        Args:
-            turnc (int, optional): how many digist to turnicate. Defaults to 2.
-
-        Returns:
-            str: the srtring representation
-        """
-        def round_if_possible(v):
-            if hasattr(v, '__round__'):
-                if almost_equal(round(v), v):
-                    v = round(v)
-            return v
-
-        def turnacate(v):
-            v = str(v)
-            return v[:v.index(".")+1+turnc] if "." in v else v
-
-        def find_spaceing():
-            res = 0
-            for row in self:
-                for v in row:
-                    v = round_if_possible(v)
-                    v = turnacate(v)
-                    res = max(res, len(str(v)))
-            return res
-        spacing = find_spaceing()+2
-        n = len(self[0])
-        vl = "|"
-        hl = (1+spacing)*n*"-" + "-" + "\n"
-        result = hl
-        for i, row in enumerate(self.__matrix):
-            result += vl
-            for v in row:
-                v = round_if_possible(v)
-                v = turnacate(v)
-                result += str(v).center(spacing)+vl
-            result += "\n"+hl
-        return result
-
-    def __add__(self, other: Matrix) -> Matrix:
-        """will add two matrices together and return the result
-
-        Args:
-            other (Matrix): the matrix to add to current one
-
-        Raises:
-            TypeError: will rise if other is not a matrix
-            ValueError: will rise if the matrices are not of the same size
-
-        Returns:
-            Matrix: the result matrix
-        """
-        if not isinstance(other, Matrix):
-            raise TypeError("Matrix can only be added to another Matrix")
-        if self.__rows != other.__rows or self.__cols != other.__cols:
-            raise ValueError("Matrices must have the same dimensions")
-        return Matrix([[self.__matrix[i][j] + other.__matrix[i][j] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
-
-    def __neg__(self) -> Matrix:
-        """will return the negative of the matrix
-
-        Returns:
-            Matrix: the negative matrix
-        """
-        return Matrix([[-self.__matrix[i][j] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
-
-    def __sub__(self, other: Matrix) -> Matrix:
-        """will subtract two matrices and return the result
-
-        Args:
-            other (Matrix): the matrix to subtract from current one
-
-        Raises:
-            TypeError: will rise if other is not a matrix
-            ValueError: will rise if the matrices are not of the same size
-
-        Returns:
-            Matrix: the result matrix
-        """
-        if not isinstance(other, Matrix):
-            raise TypeError(
-                "Matrix can only be subtracted from another Matrix")
-        if self.__rows != other.__rows or self.__cols != other.__cols:
-            raise ValueError("Matrices must have the same dimensions")
-        return Matrix([[self.__matrix[i][j] - other.__matrix[i][j] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
-
-    def __mul__(self, other: Any) -> Union[Matrix, Vector]:
-        """will multiply the matrix with the given value and return the result
-
-        Args:
-            other (Union[int, float, Complex, Vector, Matrix, Calculable]): the value to multiply with
-
-        Raises:
-            ValueError: will rise if the value is not one of the above types
-
-        Returns:
-            Any: [int, float, Complex, Vector, Matrix, Calculable]
-        """
-        from ..la2 import Calculable
-        if not isoneof(other, [int, float, complex, Vector, Matrix, Calculable]):
-            raise ValueError(
-                "Can only multiply with a int, float, complex, Vector, Matrix or Calculable")
-        if isoneof(other, [int, float, Complex, Calculable]):
-            res: list[list[Any]] = []
-            for i in range(len(self)):
-                res.append([])
-                for j in range(len(self[0])):
-                    res[i].append(self[i][j] * other)
-            return Matrix(res)
-        if isinstance(other, Vector):
-            if self.__cols != len(other):
-                raise ValueError(
-                    "Matrix and Vector must have the same number of rows")
-            return Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
-                           for i in range(self.__rows)])
-        if isinstance(other, Matrix):
-            if self.__cols != other.__rows:
-                raise ValueError(
-                    "Matrix and Matrix must have matching sizes: self.cols == other.rows")
-            return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
-                            for k in range(other.__cols)] for i in range(self.__rows)])
-
-    def __rmul__(self, other: Union[int, float, Complex, Vector, Matrix]) -> Union[float, Complex, Vector, Matrix]:
-        """will multiply the matrix with the given value and return the result
-
-        Args:
-            other (Union[int, float, Complex, Vector, Matrix, Calculable]): the value to multiply with
-
-        Raises:
-            ValueError: will rise if the value is not one of the above types
-
-        Returns:
-            Any: [int, float, Complex, Vector, Matrix, Calculable]
-        """
-        if isoneof(other, [int, float, Complex]):
-            return self.__mul__(other)
-        if isinstance(other, Vector):
-            raise TypeError(
-                "Matrix can only be multiplied by a vector from the right")
-        if isinstance(other, Matrix):
-            if self.__cols != other.__rows:
-                raise ValueError(
-                    "Matrix and Matrix must have the same number of columns")
-            return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
-                            for k in range(other.__cols)] for i in range(self.__rows)])
-        raise TypeError(
-            f"cant perform {type(other)}*Matrix.\ncan only be multiplied by a:\n\tint\n\tfloat\n\tComplex\n\tVector\n\tMatrix]")
-
-    def __eq__(self, other: Matrix, use_almost_equale: bool = True) -> bool:
-        """will compare two matrices and return True if they are equal
-
-        Args:
-            other (Matrix): the other matrix to compare to
-            use_almost_equale (bool, optional): Specifies wheter to use almost_equal when comparing Matricies. Defaults to True.
-
-        Raises:
-            TypeError: will rise it the other object is not a Matrix
-            TypeError: wiil rise if use_almost_equale is not a bool
-
-        Returns:
-            bool: True if the objects are equal, False otherwise
-        """
-        if not isinstance(other, Matrix):
-            raise TypeError(f"cant complare 'Matrix' with '{type(other)}'")
-        if not isinstance(use_almost_equale, bool):
-            raise TypeError("use_almost_equale must be a boolean")
-        if self.__rows != other.__rows or self.__cols != other.__cols:
-            return False
-        if use_almost_equale:
-            for i in range(len(self)):
-                for j in range(len(self[i])):
-                    if not almost_equal(self[i][j], other[i][j]):
-                        return False
-        if any([self.__matrix[i][j] != other.__matrix[i][j] for i in range(self.__rows) for j in range(self.__cols)]):
-            return False
-        return True
-
-    def __ne__(self, other: Matrix, use_almost_equale: bool = True) -> bool:
-        """will compare two matrices and return True if they are not equal
-
-        Args:
-            other (Matrix): the other matrix to compare to
-            use_almost_equale (bool, optional): Specifies wheter to use almost_equal when comparing Matricies. Defaults to True.
-
-        Raises:
-            TypeError: will rise if __eq__ would raise an error
-
-        Returns:
-            bool: True if the objects are not equal, False otherwise
-        """
-        try:
-            return not self.__eq__(other, use_almost_equale)
-        except TypeError as e:
-            raise e
-
-    def __len__(self) -> int:
-        """will return the number of rows in the matrix
-
-        Returns:
-            int: the number of rows in the matrix
-        """
-        return self.__rows
-
-    def __pow__(self, value: int) -> Matrix:
-        """will raise the matrix to the given power and return the result in a new matrix
-
-        Args:
-            value (int): the power to raise the matrix to
-
-        Raises:
-            TypeError: will rise if value is not an int
-            ValueError: will rise if value is less than 0
-
-        Returns:
-            Matrix: the result of the power
-        """
-        if isinstance(value, float):
-            if int(value) != value:
-                raise ValueError("value must be an integer")
-            value = int(value)
-        if not isinstance(value, int):
-            raise TypeError("value must be an int")
-        if not (0 <= value):
-            raise ValueError("value must be atleast than 0")
-        res = self
-        for _ in range(value-1):
-            res *= self
-        return res
-
-    def __iter__(self) -> list:
-        return iter(self.__matrix)
-
+    @validate(None, int, int)
     def cofactor(self, row_to_ignore: int, col_to_ignore: int) -> Matrix:
         """will return the cofactor of the matrix at the given position
 
@@ -734,7 +733,7 @@ class Matrix:
         Returns:
             Matrix: the cofactor of the matrix at the given position
         """
-        if not((0 <= row_to_ignore < self.__rows) and (0 <= col_to_ignore < self.__cols)):
+        if not ((0 <= row_to_ignore < self.__rows) and (0 <= col_to_ignore < self.__cols)):
             raise ValueError("Row or column index out of range")
         res: list[list[Any]] = []
         for i, row in enumerate(self.__matrix):
@@ -748,6 +747,7 @@ class Matrix:
                     1].append(self.__matrix[i][j])
         return Matrix(res)
 
+    @validate(None, int, int)
     def minor(self, row_to_ignore: int, col_to_ignore: int) -> Any:
         """will return the minor of the matrix at the given position (the determinant of the cofactor)
 
@@ -833,6 +833,7 @@ class Matrix:
 
         return operate_with
 
+    @validate(None, [[Vector, Matrix__], None, None])
     def concat(self, other: Union[Vector, Matrix]) -> Matrix:
         """will concatenate the matrix with the given matrix and return the result in a new matrix
 
@@ -846,8 +847,6 @@ class Matrix:
         Returns:
             Matrix: the result of the concatenation
         """
-        if not isoneof(other, [Vector, Matrix]):
-            raise TypeError("can only concat with a Vector or Matrix")
         if len(other) != len(self):
             raise ValueError(
                 "can only concat with a Matrix|Vector with the same number of rows")
@@ -858,6 +857,7 @@ class Matrix:
             res.append(self[i] + other[i])
         return Matrix(res)
 
+    @validate(int)
     def split(self, index: int) -> Tuple[Matrix, Matrix]:
         """will split the matrix into two matrices at the given index
 
@@ -871,8 +871,6 @@ class Matrix:
         Returns:
             Tuple[Matrix, Matrix]: the two matrices resulting from the split
         """
-        if not isinstance(index, int):
-            raise TypeError("can only split at an int")
         if not 0 <= index <= len(self[0]):
             raise ValueError("index out of range")
         if index == len(self[0]):
@@ -962,6 +960,7 @@ class Matrix:
             arr += [self[row][col] for row in range(len(self))]
         return Vector(arr)
 
+    @validate(None, Vector)
     def solve(self, vec: Vector) -> Union[None, Vector, Span]:
         """will solve the matrix with the given vector and return the solution
 
