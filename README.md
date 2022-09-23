@@ -1,4 +1,4 @@
-# python-la : Python linear algebra
+# python-la : Python linear algebra v=0.96.6
 ## introduction
 The aim of this project is to implement programatically all of the mathematical operations you can in linear algebra, and more so - to implement themt in such a way that it will be written programmatically as close to mathematically as possible
 
