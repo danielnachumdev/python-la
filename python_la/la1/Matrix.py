@@ -857,7 +857,7 @@ class Matrix(Matrix__):
             res.append(self[i] + other[i])
         return Matrix(res)
 
-    @validate(int)
+    @validate(None, int)
     def split(self, index: int) -> Tuple[Matrix, Matrix]:
         """will split the matrix into two matrices at the given index
 

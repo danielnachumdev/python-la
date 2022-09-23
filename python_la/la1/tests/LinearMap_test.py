@@ -24,6 +24,19 @@ def test_addition():
 
 
 def test_subtraction():
+    # FIXME
+
+    # -----------
+    # | 1  | -1 |
+    # -----------
+    # | -1 | 1  |
+    # -----------
+    #  -----------
+    # | 1  | -1 |
+    # -----------
+    # | 1  | -1 |
+    # -----------
+
     assert (LinearMap.from_fields(R2, R2, lambda v: v) -
             T).to_matrix() == Matrix([[1, -1], [1, -1]])
 

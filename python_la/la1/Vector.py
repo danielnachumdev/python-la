@@ -237,7 +237,7 @@ class Vector__(Vector____):
         """
         return iter(self.__values)
 
-    @validate(None, Vector____, bool, bool)
+    @validate(None, None, bool, bool)
     def __eq__(self, other: Vector, use_almost_equal: bool = True, check_field_equality: bool = True) -> bool:
         """Check if two vectors are equal
 
@@ -252,6 +252,8 @@ class Vector__(Vector____):
         Returns:
             bool: True if the vectors are equal, False otherwise
         """
+        if not isinstance(other, Vector):
+            return False
         if check_field_equality:
             if self.field != other.field:
                 return False
@@ -267,7 +269,6 @@ class Vector__(Vector____):
                 return False
         return True
 
-    @validate(None, Vector____, bool, bool)
     def __ne__(self, other: Vector, use_almost_equal: bool = True, check_field_equality: bool = True) -> bool:
         """Check if two vectors are not equal
 
