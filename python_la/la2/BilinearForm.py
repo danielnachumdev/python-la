@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Callable, Union
 from ..la1 import Complex, Vector, Field, Matrix, VectorSpace
+from danielutils import validate
 
 
 class BilinearForm:
@@ -16,25 +17,27 @@ class BilinearForm:
     # def createSquareBilinearForm() -> BilinearForm:
     #     pass
 
-    @staticmethod
-    def from_matrix(mat: Matrix) -> BilinearForm:
-        pass
+    # @staticmethod
+    # @validate(Matrix)
+    # def from_matrix(mat: Matrix) -> BilinearForm:
+    #     pass
 
+    @validate(None, Callable, VectorSpace)
     def __init__(self, func: Callable[[Vector, Vector], Union[int, float, Complex]], vector_space: VectorSpace) -> None:
         self.func = func
         self.vector_space = vector_space
 
-    @property
-    def kernel(self):
-        return self.to_matrix().kernel
+    # @property
+    # def kernel(self):
+    #     return self.to_matrix().kernel
 
-    @property
-    def is_symmetrical(self) -> bool:
-        pass
+    # @property
+    # def is_symmetrical(self) -> bool:
+    #     pass
 
-    @property
-    def is_square(self) -> Union[bool, None]:
-        return None
+    # @property
+    # def is_square(self) -> Union[bool, None]:
+    #     return None
 
     def __call__(self, v, u):
         return self.func(v, u)
@@ -47,6 +50,7 @@ class BilinearForm:
                 mat[i][j] = self.func(v, u)
         return Matrix(mat, field=self.vector_space.field)
 
+    @validate(None, Vector, Vector)
     def are_perpendicular(self, v1: Vector, v2: Vector) -> bool:
         """
         will return true if result of the bilinear form calculation is 0
@@ -54,13 +58,13 @@ class BilinearForm:
         return self.func(v1, v2) == 0
 
 
-class SquareBilinearForm(BilinearForm):
-    @property
-    def is_square(self) -> bool:
-        return True
+# class SquareBilinearForm(BilinearForm):
+#     @property
+#     def is_square(self) -> bool:
+#         return True
 
-    def __call__(self, v):
-        return self.func(v, v)
+#     def __call__(self, v):
+#         return self.func(v, v)
 
-    def to_matrix(self) -> Matrix:
-        pass
+#     def to_matrix(self) -> Matrix:
+#         pass

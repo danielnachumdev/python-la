@@ -24,3 +24,7 @@ class Field____:
 
 class VectorSpace____:
     pass
+
+
+class PolynomialSimple____:
+    pass

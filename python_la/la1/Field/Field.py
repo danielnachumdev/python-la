@@ -3,7 +3,7 @@ from typing import Any, Callable
 from ...utils import are_operators_implemnted, almost_equal, areinstances
 from danielutils import validate, abstractmethod
 
-from ..BaseClasses import Field____
+from ...BaseClasses import Field____
 
 
 class Field(Field____):
@@ -120,7 +120,7 @@ class Field(Field____):
         Returns:
             str: the string representation of the field
         """
-        return f"{self.name.value}{self.degree}%{self.modulu}"
+        return f"{self.name}{self.degree}%{self.modulu}"
 
     @validate(None, Field____)
     def __eq__(self, other: Field) -> bool:

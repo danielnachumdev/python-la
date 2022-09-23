@@ -5,7 +5,7 @@ from typing import Union, Any, Sequence
 from .Field import Field, RealField
 from .Complex import Complex
 from danielutils import validate, isoneof
-from .BaseClasses import Vector____
+from ..BaseClasses import Vector____
 
 
 class Vector__(Vector____):
@@ -307,7 +307,6 @@ class Vector__(Vector____):
 class Vector(Vector__):
 
     @staticmethod
-    @validate()
     def random(min: Any = -10, max: Any = 10, size: int = 10,  def_value: Any = None, f: Field = RealField()) -> Vector:
         """Generate a random vector with random values in the given range.
 

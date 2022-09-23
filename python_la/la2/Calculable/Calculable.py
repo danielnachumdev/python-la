@@ -1,10 +1,12 @@
 from __future__ import annotations
+from danielutils import validate, abstractmethod
 
 
 class Calculable:
     @staticmethod
+    @abstractmethod
     def from_string(s: str) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
     def __init__(self):
         try:
@@ -25,45 +27,61 @@ class Calculable:
             raise NotImplementedError(
                 "abstract class - operators are not implemented")
 
+    @abstractmethod
     def __add__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __radd__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __mul__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __rmul__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __neg__(self) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __sub__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __rsub__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __truediv__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __rtruediv__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __pow__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __eq__(self, other) -> Calculable:
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __ne__(self, other) -> Calculable:
-        raise NotImplementedError(
-            f"A function from {type(self)} resolved to Base Class function which is not implemented as it is a virtual method")
+        pass
 
+    @abstractmethod
     def __call__(self, value):
-        raise NotImplementedError("This is a virtual method")
+        pass
 
+    @abstractmethod
     def __str__(self) -> str:
-        raise NotImplementedError("This is a virtual method")
+        pass
+
+    def __repr__(self) -> str:
+        return str(self)

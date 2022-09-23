@@ -7,7 +7,7 @@ from .Vector import Vector
 from .Complex import Complex
 from .VectorSpace import VectorSpace
 from danielutils import validate, isoneof
-from .BaseClasses import LinearMap____
+from ..BaseClasses import LinearMap____
 
 
 class LinearMap__(LinearMap____):
@@ -111,7 +111,7 @@ class LinearMap__(LinearMap____):
             if val not in self.src:
                 raise ValueError("value is not in the source field")
         else:
-            if not Vector(val[i][0] for i in range(val.__rows)).field == self.src:
+            if not Vector(val[i][0] for i in range(val._rows)).field == self.src:
                 raise ValueError("value is not in the source field")
         try:
             return self.func(val)

@@ -6,7 +6,7 @@ from .Field import Field
 from .VectorSpace import VectorSpace
 from ..utils import are_operators_implemnted, concat_horizontally, alloneof
 from danielutils import validate, isoneof, areoneof
-from .BaseClasses import Span____
+from ..BaseClasses import Span____
 
 
 class Span__(Span____):

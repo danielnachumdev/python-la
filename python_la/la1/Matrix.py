@@ -10,7 +10,7 @@ from .Vector import Vector
 from .Field import Field, RealField
 from .Span import Span
 from danielutils import validate, isoneof, NotImplemented
-from .BaseClasses import Matrix____
+from ..BaseClasses import Matrix____
 
 
 class MatrixOperationType(enum.Enum):
@@ -25,7 +25,7 @@ class MatrixOperationType(enum.Enum):
 MOT = MatrixOperationType
 
 
-class Matrix__:
+class Matrix__(Matrix____):
     @validate(None, Sequence, Field)
     def __init__(self, mat: list[list[Any]], field: Field = RealField()) -> None:
         """Create a Matrix
@@ -39,9 +39,9 @@ class Matrix__:
         """
         if not isinstance(mat, list) or not all([isinstance(v, list) for v in mat]):
             raise TypeError("Matrix must be a 2d array")
-        self.__matrix = mat
-        self.__rows = len(mat)
-        self.__cols = len(mat[0])
+        self._matrix = mat
+        self._rows = len(mat)
+        self._cols = len(mat[0])
         self.field = field
 
     @validate(None, int)
@@ -58,16 +58,16 @@ class Matrix__:
         Returns:
             list[Any]: the row at the given index
         """
-        if not (0 <= index < self.__rows):
+        if not (0 <= index < self._rows):
             raise ValueError("Index out of range")
-        return self.__matrix[index]
+        return self._matrix[index]
 
     @validate(None, int, list)
     def __setitem__(self, index: int, value: list[Any]) -> None:
-        if not 0 <= index < self.__rows:
+        if not 0 <= index < self._rows:
             raise ValueError("Index out of range")
         # FIXME validate all items in list are of same type of this matrix
-        self.__matrix[index] = value
+        self._matrix[index] = value
 
     @validate(None, int)
     def __str__(self, turnc: int = 2) -> str:
@@ -102,7 +102,7 @@ class Matrix__:
         vl = "|"
         hl = (1+spacing)*n*"-" + "-" + "\n"
         result = hl
-        for i, row in enumerate(self.__matrix):
+        for i, row in enumerate(self._matrix):
             result += vl
             for v in row:
                 v = round_if_possible(v)
@@ -127,10 +127,10 @@ class Matrix__:
         """
         if not isinstance(other, Matrix):
             raise TypeError("Matrix can only be added to another Matrix")
-        if self.__rows != other.__rows or self.__cols != other.__cols:
+        if self._rows != other._rows or self._cols != other._cols:
             raise ValueError("Matrices must have the same dimensions")
-        return Matrix([[self.__matrix[i][j] + other.__matrix[i][j] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
+        return Matrix([[self._matrix[i][j] + other._matrix[i][j] for j in range(self._cols)]
+                       for i in range(self._rows)])
 
     def __neg__(self) -> Matrix__:
         """will return the negative of the matrix
@@ -138,8 +138,8 @@ class Matrix__:
         Returns:
             Matrix: the negative matrix
         """
-        return Matrix([[-self.__matrix[i][j] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
+        return Matrix([[-self._matrix[i][j] for j in range(self._cols)]
+                       for i in range(self._rows)])
 
     @validate(None, Matrix____)
     def __sub__(self, other: Matrix__) -> Matrix__:
@@ -158,10 +158,10 @@ class Matrix__:
         if not isinstance(other, Matrix):
             raise TypeError(
                 "Matrix can only be subtracted from another Matrix")
-        if self.__rows != other.__rows or self.__cols != other.__cols:
+        if self._rows != other._rows or self._cols != other._cols:
             raise ValueError("Matrices must have the same dimensions")
-        return Matrix([[self.__matrix[i][j] - other.__matrix[i][j] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
+        return Matrix([[self._matrix[i][j] - other._matrix[i][j] for j in range(self._cols)]
+                       for i in range(self._rows)])
 
     def __mul__(self, other: Any) -> Union[Matrix__, Vector]:
         """will multiply the matrix with the given value and return the result
@@ -187,17 +187,17 @@ class Matrix__:
                     res[i].append(self[i][j] * other)
             return Matrix(res)
         if isinstance(other, Vector):
-            if self.__cols != len(other):
+            if self._cols != len(other):
                 raise ValueError(
                     "Matrix and Vector must have the same number of rows")
-            return Vector([sum([self.__matrix[i][j] * other[j] for j in range(self.__cols)])
-                           for i in range(self.__rows)])
+            return Vector([sum([self._matrix[i][j] * other[j] for j in range(self._cols)])
+                           for i in range(self._rows)])
         if isinstance(other, Matrix):
-            if self.__cols != other.__rows:
+            if self._cols != other._rows:
                 raise ValueError(
                     "Matrix and Matrix must have matching sizes: self.cols == other.rows")
-            return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
-                            for k in range(other.__cols)] for i in range(self.__rows)])
+            return Matrix([[sum([self._matrix[i][j] * other._matrix[j][k] for j in range(self._cols)])
+                            for k in range(other._cols)] for i in range(self._rows)])
 
     def __rmul__(self, other: Union[int, float, Complex, Vector, Matrix__]) -> Union[float, Complex, Vector, Matrix__]:
         """will multiply the matrix with the given value and return the result
@@ -217,11 +217,11 @@ class Matrix__:
             raise TypeError(
                 "Matrix can only be multiplied by a vector from the right")
         if isinstance(other, Matrix):
-            if self.__cols != other.__rows:
+            if self._cols != other._rows:
                 raise ValueError(
                     "Matrix and Matrix must have the same number of columns")
-            return Matrix([[sum([self.__matrix[i][j] * other.__matrix[j][k] for j in range(self.__cols)])
-                            for k in range(other.__cols)] for i in range(self.__rows)])
+            return Matrix([[sum([self._matrix[i][j] * other._matrix[j][k] for j in range(self._cols)])
+                            for k in range(other._cols)] for i in range(self._rows)])
         raise TypeError(
             f"cant perform {type(other)}*Matrix.\ncan only be multiplied by a:\n\tint\n\tfloat\n\tComplex\n\tVector\n\tMatrix]")
 
@@ -244,14 +244,14 @@ class Matrix__:
             raise TypeError(f"cant complare 'Matrix' with '{type(other)}'")
         if not isinstance(use_almost_equale, bool):
             raise TypeError("use_almost_equale must be a boolean")
-        if self.__rows != other.__rows or self.__cols != other.__cols:
+        if self._rows != other._rows or self._cols != other._cols:
             return False
         if use_almost_equale:
             for i in range(len(self)):
                 for j in range(len(self[i])):
                     if not almost_equal(self[i][j], other[i][j]):
                         return False
-        if any([self.__matrix[i][j] != other.__matrix[i][j] for i in range(self.__rows) for j in range(self.__cols)]):
+        if any([self._matrix[i][j] != other._matrix[i][j] for i in range(self._rows) for j in range(self._cols)]):
             return False
         return True
 
@@ -280,7 +280,7 @@ class Matrix__:
         Returns:
             int: the number of rows in the matrix
         """
-        return self.__rows
+        return self._rows
 
     @validate(None, int)
     def __pow__(self, value: int) -> Matrix__:
@@ -310,7 +310,7 @@ class Matrix__:
         return res
 
     def __iter__(self) -> list:
-        return iter(self.__matrix)
+        return iter(self._matrix)
 
 
 class Matrix(Matrix__):
@@ -525,13 +525,13 @@ class Matrix(Matrix__):
         Returns:
             Any: the result
         """
-        if self.__rows != self.__cols:
+        if self._rows != self._cols:
             raise ValueError("Matrix must be square")
-        if self.__rows == 1:
-            return self.__matrix[0][0]
-        if self.__rows == 2:
-            return self.__matrix[0][0] * self.__matrix[1][1] - self.__matrix[0][1] * self.__matrix[1][0]
-        return sum([self.__matrix[i][0] * ((-1)**i) * self.minor(i, 0) for i in range(self.__rows)])
+        if self._rows == 1:
+            return self._matrix[0][0]
+        if self._rows == 2:
+            return self._matrix[0][0] * self._matrix[1][1] - self._matrix[0][1] * self._matrix[1][0]
+        return sum([self._matrix[i][0] * ((-1)**i) * self.minor(i, 0) for i in range(self._rows)])
 
     @property
     def is_invertiable(self) -> bool:
@@ -557,7 +557,7 @@ class Matrix(Matrix__):
         Returns:
             bool: True if the matrix is square, False otherwise
         """
-        return self.__rows == self.__cols
+        return self._rows == self._cols
 
     @property
     def is_symmetrical(self) -> bool:
@@ -733,18 +733,18 @@ class Matrix(Matrix__):
         Returns:
             Matrix: the cofactor of the matrix at the given position
         """
-        if not ((0 <= row_to_ignore < self.__rows) and (0 <= col_to_ignore < self.__cols)):
+        if not ((0 <= row_to_ignore < self._rows) and (0 <= col_to_ignore < self._cols)):
             raise ValueError("Row or column index out of range")
         res: list[list[Any]] = []
-        for i, row in enumerate(self.__matrix):
+        for i, row in enumerate(self._matrix):
             if i == row_to_ignore:
                 continue
             res.append([])
-            for j, col in enumerate(self.__matrix[i]):
+            for j, col in enumerate(self._matrix[i]):
                 if j == col_to_ignore:
                     continue
                 res[i if i < row_to_ignore else i -
-                    1].append(self.__matrix[i][j])
+                    1].append(self._matrix[i][j])
         return Matrix(res)
 
     @validate(None, int, int)
@@ -769,8 +769,8 @@ class Matrix(Matrix__):
         Returns:
             Matrix: the transpose of the matrix
         """
-        return Matrix([[self.__matrix[j][i] for j in range(self.__cols)]
-                       for i in range(self.__rows)])
+        return Matrix([[self._matrix[j][i] for j in range(self._cols)]
+                       for i in range(self._rows)])
 
     def conjugate(self) -> Matrix:
         """will return the conjugate of the matrix
@@ -808,8 +808,8 @@ class Matrix(Matrix__):
                 return 0
             return -1 if a_index > b_index else 1
 
-        self.__matrix = sorted(
-            self.__matrix, key=functools.cmp_to_key(comparer), reverse=True)
+        self._matrix = sorted(
+            self._matrix, key=functools.cmp_to_key(comparer), reverse=True)
 
     def apply_operation(self, operation: MatrixOperationType, iv1, iv2, operate_with=None) -> Matrix:
         if not isinstance(operation, MatrixOperationType):

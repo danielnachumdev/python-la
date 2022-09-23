@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any
 from ..Field import Field
 from ..Vector import Vector
-from ..BaseClasses import VectorSpace____
+from ...BaseClasses import VectorSpace____
 from danielutils import validate
 
 

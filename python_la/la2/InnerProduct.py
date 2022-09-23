@@ -1,11 +1,13 @@
 import random
 from typing import Callable, Union
 from ..la1 import Complex, Vector
+from danielutils import validate
 
 
 class InnerProduct:
 
     @staticmethod
+    @validate(Callable, Callable)
     def is_inner_product(func: Callable[[Vector, Vector], float], generator_func: Callable[[bool], Vector]) -> bool:
         MIN_VAL = -100
         MAX_VAL = 100
@@ -48,6 +50,7 @@ class InnerProduct:
 
         return all[check_linearity(func, generator_func), check_symmetry(func, generator_func), check_norm(func, generator_func)]
 
+    @validate(None, Callable)
     def __init__(self, func: Callable[[Vector, Vector], float]) -> None:
         if func is None:
             raise ValueError("func is None")
@@ -56,15 +59,6 @@ class InnerProduct:
     def __call__(self, v1, v2) -> Union[float, Complex]:
         return self._func(v1, v2)
 
-
-# def __StandardInnerProduct(a: Vector, b: Vector) -> float:
-#     if not isinstance(a, Vector):
-#         raise TypeError("a must be a Vector")
-#     if not isinstance(b, Vector):
-#         raise TypeError("b must be a Vector")
-#     if a.length != b.length:
-#         raise ValueError("Vectors must have the same length")
-#     return sum([a[i] * b[i] for i in range(a.length)])
 
 StandardInnerProduct = InnerProduct(
     lambda a, b: sum([a[i] * b[i] for i in range(len(a))]))

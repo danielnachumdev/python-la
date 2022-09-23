@@ -4,7 +4,7 @@ import math
 import random
 from ..utils import alloneof, almost_equal
 from danielutils import isoneof, validate, NotImplemented
-from .BaseClasses import Complex____
+from ..BaseClasses import Complex____
 
 
 class Complex(Complex____):
