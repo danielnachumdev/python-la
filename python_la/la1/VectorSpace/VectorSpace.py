@@ -114,3 +114,8 @@ class VectorSpace(VectorSpace__):
         """
         n = self.field.degree
         return [self.e(i+1) for i in range(n)]
+
+
+__all__ = [
+    "VectorSpace"
+]

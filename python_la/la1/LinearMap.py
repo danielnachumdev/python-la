@@ -140,7 +140,7 @@ class LinearMap(LinearMap__):
     @staticmethod
     @validate(Matrix)
     def from_matrix(m: Matrix) -> LinearMap:
-        return LinearMap(m.field, type(m.field)(m.field.name), lambda x: m*x)
+        return LinearMap.from_fields(type(m.field)(len(m)), type(m.field)(len(m[0])), lambda x: m*x)
 
     @staticmethod
     def from_fields(src_field, dst_field, func: Callable[[Any, Field], Any], validate: bool = False) -> LinearMap:
@@ -161,3 +161,9 @@ class LinearMap(LinearMap__):
 
 class LinearTransformation(LinearMap):
     pass
+
+
+__all__ = [
+    "LinearMap",
+    "LinearTransformation"
+]

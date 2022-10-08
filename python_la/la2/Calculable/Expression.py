@@ -8,3 +8,8 @@ class Expression:
         pass
 
     def __init__(self, string): pass
+
+
+__all__ = [
+    "Expression"
+]

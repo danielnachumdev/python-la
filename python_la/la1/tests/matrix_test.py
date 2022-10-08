@@ -1,5 +1,4 @@
 from ...la1 import Matrix, RealField, VectorSpace, Vector
-
 COUNT = 100
 N = 50
 V = VectorSpace(RealField(N))
@@ -18,19 +17,6 @@ m2 = Matrix([
 ])
 
 
-def test_from_vector():
-    for _ in range(COUNT):
-        v = V.random()
-        m = Matrix.fromVector(v)
-        for i in range(len(v)):
-            assert v[i] == m[i][0]
-
-
-def test_rank():
-    assert Matrix.identity(10).rank == 10
-    assert Matrix([[1, 1], [0, 0]]).rank == 1 == Matrix([[1, 0], [1, 0]]).rank
-
-
 def test_from_vectors():
     for _ in range(int(COUNT/10)+1):
         vecs = [V.random() for _ in range(10)]
@@ -38,14 +24,6 @@ def test_from_vectors():
         for i in range(len(vecs[0])):
             for j in range(len(vecs)):
                 assert vecs[j][i] == m[i][j]
-
-
-def test_determinant():
-    assert Matrix([[1, 1], [1, 1]]).determinant == 0
-
-
-def test_id():
-    assert Matrix.identity(2) == Matrix([[1, 0], [0, 1]])
 
 
 def test_guassian_elimination():

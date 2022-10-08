@@ -29,3 +29,8 @@ class InnerProductSpace(VectorSpace):
         if not check_foreach([v, u], lambda x: x in self):
             raise ValueError("v and u must be in the VectorSpace")
         return self(v, u) == 0
+
+
+__all__ = [
+    "InnerProductSpace"
+]

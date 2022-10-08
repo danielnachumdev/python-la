@@ -1058,3 +1058,9 @@ class Matrix(Matrix__):
         if isinstance(res, Vector):
             res = Span([res])
         return res.dim
+
+
+__all__ = [
+    "Matrix",
+    "MatrixOperationType"
+]

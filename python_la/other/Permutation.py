@@ -13,3 +13,8 @@ class Permutation:
 
     def __call__(self, value) -> list:
         return [value[i] for i in self.permutation]
+
+
+__all__ = [
+    "Permutation"
+]

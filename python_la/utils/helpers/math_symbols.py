@@ -34,8 +34,8 @@ python_la_superscript_digits = [python_la_superscript_0, python_la_superscript_1
                                 python_la_superscript_4, python_la_superscript_5, python_la_superscript_6, python_la_superscript_7, python_la_superscript_8, python_la_superscript_9]
 
 
-def python_la_superscript_n(n) -> str: return "".join(
-    [python_la_superscript_digits[int(i)] for i in str(n)])
+def python_la_superscript_n(n) -> str:
+    return "".join([python_la_superscript_digits[int(i)] for i in str(n)])
 
 
 subscript_0 = "\u2080"

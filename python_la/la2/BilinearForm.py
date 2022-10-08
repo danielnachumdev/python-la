@@ -58,6 +58,11 @@ class BilinearForm:
         return self.func(v1, v2) == 0
 
 
+__all__ = [
+    "BilinearForm"
+]
+
+
 # class SquareBilinearForm(BilinearForm):
 #     @property
 #     def is_square(self) -> bool:

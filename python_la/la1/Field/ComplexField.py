@@ -40,3 +40,8 @@ class ComplexField(Field):
         if isinstance(value, [int, float, Complex]):
             return True
         return False
+
+
+__all__ = [
+    "ComplexField"
+]

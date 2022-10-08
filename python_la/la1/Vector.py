@@ -458,3 +458,8 @@ class Vector(Vector__):
             Vector: a duplicate of the vector
         """
         return Vector([v for v in self], self.field)
+
+
+__all__ = [
+    "Vector"
+]

@@ -59,3 +59,8 @@ class RationalField(Field):
         if isinstance(value, [int, float]):
             return True
         return False
+
+
+__all__ = [
+    "RationalField"
+]

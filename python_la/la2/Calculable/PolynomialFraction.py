@@ -135,3 +135,8 @@ class PolynomialFraction(PolynomialFraction__):
     @NotImplemented
     def simplify() -> PolynomialFraction:
         pass
+
+
+__all__ = [
+    "PolynomialFraction"
+]

@@ -363,3 +363,8 @@ class Span(Span__):
         for v in self:
             res += random.uniform(min, max) * v
         return res
+
+
+__all__ = [
+    "Span"
+]

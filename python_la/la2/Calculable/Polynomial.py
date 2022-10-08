@@ -5,3 +5,8 @@ from .Calculable import Calculable
 class Polynomial(Calculable):
     def __init__(self, polys) -> None:
         pass
+
+
+__all__ = [
+    "Polynomial"
+]

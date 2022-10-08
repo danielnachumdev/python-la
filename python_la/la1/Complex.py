@@ -166,9 +166,14 @@ class Complex(Complex____):
 
     @ property
     def norm(self):
-        return (self * self.conjugate).real
+        return math.sqrt((self * self.conjugate).real)
 
     @ staticmethod
     @validate(__int_float, __int_float, Callable)
     def random(min_val: float = -10, max_val: float = 10, value_func=random.randint) -> Complex:
         return Complex(value_func(min_val, max_val), value_func(min_val, max_val))
+
+
+__all__ = [
+    "Complex"
+]

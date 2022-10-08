@@ -410,3 +410,8 @@ class PolynomialSimple(PolynomialSimple__):
             else:
                 res *= PolynomialSimple.from_string(f"x-{root}")
         return res
+
+
+__all__ = [
+    "PolynomialSimple"
+]
