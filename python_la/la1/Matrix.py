@@ -531,7 +531,7 @@ class Matrix(Matrix__):
             return self._matrix[0][0]
         if self._rows == 2:
             return self._matrix[0][0] * self._matrix[1][1] - self._matrix[0][1] * self._matrix[1][0]
-        return sum([self._matrix[i][0] * ((-1)**i) * self.minor(i, 0) for i in range(self._rows)])
+        return sum([self._matrix[i][0] * ((-1)**i) * self.minor(i, 0) for i in range(self._rows) if self._matrix[i][0] != 0])
 
     @property
     def is_invertiable(self) -> bool:
