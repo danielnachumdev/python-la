@@ -12,12 +12,10 @@ description = "Python linear algebra library"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"
-# Exact pin: 0.7.0 is the last line verified green with this suite that still
-# exports multi-arg `@validate`, `NotImplemented`, `abstractmethod`, and
-# `TestFactory` / `Test`. 0.7.7+ diverges (suite regressions); 0.7.8+ hard-
-# requires Windows/`screeninfo` at import; 0.8+ renamed validate.
+# Current danielutils: annotation `@validate`, abc-style abstracts in-tree,
+# and isoneof/areoneof. Legacy multi-arg validate / TestFactory were removed upstream.
 dependencies = [
-    "danielutils==0.7.0",
+    "danielutils>=1.2.1",
 ]
 keywords = [
     "python",

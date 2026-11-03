@@ -9,7 +9,7 @@ from .Complex import Complex
 from .Vector import Vector
 from .Field import Field, RealField
 from .Span import Span
-from danielutils import validate, isoneof, NotImplemented
+from danielutils import isoneof
 from ..BaseClasses import Matrix____
 
 
@@ -26,7 +26,6 @@ MOT = MatrixOperationType
 
 
 class Matrix__(Matrix____):
-    @validate(None, Sequence, Field)
     def __init__(self, mat: list[list[Any]], field: Field = RealField()) -> None:
         """Create a Matrix
 
@@ -44,7 +43,6 @@ class Matrix__(Matrix____):
         self._cols = len(mat[0])
         self.field = field
 
-    @validate(None, int)
     def __getitem__(self, index: int) -> list[Any]:
         """wil return the row at the given index
 
@@ -62,14 +60,12 @@ class Matrix__(Matrix____):
             raise ValueError("Index out of range")
         return self._matrix[index]
 
-    @validate(None, int, list)
     def __setitem__(self, index: int, value: list[Any]) -> None:
         if not 0 <= index < self._rows:
             raise ValueError("Index out of range")
         # FIXME validate all items in list are of same type of this matrix
         self._matrix[index] = value
 
-    @validate(None, int)
     def __str__(self, turnc: int = 2) -> str:
         """will return a string representation of the matrix
 
@@ -111,7 +107,6 @@ class Matrix__(Matrix____):
             result += "\n"+hl
         return result
 
-    @validate(None, Matrix____)
     def __add__(self, other: Matrix__) -> Matrix__:
         """will add two matrices together and return the result
 
@@ -141,7 +136,6 @@ class Matrix__(Matrix____):
         return Matrix([[-self._matrix[i][j] for j in range(self._cols)]
                        for i in range(self._rows)])
 
-    @validate(None, Matrix____)
     def __sub__(self, other: Matrix__) -> Matrix__:
         """will subtract two matrices and return the result
 
@@ -225,7 +219,6 @@ class Matrix__(Matrix____):
         raise TypeError(
             f"cant perform {type(other)}*Matrix.\ncan only be multiplied by a:\n\tint\n\tfloat\n\tComplex\n\tVector\n\tMatrix]")
 
-    @validate(None, Matrix____, bool)
     def __eq__(self, other: Matrix__, use_almost_equale: bool = True) -> bool:
         """will compare two matrices and return True if they are equal
 
@@ -255,7 +248,6 @@ class Matrix__(Matrix____):
             return False
         return True
 
-    @validate(None, Matrix____, bool)
     def __ne__(self, other: Matrix__, use_almost_equale: bool = True) -> bool:
         """will compare two matrices and return True if they are not equal
 
@@ -282,7 +274,6 @@ class Matrix__(Matrix____):
         """
         return self._rows
 
-    @validate(None, int)
     def __pow__(self, value: int) -> Matrix__:
         """will raise the matrix to the given power and return the result in a new matrix
 
@@ -316,7 +307,6 @@ class Matrix__(Matrix____):
 class Matrix(Matrix__):
 
     @staticmethod
-    @validate(Vector)
     def fromVector(vec: Vector) -> Matrix:
         """Create a Matrix from a single Vector, the matrix will have 1 column and the same number of rows as the vector
 
@@ -334,7 +324,6 @@ class Matrix(Matrix__):
         return Matrix([[v] for v in vec], vec.field)
 
     @staticmethod
-    @validate([Sequence, lambda seq: areinstances(seq, Vector), "all elements must be instances of class 'Vector'"])
     def from_vectors(vecs: Sequence[Vector]) -> Matrix:
         """Create a Matrix from a list of Vectors, the matrix will have the same number of columns as the number of vectors and the same number of rows as the number of elements in a vector
 
@@ -358,7 +347,6 @@ class Matrix(Matrix__):
         return Matrix(mat, field=vecs[0].field)
 
     @staticmethod
-    @validate(int, int, Field, float, float)
     def random(rows: int, cols: int, f: Field = RealField(), min: float = -10, max: float = 10, ) -> Matrix:
         """Create a random Matrux acording to params
 
@@ -375,7 +363,6 @@ class Matrix(Matrix__):
         return Matrix([[f.random(min, max) for _ in range(cols)]for __ in range(rows)], field=f)
 
     @staticmethod
-    @validate([Sequence, lambda seq: areinstances(seq, Matrix), None])
     def from_jordan_blocks(blocks: Sequence[Matrix]) -> Matrix:
         """Create a Matrix from a list of Jordan blocks
 
@@ -420,7 +407,6 @@ class Matrix(Matrix__):
         return res
 
     @staticmethod
-    @validate(int, None)
     def create_jordan_blcok(size: int, eigenvalue: Any) -> Matrix:
         """Create a Jordan block from a size and an eigenvalue
 
@@ -437,7 +423,6 @@ class Matrix(Matrix__):
         return Matrix.identity(size)*eigenvalue + m
 
     @staticmethod
-    @validate([int, lambda x: x > 0, "must be positive integer"])
     def identity(size: int) -> Matrix:
         """Create identity matrix if given size
 
@@ -475,11 +460,8 @@ class Matrix(Matrix__):
         return VectorSpace(self.field).standard_basis() - self.kernel
 
     @property
-    @NotImplemented
     def adjugate(self) -> Matrix:
-        pass
-        # TODO implement adjugate
-
+        raise NotImplementedError
     @property
     def row_space(self) -> list[Vector]:
         return [Vector(r) for r in self]
@@ -719,7 +701,6 @@ class Matrix(Matrix__):
             res *= PolynomialSimple([1, -eigenvalue], [1, 0])**power
         return res
 
-    @validate(None, int, int)
     def cofactor(self, row_to_ignore: int, col_to_ignore: int) -> Matrix:
         """will return the cofactor of the matrix at the given position
 
@@ -747,7 +728,6 @@ class Matrix(Matrix__):
                     1].append(self._matrix[i][j])
         return Matrix(res)
 
-    @validate(None, int, int)
     def minor(self, row_to_ignore: int, col_to_ignore: int) -> Any:
         """will return the minor of the matrix at the given position (the determinant of the cofactor)
 
@@ -833,7 +813,6 @@ class Matrix(Matrix__):
 
         return operate_with
 
-    @validate(None, [[Vector, Matrix__], None, None])
     def concat(self, other: Union[Vector, Matrix]) -> Matrix:
         """will concatenate the matrix with the given matrix and return the result in a new matrix
 
@@ -857,7 +836,6 @@ class Matrix(Matrix__):
             res.append(self[i] + other[i])
         return Matrix(res)
 
-    @validate(None, int)
     def split(self, index: int) -> Tuple[Matrix, Matrix]:
         """will split the matrix into two matrices at the given index
 
@@ -960,7 +938,6 @@ class Matrix(Matrix__):
             arr += [self[row][col] for row in range(len(self))]
         return Vector(arr)
 
-    @validate(None, Vector)
     def solve(self, vec: Vector) -> Union[None, Vector, Span]:
         """will solve the matrix with the given vector and return the solution
 

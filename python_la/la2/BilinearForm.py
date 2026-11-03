@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Callable, Union
 from ..la1 import Complex, Vector, Field, Matrix, VectorSpace
-from danielutils import validate
 
 
 class BilinearForm:
@@ -18,11 +17,9 @@ class BilinearForm:
     #     pass
 
     # @staticmethod
-    # @validate(Matrix)
     # def from_matrix(mat: Matrix) -> BilinearForm:
     #     pass
 
-    @validate(None, Callable, VectorSpace)
     def __init__(self, func: Callable[[Vector, Vector], Union[int, float, Complex]], vector_space: VectorSpace) -> None:
         self.func = func
         self.vector_space = vector_space
@@ -50,7 +47,6 @@ class BilinearForm:
                 mat[i][j] = self.func(v, u)
         return Matrix(mat, field=self.vector_space.field)
 
-    @validate(None, Vector, Vector)
     def are_perpendicular(self, v1: Vector, v2: Vector) -> bool:
         """
         will return true if result of the bilinear form calculation is 0

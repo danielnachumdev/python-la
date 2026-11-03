@@ -5,12 +5,11 @@ from .Calculable import Calculable
 from ...la1 import Complex, Matrix, LinearMap
 from ...utils import string_splitter, check_foreach, python_la_is_number, split_if_any, sign, almost_equal, newton_raphson, pretty_str
 import math
-from danielutils import validate, isoneof
+from danielutils import isoneof
 from ...BaseClasses import PolynomialSimple____
 
 
 class PolynomialSimple__(Calculable, PolynomialSimple____):
-    @validate(None, Sequence, Sequence)
     def __init__(self, prefixes: Sequence, powers: Sequence) -> None:
         if len(prefixes) != len(powers):
             if len(prefixes) == 1 and len(powers) == 0 and prefixes[0] == 0:
@@ -111,7 +110,6 @@ class PolynomialSimple__(Calculable, PolynomialSimple____):
             res = res[1:]
         return pretty_str(res)
 
-    @validate(None, [int, float, Complex, PolynomialSimple____])
     def __add__(self, other) -> PolynomialSimple:
         if isoneof(other, [int, float, Complex]):
             if other == 0:
@@ -141,7 +139,6 @@ class PolynomialSimple__(Calculable, PolynomialSimple____):
     def __neg__(self) -> PolynomialSimple:
         return self*(-1)
 
-    @validate(None, [int, float, Complex, PolynomialSimple____, Matrix])
     def __mul__(self, other) -> Union[PolynomialSimple, Matrix]:
         if isoneof(other, [int, float, Complex]):
             return PolynomialSimple([other*pre for pre in self.prefixes], self.powers)
@@ -158,7 +155,6 @@ class PolynomialSimple__(Calculable, PolynomialSimple____):
     def __rmul__(self, other) -> PolynomialSimple:
         return self.__mul__(other)
 
-    @validate(None, [int, float, Complex, PolynomialSimple____])
     def __truediv__(self, other) -> Tuple[PolynomialSimple, PolynomialSimple]:
         if self == other:
             return PolynomialSimple([1], [0]), 0
@@ -193,7 +189,6 @@ class PolynomialSimple__(Calculable, PolynomialSimple____):
         elif isinstance(other, PolynomialSimple):
             pass
 
-    @validate(None, int)
     def __pow__(self, pow) -> PolynomialSimple:
         if isinstance(pow, int):
             if pow == 0:
@@ -205,7 +200,6 @@ class PolynomialSimple__(Calculable, PolynomialSimple____):
                 return 1/res
             return res
 
-    @validate(None, [int, float, Complex, PolynomialSimple____])
     def __eq__(self, other: PolynomialSimple) -> bool:
         if isoneof(other, [int, float, Complex]):
             if other == 0:
@@ -248,7 +242,6 @@ class PolynomialSimple__(Calculable, PolynomialSimple____):
 
 class PolynomialSimple(PolynomialSimple__):
     @staticmethod
-    @validate(str, str)
     def from_string(input: str, var: str = "x") -> PolynomialSimple:
         # FIXME "x-1" == "x+1" which is not good
         if var not in input:
@@ -392,13 +385,11 @@ class PolynomialSimple(PolynomialSimple__):
             return PolynomialSimple([0], [0])
         return PolynomialSimple([self.prefixes[i]/(self.powers[i]+1) for i in range(len(self.powers))], [self.powers[i] + 1 for i in range(len(self.powers))])
 
-    @validate(None, PolynomialSimple__)
     def solve(self, solve_for: PolynomialSimple = 0) -> list:
         if not isinstance(solve_for, PolynomialSimple):
             raise TypeError("solve_for must be a PolynomialSimple")
         return (self-solve_for).roots
 
-    @validate(None, PolynomialSimple__)
     def gcd_with(self, other: PolynomialSimple) -> PolynomialSimple:
         def intersection(lst1, lst2):
             return [value for value in set(lst1) if value in set(lst2)]
