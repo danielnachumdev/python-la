@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-la"
+version = "0.97.0"
+authors = [
+    { name = "danielnachumdev", email = "danielnachumdev@gmail.com" },
+]
+description = "Python linear algebra library"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+# Exact pin: 0.7.0 is the last line verified green with this suite that still
+# exports multi-arg `@validate`, `NotImplemented`, `abstractmethod`, and
+# `TestFactory` / `Test`. 0.7.7+ diverges (suite regressions); 0.7.8+ hard-
+# requires Windows/`screeninfo` at import; 0.8+ renamed validate.
+dependencies = [
+    "danielutils==0.7.0",
+]
+keywords = [
+    "python",
+    "linear algebra",
+    "vector",
+    "matrix",
+    "field",
+    "vector field",
+    "span",
+    "linear maps",
+    "bilinear form",
+    "inner product",
+    "linear transformation",
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: Unix",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+]
+
+[project.urls]
+Homepage = "https://github.com/danielnachumdev/python-la"
+"Bug Tracker" = "https://github.com/danielnachumdev/python-la/issues"
+
+[tool.setuptools.packages.find]
+include = ["python_la*"]
+exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
+
+[tool.setuptools.package-data]
+"python_la" = ["py.typed"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-xdist>=3.6",
+    "setuptools>=61.0",
+]
+
+# default-groups = [] so `uv sync` is runtime-only; CI uses `--group dev`.
+[tool.uv]
+default-groups = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test_*"]
+python_functions = ["test_*"]
+addopts = [
+    "-q",
+    "--strict-markers",
+    "--tb=short",
+    "--color=yes",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+]

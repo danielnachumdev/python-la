@@ -10,22 +10,24 @@ Implementation guide for coding agents changing **python-la**. Product pitch and
 | -------- | ------ |
 | What is this? | Python **linear algebra** library (course-shaped API: matrices, fields, maps, polynomials, IPS) |
 | Importable code | `python_la/` |
-| Toolchain | **setuptools** via [`setup.py`](setup.py) (no `pyproject.toml` / uv yet) |
-| Version | Hard-coded in `setup.py` (`VERSION`); also shown historically in older README titles — keep `setup.py` authoritative until a CD stamp lands |
-| Tests | `tests/` (plus nested `*/tests` under the package); **never delete** |
+| Toolchain | [uv](https://docs.astral.sh/uv/) + `pyproject.toml` / `uv.lock` |
+| Python | `>=3.11` (CI matrix **3.11, 3.12, 3.13**) |
+| Version | Seeded at **0.97.0** to match current PyPI; CD stamps `pyproject.toml` from GitHub Release tags thereafter |
+| Tests | `tests/` — pytest; **never delete** |
 | Secrets | Never commit `.pypirc`, API keys, tokens |
 
 ```text
 .
+├── .github/             # CODEOWNERS, dependabot.yml, thin CI/CD orchestrators
 ├── python_la/           # Importable package
 │   ├── la1/             # Fields, Vector, Matrix, Span, LinearMap, VectorSpace
 │   ├── la2/             # Calculable/polynomials, BilinearForm, InnerProduct*
 │   ├── utils/           # helpers + decorators
 │   ├── other/           # Graph, Permutation
 │   └── archive/         # Historical / unused — do not revive casually
-├── tests/               # Primary pytest-style suite
-├── setup.py             # Package metadata + install_requires
-├── MANIFEST.in
+├── tests/               # Primary pytest suite
+├── pyproject.toml
+├── uv.lock
 ├── README.md            # Marketing / user docs
 ├── LICENSE              # MIT
 └── AGENTS.md
@@ -33,30 +35,30 @@ Implementation guide for coding agents changing **python-la**. Product pitch and
 
 Default branch: **`main`**.
 
-Shared CI/CD (when thin workflows are present): [`danielnachumdev/actions`](https://github.com/danielnachumdev/actions) (`@latest`, `standards-ref: latest`). How to adopt: [`HOW-TO-USE.md`](https://github.com/danielnachumdev/actions/blob/v1/HOW-TO-USE.md). Prefer required checks **`CI / CI`** and **`Semver / Semver`** once wired. Thin CI may use `allow-empty: true` until the suite is a reliable gate.
+Shared CI/CD: [`danielnachumdev/actions`](https://github.com/danielnachumdev/actions) (this repo pins **`@latest`**). How to adopt: [`HOW-TO-USE.md`](https://github.com/danielnachumdev/actions/blob/v1/HOW-TO-USE.md). Prefer required checks **`CI / CI`** and **`Semver / Semver`**.
 
 ---
 
 ## Develop
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -e .
-pip install pytest          # if not already available via danielutils workflows
-pytest
-# or: python -m pytest
+uv sync                 # runtime only → .venv
+uv sync --group dev     # + pytest, …
+# or: uv sync --all-groups
 ```
+
+`tool.uv.default-groups` is empty — `uv sync` does **not** install `dev` by default. CI uses `uv sync --group dev`.
 
 | Task | Command |
 | ---- | ------- |
-| Import smoke | `python -c "import python_la; from python_la import Matrix, Vector"` |
-| Tests | `pytest` from repo root (discover `tests/` and package-local tests) |
+| Import smoke | `uv run python -c "import python_la; from python_la import Matrix, Vector"` |
+| Tests | `uv run pytest` |
 
 ### Dependencies
 
-- **Runtime:** `danielutils` (declared in `setup.py` `install_requires`)
-- Prefer keeping the public surface re-exported through `python_la/__init__.py` → `la1` / `la2` / `utils` star imports unless deliberately narrowing the API.
+- **Runtime:** `danielutils==0.7.0` — verified with this suite; still exports multi-arg `@validate`, `NotImplemented`, `abstractmethod`, and `TestFactory` / `Test`. Do not bump without re-running the full suite and (for ≥0.7.8) fixing Windows/`screeninfo` import, or (for ≥0.8) migrating off the old validate / TestFactory APIs.
+- **Dev group:** pytest, pytest-cov, pytest-xdist, setuptools
+- Prefer editing deps in `pyproject.toml` and regenerating with `uv lock` / `uv sync --group dev`
 
 ---
 
@@ -66,7 +68,7 @@ pytest
 - Keep math-facing APIs readable (method/property names that match course language: `kernel`, `characteristic_polynomial`, `to_orthonormal`, …).
 - Nested READMEs under `python_la/la1/`, `la2/`, etc. are **implementation inventories** for humans browsing the tree — do not duplicate full CI/agent process there; keep that here.
 - `python_la/archive/` is legacy; avoid new imports from it in production paths.
-- Do **not** migrate to uv/`pyproject.toml` in a drive-by docs PR; treat packaging modernization as its own change with tests and install proof.
+- Public surface is re-exported through `python_la/__init__.py` → `la1` / `la2` / `utils` star imports unless deliberately narrowing the API. `__version__` is `importlib.metadata.version("python-la")` (fallback `"0.0.0"` if not installed).
 
 ---
 
@@ -74,10 +76,22 @@ pytest
 
 1. Branch off `main`; open a PR into `main`.
 2. Attach **exactly one** semver label: `noBump` | `bumpPatch` | `bumpMinor` | `bumpMajor`.
-3. When CI exists: thin orchestrators calling `danielnachumdev/actions`; Dependabot PRs stay on `noBump`.
-4. Change shared CI/semver behavior in **`danielnachumdev/actions`**, not by re-vendoring here.
-5. PyPI releases today are **manual** via the setuptools package (`python-la` on PyPI). Do not invent a local `publish.py` / quickpub path unless the repo explicitly adds one. Prefer Trusted Publishing / semver-cd later if CD is adopted.
+3. **CI** — `…/ci.yml@latest` (tests) + `…/semver-ci.yml@latest` (validate label). Prefer **`CI / CI`** and **`Semver / Semver`**.
+4. **CD** — `…/semver-cd.yml@latest` after CI succeeds on `main`: bump → wheel → GitHub Release → floating `vMAJOR` → **PyPI** (`publish-pypi: true`), or skip on `noBump`.
+5. Version **source of truth** is GitHub Release tags. If none yet, CD seeds from `pyproject.toml` (**0.97.0** = current PyPI).
+6. Dependabot PRs stay on `noBump` (auto-merge workflow present).
+7. Change shared CI/semver behavior in **`danielnachumdev/actions`**, not by re-vendoring here.
 
-### Sensitive / ignored
+**PyPI:** shipped only via CD (Trusted Publishing OIDC preferred for repo + workflow `cd.yml`; optional repo secret `PYPI_API_TOKEN`). Thin CD must grant `id-token: write` and pass `PYPI_API_TOKEN` by name. There is no local `publish.py` / quickpub path.
 
-Do not commit: `.pypirc`, `.venv/`, `venv/`, `dist/`, `build/`, `*.egg-info/`, `__pycache__/`, API keys. Respect `.gitignore`.
+### Repo gates (already configured)
+
+- `.github/CODEOWNERS` — `@danielnachumdev`
+- Branch protection / ruleset: required **`CI / CI`** + **`Semver / Semver`**; code-owner reviews; no force-push to `main`
+- Private vulnerability reporting via GitHub Security Advisories
+
+---
+
+## Sensitive / ignored
+
+Do not commit: `.pypirc`, `.venv/`, `venv/`, `dist/`, `__pycache__/`, API keys, coverage HTML (`htmlcov/`). Track `uv.lock`. Respect `.gitignore`.
