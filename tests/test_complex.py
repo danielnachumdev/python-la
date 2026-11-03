@@ -2,6 +2,7 @@ import math
 
 from python_la.la1.Complex import Complex
 from python_la.la1.Complex import Complex as c
+from python_la.utils import almost_equal
 
 a = c(1, 1)
 b = c(1, 0)
@@ -62,6 +63,13 @@ def test___rtruediv__():
 def test___pow__():
     assert a ** 2 == a * a
     assert a ** 4 == a * a * a * a
+
+
+def test___rpow__():
+    assert 2 ** Complex(3, 0) == Complex(8, 0)
+    assert almost_equal((math.e ** Complex(0, math.pi)).real, -1)
+    assert almost_equal((math.e ** Complex(0, math.pi)).imag, 0)
+    assert 4 ** Complex(0.5, 0) == Complex(2, 0)
 
 
 def test_conjugate():

@@ -461,7 +461,22 @@ class Matrix(Matrix__):
 
     @property
     def adjugate(self) -> Matrix:
-        raise NotImplementedError
+        """Classical adjugate (transpose of the cofactor matrix).
+
+        Raises:
+            ValueError: if the matrix is not square
+        """
+        if not self.is_square:
+            raise ValueError("Matrix must be square")
+        cofactors: list[list[Any]] = []
+        for i in range(self._rows):
+            row: list[Any] = []
+            for j in range(self._cols):
+                sign = 1 if (i + j) % 2 == 0 else -1
+                row.append(sign * self.minor(i, j))
+            cofactors.append(row)
+        return Matrix(cofactors, self.field).transpose()
+
     @property
     def row_space(self) -> list[Vector]:
         return [Vector(r) for r in self]
@@ -483,7 +498,6 @@ class Matrix(Matrix__):
         Returns:
             int: the result
         """
-        # TODO fix rank calculation this is not correct
         tmp = self.gaussian_elimination()
         rank = 0
         for i in range(min(len(tmp), len(tmp[0]))):
@@ -491,10 +505,6 @@ class Matrix(Matrix__):
                 if v != tmp.field.zero:
                     rank += 1
                     break
-
-        # for i in tmp.__matrix:
-        #     if not all([i == 0 for i in i]):
-        #         rank += 1
         return rank
 
     @property
@@ -593,8 +603,18 @@ class Matrix(Matrix__):
 
     @property
     def is_nilpotent(self) -> bool:
-        # TODO implement nilpotency check
-        pass
+        """True iff some positive power of this square matrix is the zero matrix.
+
+        For an n×n matrix, equivalent to ``A**n`` being zero.
+        """
+        if not self.is_square:
+            return False
+        n = len(self)
+        zero = Matrix(
+            [[self.field.zero for _ in range(n)] for _ in range(n)],
+            self.field,
+        )
+        return (self ** n) == zero
 
     @property
     def eigenvalues(self) -> list[Any]:
