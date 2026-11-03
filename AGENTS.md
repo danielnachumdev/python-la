@@ -56,7 +56,7 @@ uv sync --group dev     # + pytest, …
 
 ### Dependencies
 
-- **Runtime:** `danielutils==0.7.0` — verified with this suite; still exports multi-arg `@validate`, `NotImplemented`, `abstractmethod`, and `TestFactory` / `Test`. Do not bump without re-running the full suite and (for ≥0.7.8) fixing Windows/`screeninfo` import, or (for ≥0.8) migrating off the old validate / TestFactory APIs.
+- **Runtime:** `danielutils>=1.2.1` — use annotation `@validate`, `abc.abstractmethod`, and pytest (not legacy multi-arg validate / TestFactory / `@NotImplemented`)
 - **Dev group:** pytest, pytest-cov, pytest-xdist, setuptools
 - Prefer editing deps in `pyproject.toml` and regenerating with `uv lock` / `uv sync --group dev`
 

@@ -5,12 +5,11 @@ from .Vector import Vector
 from .Field import Field
 from .VectorSpace import VectorSpace
 from ..utils import are_operators_implemnted, concat_horizontally, alloneof
-from danielutils import validate, isoneof, areoneof
+from danielutils import areoneof, isoneof
 from ..BaseClasses import Span____
 
 
 class Span__(Span____):
-    @validate(None, [Sequence, lambda seq: areoneof(seq, [Vector])], Vector)
     def __init__(self, objects: list[Vector], offset: Vector = None) -> None:
         """initializes the span with the given vectors
 
@@ -49,7 +48,6 @@ class Span__(Span____):
             raise AttributeError(
                 "Not all required operators are implemented for the class of the objects")
 
-    @validate(None, bool)
     def __str__(self, raw: bool = False) -> str:
         """returns a string representation of the span
 
@@ -66,7 +64,6 @@ class Span__(Span____):
             return res
         return concat_horizontally(self.vectors, "\t")
 
-    @validate(None, [[Vector, Span____], None, None])
     def __add__(self, other: Union[Vector, Span]) -> Span:
         """returns the span of the vectors in the span plus the given vector or span
 
@@ -105,7 +102,6 @@ class Span__(Span____):
     #     res = set(self.vectors) - set(other.vectors)
     #     return Span(list(res))
 
-    @validate(None, int)
     def __getitem__(self, index: int) -> Vector:
         """returns the vector at the given index
 
@@ -137,7 +133,6 @@ class Span__(Span____):
         """
         return len(self.vectors)
 
-    @validate(None, Vector)
     def __contains__(self, vector: Vector) -> bool:
         """checks whether a vector is one of the original elements creating the span
 
@@ -171,7 +166,6 @@ class Span__(Span____):
 
 class Span(Span__):
     @staticmethod
-    @validate(Span__, Span__)
     def are_same_span(s1: Span, s2: Span) -> bool:
         """checks whether two spans are the same
 
@@ -203,7 +197,6 @@ class Span(Span__):
         return True
 
     @staticmethod
-    @validate(Field)
     def span_field(field: Field) -> Span:
         """returns a span of the field
 
@@ -260,7 +253,6 @@ class Span(Span__):
     # def is_orthonormal(self) -> bool:
     #     return self.toOrthonormal() == self
 
-    @validate(None, Vector)
     def remove(self, vec: Vector) -> None:
         """removes a vector from the span
 
@@ -276,7 +268,6 @@ class Span(Span__):
         if vec in self.vectors:
             self.vectors.remove(vec)
 
-    @validate(None, int)
     def remove_at(self, index: int) -> None:
         """removes the vector at the given index from the span
 
@@ -291,7 +282,6 @@ class Span(Span__):
             raise ValueError("index out of range")
         self.vectors.pop(index)
 
-    @validate(None, Vector)
     def contains(self, vector: Vector) -> bool:
         """checks whether there is a linear combinations of vectors in the span that equals the vector
 
@@ -329,7 +319,6 @@ class Span(Span__):
             result.append(current.normalize())
         return Span(result)
 
-    @validate(None, Vector)
     def projection_of(self, v: Vector) -> Vector:
         """returns the projection of a vector onto the span
 
@@ -347,7 +336,6 @@ class Span(Span__):
             res += v.projection_onto(w)
         return res
 
-    @validate(None, [[int, float], None, None], [[int, float], None, None])
     def random(self, min: Union[int, float] = -10, max: Union[int, float] = 10) -> Vector:
         """Creates a random vector from the span
 

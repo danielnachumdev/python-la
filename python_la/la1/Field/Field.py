@@ -1,16 +1,15 @@
 from __future__ import annotations
 from typing import Any, Callable
 from ...utils import are_operators_implemnted, almost_equal, areinstances
-from danielutils import validate, abstractmethod
 
 from ...BaseClasses import Field____
+from abc import ABC, abstractmethod
 
 
-class Field(Field____):
+class Field(Field____, ABC):
     """An interface class to create derived classes
     """
     @staticmethod
-    @validate(Field____, int)
     def is_field(field: Field, iterations: int = 100) -> bool:
         """will check if all of the field axioms hold, returns a probablistic answer!
 
@@ -86,7 +85,6 @@ class Field(Field____):
                 return False
         return True
 
-    @validate(None, None, None, None, int, int, bool)
     def __init__(self, name: Any, zero: Any, one: Any, degree: int = 1, modulu: int = 1, validate: bool = False) -> None:
         """Constructor for Field class
 
@@ -122,7 +120,6 @@ class Field(Field____):
         """
         return f"{self.name}{self.degree}%{self.modulu}"
 
-    @validate(None, Field____)
     def __eq__(self, other: Field) -> bool:
         return self.name == other.name and self.modulu == other.modulu and self.degree == other.degree and self.zero == other.zero and self.one == other.one
 
