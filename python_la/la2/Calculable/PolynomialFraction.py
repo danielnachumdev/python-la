@@ -106,7 +106,59 @@ class PolynomialFraction__(PolynomialFraction____):
 class PolynomialFraction(PolynomialFraction__):
     @staticmethod
     def from_string(string, var="x") -> PolynomialFraction:
-        raise NotImplementedError
+        """Parse ``num``, ``num/den``, or ``(num)/(den)`` into a fraction.
+
+        Bracketed products such as ``(x+1)*(x-1)`` are not supported; use
+        ``PolynomialSimple.from_string`` pieces via ``from_polynomials``.
+        """
+        if not isinstance(string, str) or not string.strip():
+            raise ValueError("string must be a non-empty str")
+        text = string.strip().replace(" ", "")
+        slash = PolynomialFraction._top_level_slash(text)
+        if slash is None:
+            return PolynomialFraction.from_polynomials(
+                PolynomialSimple.from_string(text, var),
+                PolynomialSimple([1], [0]),
+            )
+        numerator = PolynomialFraction._strip_outer_parens(text[:slash])
+        denominator = PolynomialFraction._strip_outer_parens(text[slash + 1:])
+        if not numerator or not denominator:
+            raise ValueError(f"invalid polynomial fraction: {string!r}")
+        return PolynomialFraction.from_polynomials(
+            PolynomialSimple.from_string(numerator, var),
+            PolynomialSimple.from_string(denominator, var),
+        )
+
+    @staticmethod
+    def _top_level_slash(text: str) -> int | None:
+        depth = 0
+        for i, ch in enumerate(text):
+            if ch in "([{":
+                depth += 1
+            elif ch in ")]}":
+                depth -= 1
+            elif ch == "/" and depth == 0:
+                return i
+        return None
+
+    @staticmethod
+    def _strip_outer_parens(text: str) -> str:
+        text = text.strip()
+        while len(text) >= 2 and text[0] == "(" and text[-1] == ")":
+            depth = 0
+            wraps = True
+            for i, ch in enumerate(text):
+                if ch == "(":
+                    depth += 1
+                elif ch == ")":
+                    depth -= 1
+                    if depth == 0 and i != len(text) - 1:
+                        wraps = False
+                        break
+            if not wraps:
+                break
+            text = text[1:-1].strip()
+        return text
 
     @staticmethod
     def from_polynomials(nominator: PolynomialSimple, denominator: PolynomialSimple) -> PolynomialFraction:
@@ -119,8 +171,8 @@ class PolynomialFraction(PolynomialFraction__):
     def destructure(self) -> Tuple[PolynomialSimple, PolynomialSimple]:
         return self.nominator, self.denominator
 
-    def simplify() -> PolynomialFraction:
-        raise NotImplementedError
+    def simplify(self) -> PolynomialFraction:
+        raise NotImplementedError("PolynomialFraction.simplify is not implemented")
 __all__ = [
     "PolynomialFraction"
 ]

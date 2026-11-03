@@ -153,8 +153,17 @@ class Complex(Complex____):
                 res *= self
             return fix_negativ(res)
 
-    def __rpow__(self, other):
-        raise NotImplementedError
+    def __rpow__(self, other: Union[int, float, Complex]) -> Complex:
+        """Raise a real or complex base to this complex power via ``cmath``."""
+        if isinstance(other, Complex):
+            base = complex(other.real, other.imag)
+        elif isoneof(other, [int, float]):
+            base = complex(other, 0)
+        else:
+            return NotImplemented
+        result = base ** complex(self.real, self.imag)
+        return Complex(result.real, result.imag)
+
     @ property
     def conjugate(self):
         return Complex(self.real, -self.imag)
