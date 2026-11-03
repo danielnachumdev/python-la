@@ -4,12 +4,11 @@ from ..utils import almost_equal, areinstances
 from typing import Union, Any, Sequence
 from .Field import Field, RealField
 from .Complex import Complex
-from danielutils import validate, isoneof
+from danielutils import isoneof
 from ..BaseClasses import Vector____
 
 
 class Vector__(Vector____):
-    @validate(None, Sequence, Field)
     def __init__(self, values: list[Any], field: Field = None) -> None:
         """Initialize a vector with the given values and field
 
@@ -21,7 +20,6 @@ class Vector__(Vector____):
         # TODO add default field detection
         self.field = RealField(len(values)) if not field else field
 
-    @validate(None, bool)
     def __str__(self, raw: bool = False) -> str:
         """Return a string representation of the vector
 
@@ -46,7 +44,6 @@ class Vector__(Vector____):
             res += hs
         return res
 
-    @validate(None, Vector____)
     def __add__(self, other: Vector) -> Vector:
         """Add two vectors together
 
@@ -67,7 +64,6 @@ class Vector__(Vector____):
             raise ValueError("Vectors must have the same length")
         return Vector([self[i] + other[i] for i in range(len(self))], self.field)
 
-    @validate(None, Vector____)
     def __radd__(self, other: Vector) -> Vector:
         """Add a vector to a number
 
@@ -85,7 +81,6 @@ class Vector__(Vector____):
         except Exception as e:
             raise e
 
-    @validate(None, Vector____)
     def __sub__(self, other: Vector) -> Vector:
         """Subtract two vectors
 
@@ -106,7 +101,6 @@ class Vector__(Vector____):
             raise ValueError("Vectors must have the same length")
         return Vector([self.__values[i] - other.__values[i] for i in range(len(self.__values))], self.field)
 
-    @validate(None, Vector____)
     def __rsub__(self, other: Vector) -> Vector:
         """Subtract a vector from a number
 
@@ -132,7 +126,6 @@ class Vector__(Vector____):
         """
         return Vector([-self.__values[i] for i in range(len(self.__values))], self.field)
 
-    @validate(None, [[int, float, Complex], None, None])
     def __mul__(self, num: Union[int, float, Complex]) -> Vector:
         """ Multiply a vector by a number or a complex number
 
@@ -147,7 +140,6 @@ class Vector__(Vector____):
         """
         return Vector([num * self.__values[i] for i in range(len(self.__values))], self.field)
 
-    @validate(None, [[int, float, Complex], None, None])
     def __rmul__(self, num: Union[int, float, Complex]) -> Vector:
         """Multiply a vector by a number
 
@@ -165,7 +157,6 @@ class Vector__(Vector____):
         except Exception as e:
             raise e
 
-    @validate(None, [[int, float, Complex], None, None])
     def __truediv__(self, other: Union[int, float, Complex]) -> Vector:
         """Divide a vector by a number or a complex number
 
@@ -194,7 +185,6 @@ class Vector__(Vector____):
         """
         raise ValueError("cant divide by a vector")
 
-    @validate(None, int)
     def __getitem__(self, index: int) -> Any:
         """Get the value at a given index
 
@@ -212,7 +202,6 @@ class Vector__(Vector____):
             raise IndexError("Vector index out of range")
         return self.__values[index]
 
-    @validate(None, int, None)
     def __setitem__(self, index: int, value: Any) -> None:
         """Set the value at a given index
 
@@ -237,7 +226,6 @@ class Vector__(Vector____):
         """
         return iter(self.__values)
 
-    @validate(None, None, bool, bool)
     def __eq__(self, other: Vector, use_almost_equal: bool = True, check_field_equality: bool = True) -> bool:
         """Check if two vectors are equal
 
@@ -332,7 +320,6 @@ class Vector(Vector__):
         return Vector([f.random(min, max) if def_value is None else def_value for _ in range(size)])
 
     @staticmethod
-    @validate(int, Field, None)
     def from_size(size: int, field: Field, default_value: Any = None) -> Vector:
         """Create a vector of the given size with the given field and default value
 
@@ -349,7 +336,6 @@ class Vector(Vector__):
         return Vector([default_value for _ in range(size)], field.__class__(size, field.modulu))
 
     @ staticmethod
-    @validate(int, int, Field)
     def e(i: int, size: int, field: Field) -> Vector:
         """Create the ith element of the e vector of the given size and field
 
@@ -391,7 +377,6 @@ class Vector(Vector__):
         """
         return sum([x ** 2 for x in self]) ** 0.5
 
-    @validate(None, Vector__)
     def dot(self, other: Vector) -> Vector:
         """Get the dot product of two vectors
 

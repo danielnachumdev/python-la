@@ -1,8 +1,8 @@
 from __future__ import annotations
-from danielutils import validate, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Calculable:
+class Calculable(ABC):
     @staticmethod
     @abstractmethod
     def from_string(s: str) -> Calculable:
